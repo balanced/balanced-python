@@ -82,11 +82,10 @@ class Page(object):
         if start is not None and stop is not None:
             self.qs['offset'] = (self.offset or 0) + start
             self.qs['limit'] = stop - start
-        elif start is None and stop is not None:
+        elif stop is not None:
             self.qs['limit'] = stop
-        elif start is not None and stop is None:
+        elif start is not None:
             self.qs['offset'] = (self.offset or 0) + start
-
         return itertools.islice(self, start, stop)
 
     def __iter__(self):
