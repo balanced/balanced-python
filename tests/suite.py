@@ -239,3 +239,7 @@ class BasicUseCases(unittest.TestCase):
         the_exception = exc.exception
         self.assertEqual(the_exception.status_code, 400)
         print the_exception
+
+    def test_o_slice_syntax(self):
+        for d in balanced.Debit.query[:2]:
+            print d

@@ -1,6 +1,7 @@
 import itertools
 import re
 import logging
+import pprint
 import urlparse
 
 from utils import cached_property, url_encode, classproperty
@@ -58,9 +59,11 @@ class Page(object):
         if isinstance(item, slice):
             start, stop, step = item.start, item.stop, item.step
 
-            if all((isinstance(stop, int),
-                    isinstance(start, int),
-                    stop - start <= 0)):
+            # can't use all() here because it doesnt
+            # fail fast.
+            if (isinstance(stop, int) and
+                isinstance(start, int) and
+                stop - start <= 0):
                 return []
 
             elif any((isinstance(start, int) and start < 0,
@@ -83,7 +86,12 @@ class Page(object):
             self.qs['limit'] = stop
         elif start is not None and stop is None:
             self.qs['offset'] = (self.offset or 0) + start
-        return self
+
+        return itertools.islice(self, start, stop)
+
+    def __iter__(self):
+        for resource in itertools.chain(self.items, self.next_page):
+            yield resource
 
     @classmethod
     def from_uri_and_params(cls, uri, params):
@@ -176,10 +184,6 @@ class Page(object):
     def previous_page(self):
         uri = self._lazy_loaded['previous_uri']
         return self._fetch(uri)
-
-    def __iter__(self):
-        for resource in itertools.chain(self.items, self.next_page):
-            yield resource
 
 
 class Resource(object):
@@ -380,7 +384,7 @@ class Marketplace(Resource):
 
     @classproperty
     def my_marketplace(self):
-        return Merchant.query.one().marketplace
+        return Merchant.me.marketplace
 
     def create_buyer(self, email_address, credit_card, name=None, meta=None):
         meta = meta or {}
