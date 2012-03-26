@@ -241,5 +241,9 @@ class BasicUseCases(unittest.TestCase):
         print the_exception
 
     def test_o_slice_syntax(self):
-        for d in balanced.Debit.query[:2]:
-            print d
+        total_debit = balanced.Debit.query.count()
+        self.assertNotEqual(total_debit, 2)
+        sliced_debits = balanced.Debit.query[:2]
+        self.assertEqual(len(sliced_debits), 2)
+        for debit in sliced_debits:
+            self.assertIsInstance(debit, balanced.Debit)

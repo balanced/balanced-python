@@ -1,7 +1,6 @@
 import itertools
 import re
 import logging
-import pprint
 import urlparse
 
 from utils import cached_property, url_encode, classproperty
@@ -51,7 +50,6 @@ class MultipleResultsFound(Exception):
 class Page(object):
 
     def __init__(self, uri):
-        self._resource = _RESOURCES.from_uri(uri)
         self.uri = uri
         self.qs = {}
 
@@ -103,7 +101,8 @@ class Page(object):
         return cls(uri)
 
     def __repr__(self):
-        return '<Page{}{}>'.format(self._resource, self.qs)
+        _resource = _RESOURCES.from_uri(self.uri)
+        return '<Page{}{}>'.format(_resource, self.qs)
 
     def all(self):
         return list(self)
@@ -123,7 +122,7 @@ class Page(object):
     @cached_property
     def _lazy_loaded(self):
         page = self._fetch(self.uri)
-        response = self._resource.http_client.get(page.uri)
+        response = Resource.http_client.get(page.uri)
         return response.deserialized
 
     def _fetch(self, uri):
@@ -133,7 +132,9 @@ class Page(object):
 
     @property
     def items(self):
-        return (self._resource(**item) for item in self._lazy_loaded['items'])
+        for item in self._lazy_loaded['items']:
+            _resource = _RESOURCES.from_uri(item['uri'])
+            yield _resource(**item)
 
     @property
     def total(self):
@@ -141,7 +142,7 @@ class Page(object):
 
     def count(self):
         self.qs['offset'] = 0
-        self.qs['limit'] = 0
+        self.qs['limit'] = 1
         return self._fetch(self.uri).total
 
     @property
@@ -279,7 +280,7 @@ def make_constructor():
 
         setattr(class_instance.__class__, key, cached_property(closure))
 
-    def the_init(cls, **kwargs):
+    def the_init(self, **kwargs):
         # iterate through the schema that comes back
         for key, value in kwargs.iteritems():
             if is_subresource(value):
@@ -303,16 +304,16 @@ def make_constructor():
                         "Unknown resource '%s' for '%s'. Make sure it is "
                         "added in resources.py.", new_key, value)
                 else:
-                    make_property(cls, new_key, value, resource)
+                    make_property(self, new_key, value, resource)
 
-            setattr(cls, key, value)
+            setattr(self, key, value)
 
-        if not hasattr(cls, 'uri'):
-            if cls.RESOURCE['resides_under_marketplace']:
+        if not hasattr(self, 'uri'):
+            if self.RESOURCE['resides_under_marketplace']:
                 uri = '{}/{}'.format(
                     Marketplace.my_marketplace.uri,
-                    cls.RESOURCE['collection'])
-                cls.uri = uri
+                    self.RESOURCE['collection'])
+                self.uri = uri
 
     return the_init
 
@@ -419,6 +420,10 @@ class Debit(Resource):
             amount=amount,
             description=description
         ).save()
+
+
+class Transaction(Resource):
+    __metaclass__ = resource_base(collection='transactions')
 
 
 class Credit(Resource):
