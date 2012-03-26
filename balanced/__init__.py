@@ -7,7 +7,7 @@ from balanced.http_client import HTTPClient
 from balanced.resources import (
     Resource, Marketplace, Account, APIKey,
     Authorization, Credit, Debit, Refund,
-    Merchant)
+    Merchant, Transaction)
 
 
 __all__ = [
@@ -20,6 +20,7 @@ __all__ = [
     Debit.__name__,
     Refund.__name__,
     Merchant.__name__,
+    Transaction.__name__,
     ]
 
 http_client = HTTPClient()
