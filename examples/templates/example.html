@@ -1,0 +1,134 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h1>Create A Marketplace</h1>
+<div>
+  <form action="/marketplaces" method="post">
+    <label><input type="text" class="text" name="name"></label>
+    <label><input type="text" class="text" name="domain_url"></label>
+    <label><input type="text" class="text" name="support_email_address"></label>
+    <label><input type="text" class="text" name="support_phone_number"></label>
+    <label><input type="text" class="text" name="account[name]"></label>
+    <label><input type="text" class="text" name="account[email_address]"></label>
+  </form>
+</div>
+
+<table id="chargePermissionTable">
+  <tr>
+    <td>Email
+    <td><input type="text" class="text" id="email_address" value="{{ payment_details.payer_email_address }}">
+  </tr>
+</table>
+<a href="javascript:;" onclick="createChargePermission();">Create Charge Permission</a><br>
+<a href="javascript:;" onclick="findChargePermission();">Find Charge Permission</a><br>
+<pre id="find_charge_permission_results"></pre>
+
+<h1>Display charge permission iframe</h1>
+<table>
+  <tr>
+    <td>Charge permission id
+    <td><input type="text" class="text" id="charge_permission_id">
+  </tr>
+  <tr>
+    <td>Card holder name</td>
+    <td><input type="text" class="text" id="charge_permission_cardholder_name">
+  </tr>
+  <tr>
+    <td>server
+    <td><input type="text" class="text" id="charge_permission_server" value="{{ iframe_root_uri }}">
+  </tr>
+</table>
+<a href="javascript:;" onclick="deactivateChargePermission();">Deactivate Charge Permission</a><br>
+<a href="javascript:;" onclick="startChargePermissionIFrame();">Start Charge Permission IFrame</a><br>
+<div id="pound-pcp"></div>
+
+<h1>Create payment</h1>
+<table id="paymentsTable">
+  <tr>
+    <td>Payment Amount
+    <td><input type="text" class="text" id="amount" value="{{ payment_details.amount }}">
+  </tr>
+  <tr>
+    <td>Payer Fee</td>
+    <td><input type="text" class="text" id="payer_fee_amount" value="{{ payment_details.payer_fee_amount }}">
+  </tr>
+  <tr>
+    <td>Recipient Fee</td>
+    <td><input type="text" class="text" id="recipient_fee_amount" value="{{ payment_details.recipient_fee_amount }}">
+  </tr>
+  <tr>
+    <td>Payer Email</td>
+    <td><input type="text" class="text" id="payer_email_address" value="{{ payment_details.payer_email_address }}">
+  </tr>
+  <tr>
+    <td>Recipient Email</td>
+    <td><input type="text" class="text" id="recipient_email_address" value="{{ payment_details.recipient_email_address }}">
+  </tr>
+  <tr>
+    <td>Description</td>
+    <td><input type="text" class="text" id="description" value="{{ payment_details.description }}">
+  </tr>
+  <tr>
+    <td>Developer identifier</td>
+    <td><input type="text" class="text" id="developer_identifier" value="{{ payment_details.developer_identifier }}">
+  </tr>
+</table>
+
+<a href="javascript:;" onclick="createPayment();">Create Payment</a>
+
+<h1>Display payment iframe</h1>
+<table>
+  <tr>
+    <td>Payment id(s)</td>
+    <td><input type="text" class="text" id="payment_id">
+  </tr>
+  <tr>
+    <td>Card holder name</td>
+    <td><input type="text" class="text" id="cardholder_name">
+  </tr>
+  <tr>
+    <td>server</td>
+    <td><input type="text" class="text" id="server" value="{{ iframe_root_uri }}">
+  </tr>
+</table>
+<a href="javascript:;" onclick="startIFrame();">Start Payment IFrame</a>
+&nbsp;
+<a href="javascript:;" onclick="launchLightbox();">Launch Lightbox</a>
+<div id="pound-root"></div>
+<h1 id="paymentComplete" style="display:none;color:green;">
+  Payment Complete
+</h1>
+<h1>Create User</h1>
+<table id="create_user_table">
+  <tr>
+    <td>First Name</td>
+    <td><input type="text" class="text" id="user_first_name">
+  </tr>
+  <tr>
+    <td>Last Name</td>
+    <td><input type="text" class="text" id="user_last_name">
+  </tr>
+  <tr>
+    <td>Email Address</td>
+    <td><input type="text" class="text" id="user_email_address">
+  </tr>
+</table>
+<a href="javascript:;" onclick="createUser();">Create User</a>
+
+<pre id="created_user_results"></pre>
+
+
+<h1>Payment Operations</h1>
+<table>
+  <tr>
+    <td>Payment id(s)
+    <td><input type="text" class="text" id="operating_payment_sid">
+  </tr>
+</table>
+<a href="javascript:;" onclick="authorizePayment();">Authorize Payment</a><br>
+<a href="javascript:;" onclick="escrowPayment();">Escrow Payment</a><br>
+<a href="javascript:;" onclick="releasePayment();">Release Payment</a><br>
+<a href="javascript:;" onclick="cancelPayment();">Cancel Payment</a><br>
+
+<pre id="operation_results"></pre>
+{% endblock %}

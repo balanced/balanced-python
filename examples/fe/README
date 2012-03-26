@@ -1,0 +1,7 @@
+Front-end submodule for simple marketplace.
+
+Backing server implemented by various example simple marketplaces:
+
+    https://github.com/PoundPay/poundpay-php
+    https://github.com/PoundPay/poundpay-python
+    https://github.com/PoundPay/poundpay-ruby

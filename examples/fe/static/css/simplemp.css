@@ -1,0 +1,13 @@
+body {
+  font-family: Arial, sans-serif;
+  font-size: 12px;
+}
+
+input {
+  font-size: 12px;
+  width: 300px;
+}
+
+td {
+  padding: 3px;
+}
