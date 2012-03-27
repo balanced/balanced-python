@@ -277,7 +277,7 @@ def make_constructor():
         def closure(_):
             return from_uri(resource, uri)
 
-        setattr(class_instance.__class__, key, classproperty(closure))
+        setattr(class_instance.__class__, key, cached_property(closure))
 
     def the_init(self, **kwargs):
         # iterate through the schema that comes back
