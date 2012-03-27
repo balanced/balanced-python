@@ -10,7 +10,6 @@ LOGGER = logging.getLogger(__name__)
 
 
 _RE_ALLOWED_LITERALS = re.compile(r'[\w]+$')
-_SENTINEL = object()
 
 
 class _ResourceRegistry(dict):
