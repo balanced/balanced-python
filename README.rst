@@ -77,7 +77,7 @@ Create a merchant (individual person)
     )
 
 
-Create a mercahant (Business)
+Create a merchant (Business)
 `````````````````````````````
 
 ::
