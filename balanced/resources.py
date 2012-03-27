@@ -272,12 +272,15 @@ class _LazyURIDescriptor(object):
 
     def __init__(self, key):
         self.key = key
+        self._cached = None
 
     def __get__(self, obj, objtype=None):
         if obj is None:
             return self
         uri = getattr(obj, self.key)
-        return from_uri(uri)
+        if not self._cached:
+            self._cached = from_uri(uri)
+        return self._cached
 
 
 def make_constructors():
@@ -288,10 +291,16 @@ def make_constructors():
 
     def the_new(cls, **kwargs):
         for key in kwargs.iterkeys():
-            if is_uri(key):
-                new_key = key.replace('_uri', '')
-                if not hasattr(cls, new_key):
-                    setattr(cls, new_key, _LazyURIDescriptor(key))
+            if not is_uri(key):
+                continue
+
+            new_key = key.replace('_uri', '')
+
+            if hasattr(cls, new_key):
+                continue
+
+            setattr(cls, new_key, _LazyURIDescriptor(key))
+
         return object.__new__(cls, **kwargs)
 
     def the_init(self, **kwargs):
