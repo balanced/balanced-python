@@ -13,6 +13,26 @@ SERIALIZERS = {
 app = bottle.Bottle()
 
 
+@app.get('/marketplaces/<mp_eid>/accounts/<ac_eid>')
+def marketplace_accounts(mp_eid, ac_eid):
+    bottle.response.content_type = (
+        bottle.request.headers.get('Accept', 'application/json'))
+    serializer = SERIALIZERS[bottle.response.content_type]
+    the_response = _responses.accounts.show(mp_eid, ac_eid)
+    bottle.response.body = serializer(the_response)
+    return bottle.response
+
+
+@app.get('/merchants')
+def merchants_index():
+    bottle.response.content_type = (
+        bottle.request.headers.get('Accept', 'application/json'))
+    serializer = SERIALIZERS[bottle.response.content_type]
+    the_response = _responses.merchants.index()
+    bottle.response.body = serializer(the_response)
+    return bottle.response
+
+
 @app.get('/marketplaces')
 def marketplaces_index():
     bottle.response.content_type = (
@@ -45,6 +65,18 @@ def marketplaces_create():
 @app.put('/marketplaces/<_eid>')
 def marketplaces_put(_eid):
     return marketplaces_create()
+
+
+@app.get('/marketplaces/<_eid>/transactions')
+def marketplaces_transactions(_eid):
+    bottle.response.content_type = (
+        bottle.request.headers.get('Accept', 'application/json'))
+    serializer = SERIALIZERS[bottle.response.content_type]
+    limit = int(bottle.request.query.limit or 10)
+    offset = int(bottle.request.query.offset or 0)
+    the_response = _responses.transactions.index(limit, offset)
+    bottle.response.body = serializer(the_response)
+    return bottle.response
 
 
 app.mount('/v1', app)

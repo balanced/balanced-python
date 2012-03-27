@@ -10,6 +10,7 @@ LOGGER = logging.getLogger(__name__)
 
 
 _RE_ALLOWED_LITERALS = re.compile(r'[\w]+$')
+_SENTINEL = object()
 
 
 class _ResourceRegistry(dict):
@@ -251,11 +252,12 @@ def is_collection(uri):
     return _RE_ALLOWED_LITERALS.match(end_identifier)
 
 
-def from_uri(cls, uri, **kwargs):
+def from_uri(uri, **kwargs):
+    resource = _RESOURCES.from_uri(uri)
     if is_collection(uri):
-        return cls.query.filter(**kwargs)
+        return resource.query.filter(**kwargs)
     else:
-        return cls.find(uri, **kwargs)
+        return resource.find(uri, **kwargs)
 
 
 def is_subresource(value):
@@ -266,18 +268,31 @@ def is_uri(key):
     return isinstance(key, basestring) and key.endswith('_uri')
 
 
-def make_constructor():
+class _LazyURIDescriptor(object):
+
+    def __init__(self, key):
+        self.key = key
+
+    def __get__(self, obj, objtype=None):
+        if obj is None:
+            return self
+        uri = getattr(obj, self.key)
+        return from_uri(uri)
+
+
+def make_constructors():
     """Makes an initializer constructor that decends
     recursively into all schema specified for sub resources.
 
     """
 
-    def make_property(class_instance, key, uri, resource):
-
-        def closure(_):
-            return from_uri(resource, uri)
-
-        setattr(class_instance.__class__, key, cached_property(closure))
+    def the_new(cls, **kwargs):
+        for key in kwargs.iterkeys():
+            if is_uri(key):
+                new_key = key.replace('_uri', '')
+                if not hasattr(cls, new_key):
+                    setattr(cls, new_key, _LazyURIDescriptor(key))
+        return object.__new__(cls, **kwargs)
 
     def the_init(self, **kwargs):
         # iterate through the schema that comes back
@@ -294,16 +309,6 @@ def make_constructor():
                         "based access", key)
                 else:
                     value = resource(**value)
-            elif is_uri(key):
-                new_key = key.replace('_uri', '')
-                try:
-                    resource = _RESOURCES.from_uri(value)
-                except KeyError:
-                    LOGGER.warning(
-                        "Unknown resource '%s' for '%s'. Make sure it is "
-                        "added in resources.py.", new_key, value)
-                else:
-                    make_property(self, new_key, value, resource)
 
             setattr(self, key, value)
 
@@ -314,7 +319,7 @@ def make_constructor():
                     self.RESOURCE['collection'])
                 self.uri = uri
 
-    return the_init
+    return the_init, the_new
 
 
 def resource_base(singular=None,
@@ -325,13 +330,17 @@ def resource_base(singular=None,
     class Base(type):
 
         def __new__(mcs, classname, bases, clsdict):
+
+            the_init, the_new = make_constructors()
+
             clsdict.update({
                 'RESOURCE': metadata or {
                     'singular': singular or classname.lower(),
                     'collection': collection,
                     'resides_under_marketplace': resides_under_marketplace,
                 },
-                '__init__': make_constructor(),
+                '__init__': the_init,
+                '__new__': the_new,
                 })
 
             the_class = type.__new__(mcs, classname, bases, clsdict)
