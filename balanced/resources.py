@@ -409,12 +409,12 @@ class Marketplace(Resource):
         collection='marketplaces',
         resides_under_marketplace=False)
 
-    def create_buyer(self, email_address, credit_card, name=None, meta=None):
+    def create_buyer(self, email_address, card, name=None, meta=None):
         meta = meta or {}
         return Account(
             uri=self.accounts_uri,
             email_address=email_address,
-            credit_card=credit_card,
+            card=card,
             name=name,
             meta=meta,
         ).save()
