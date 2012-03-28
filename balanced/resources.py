@@ -290,6 +290,7 @@ def make_constructors():
 
     def the_new(cls, **kwargs):
         for key in kwargs.iterkeys():
+
             if not is_uri(key):
                 continue
 
@@ -338,7 +339,6 @@ def resource_base(singular=None,
     class Base(type):
 
         def __new__(mcs, classname, bases, clsdict):
-
             the_init, the_new = make_constructors()
 
             clsdict.update({
@@ -394,14 +394,20 @@ class Account(Resource):
         ).save()
 
 
+class Merchant(Resource):
+    __metaclass__ = resource_base(
+        collection='merchants',
+        resides_under_marketplace=False)
+
+    @classproperty
+    def me(self):
+        return self.query.one()
+
+
 class Marketplace(Resource):
     __metaclass__ = resource_base(
         collection='marketplaces',
         resides_under_marketplace=False)
-
-    @classproperty
-    def my_marketplace(self):
-        return Merchant.me.marketplace
 
     def create_buyer(self, email_address, credit_card, name=None, meta=None):
         meta = meta or {}
@@ -424,6 +430,10 @@ class Marketplace(Resource):
             name=name,
             meta=meta,
         ).save()
+
+    @classproperty
+    def my_marketplace(self):
+        return self.query.one()
 
 
 class Debit(Resource):
@@ -466,13 +476,3 @@ class APIKey(Resource):
         singular='api_key',
         collection='api_keys',
         resides_under_marketplace=False)
-
-
-class Merchant(Resource):
-    __metaclass__ = resource_base(
-        collection='merchants',
-        resides_under_marketplace=False)
-
-    @classproperty
-    def me(self):
-        return Merchant.query.one()
