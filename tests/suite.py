@@ -47,7 +47,7 @@ class BasicUseCases(unittest.TestCase):
     def test_d_create_a_buyer(self):
         self.assertIsNotNone(balanced.config.api_key_secret)
         mp = self._find_marketplace()
-        buyer = mp.create_buyer('m@poundpay.com', credit_card={
+        buyer = mp.create_buyer('m@poundpay.com', card={
             "name": "khalkhalash onastick",
             "card_number": "4111111111111111",
             "expiration_month": 4,
