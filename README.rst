@@ -14,6 +14,16 @@ Authentication
     balanced.configure(key.secret)
 
 
+Create a marketplace
+````````````````````
+You have to create a marketplace before creating accounts to
+debit and credit.
+
+::
+
+    Marketplace().save()
+
+
 Create a buyer
 ``````````````
 
@@ -24,7 +34,7 @@ Create a buyer
     buyer = Account(
         name='Bill James',  # Optional
         email_address='will@gmail.com',
-        credit_card={
+        card={
             'name': 'William James',  # Optional
             'card_number': '4111111111111111',
             'expiration_month': 4,
@@ -43,11 +53,20 @@ Debit a buyer
 
 ::
 
-    buyer.debit(
+    debit = buyer.debit(
         20000,
         appears_on_statement_as='example.com'  # Default: marketplace domain
         description='Beat by Dr. Dre'  # Optional
     )
+
+
+Refund a debit
+``````````````
+
+::
+
+    debit.refund()
+
 
 
 Create a merchant (individual person)
@@ -59,7 +78,7 @@ Create a merchant (individual person)
 
     merchant = Account(
         name='Bill James',  # Optional
-        email_address='will@gmail.com',
+        email_address='bill@gmail.com',
         merchant={
             'type': 'person',
             'name': 'William James',
@@ -74,7 +93,7 @@ Create a merchant (individual person)
             'account_number': '28304871049',
             'bank_code': '121042882'  # Routing number in the US
         }
-    )
+    ).save()
 
 
 Create a merchant (Business)
