@@ -129,9 +129,19 @@ Create a merchant (Business)
         }
     )
 
+
 Credit a merchant
 `````````````````
 
 ::
 
     merchant.credit(19000, description='Beats by Dr. Dre')
+
+
+Known API Issues
+````````````````
+- Credit card and bank account information do not show up on transactions or accounts
+- Need to define ways to generate rejections -- card declined, merchant declined, etc. --
+cases in test environment
+- There is no date defined for when an authorization was voided
+- Need better documentation
