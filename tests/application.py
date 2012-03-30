@@ -40,7 +40,7 @@ def marketplaces_index():
     serializer = SERIALIZERS[bottle.response.content_type]
     limit = int(bottle.request.query.limit or 10)
     offset = int(bottle.request.query.offset or 0)
-    num = int(bottle.request.query.num or 2)
+    num = int(bottle.request.query.num or 1)
     pages = int(bottle.request.query.pages or 1)
     the_response = _responses.marketplaces.index(limit, offset, num, pages)
     bottle.response.body = serializer(the_response)
