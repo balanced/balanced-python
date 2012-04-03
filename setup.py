@@ -38,6 +38,7 @@ VERSION = _get_version()
 LONG_DESCRIPTION = _get_long_description()
 INSTALL_REQUIRES = [
     'requests==0.10.2',
+    'iso8601==0.1.4',
 ]
 
 

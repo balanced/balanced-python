@@ -3,6 +3,8 @@ import re
 import logging
 import urlparse
 
+import iso8601
+
 from utils import cached_property, url_encode, classproperty
 
 
@@ -263,6 +265,14 @@ def is_subresource(value):
     return isinstance(value, dict) and 'uri' in value
 
 
+def is_date(value):
+    return (
+        value and
+        isinstance(value, basestring) and
+        'Z' in value
+        )
+
+
 def is_uri(key):
     return isinstance(key, basestring) and key.endswith('_uri')
 
@@ -318,7 +328,8 @@ def make_constructors():
                         "based access", key)
                 else:
                     value = resource(**value)
-
+            elif key.endswith('_at') and is_date(value):
+                value = iso8601.parse_date(value)
             setattr(self, key, value)
 
         if not hasattr(self, 'uri'):

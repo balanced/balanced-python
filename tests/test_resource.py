@@ -1,4 +1,5 @@
 from __future__ import unicode_literals
+import datetime
 
 import balanced
 from .application import app
@@ -17,3 +18,10 @@ class TestResourceConstruction(WSGIServerTest):
                 t for t in balanced.Transaction.query
                 if 'TEST-MP778-071-6386/debits/W985-622-9570' in t.uri]
             self.assertEqual(txns[0].account_uri, txns[0].account.uri)
+
+    def test_implicit_conversion_to_datetime(self):
+        with self.start_server(app):
+            for txn in balanced.Transaction.query:
+                if isinstance(txn, balanced.Debit):
+                    break
+            self.assertIsInstance(txn.created_at, datetime.datetime)
