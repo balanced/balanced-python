@@ -7,6 +7,14 @@ import base64
 import hashlib
 import hmac
 import inspect
+try:
+    import simplejson as json
+except ImportError:
+    import json
+
+
+_JSON_ERROR_MSG = (
+    'Object of type {0} with value of {1} is not JSON serializable')
 
 
 def iter_multi_items(mapping):
@@ -211,3 +219,43 @@ def classproperty(func):
         func = classmethod(func)
 
     return ClassPropertyDescriptor(func)
+
+
+class BalancedJSONSerializer(object):
+
+    def __init__(self, explicit_none_check=False):
+        self.serialization_chain = []
+        self.explicit_none_check = explicit_none_check
+
+    def add(self, callable_serializer):
+        self.serialization_chain.append(callable_serializer)
+        return self
+
+    def __call__(self, serializable):
+        for serializer in self.serialization_chain:
+            result = serializer(serializable)
+            if ((not self.explicit_none_check and result) or
+                (self.explicit_none_check and result is not None)):
+                return result
+
+        error_msg = _JSON_ERROR_MSG.format(type(serializable),
+            repr(serializable))
+        raise TypeError(error_msg)
+
+
+def handle_datetime(serializable):
+    if hasattr(serializable, 'isoformat'):
+        # Serialize DateTime objects to RFC3339 protocol.
+        # http://www.ietf.org/rfc/rfc3339.txt
+        return serializable.isoformat() + 'Z'
+
+
+# should be a singleton
+json_serializer = BalancedJSONSerializer()
+json_serializer.add(handle_datetime)
+
+
+def to_json(*args, **kwargs):
+    return json.dumps(dict(*args, **kwargs),
+        use_decimal=True,
+        default=json_serializer)

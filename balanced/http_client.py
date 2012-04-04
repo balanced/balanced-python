@@ -5,10 +5,11 @@ import threading
 import requests
 
 from balanced.config import Config
+from balanced.utils import to_json
 
 
 serializers = {
-    'application/json': json.dumps
+    'application/json': to_json
     }
 
 
