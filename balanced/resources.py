@@ -333,11 +333,7 @@ def make_constructors():
             setattr(self, key, value)
 
         if not hasattr(self, 'uri'):
-            if self.RESOURCE['resides_under_marketplace']:
-                uri = '{}/{}'.format(
-                    Marketplace.my_marketplace.uri,
-                    self.RESOURCE['collection'])
-                self.uri = uri
+            self.uri = uri_discovery(self)
 
     return the_init, the_new
 
