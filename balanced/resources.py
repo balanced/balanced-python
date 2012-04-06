@@ -98,7 +98,9 @@ class Page(object):
         parsed_qs = urlparse.parse_qs(parsed_uri.query)
         if params and isinstance(params, (dict, )):
             parsed_qs.update(params)
-        uri = parsed_uri.path + '?' + url_encode(parsed_qs)
+        uri = parsed_uri.path
+        if parsed_qs:
+            uri = uri + '?' + url_encode(parsed_qs)
         return cls(uri)
 
     def __repr__(self):
