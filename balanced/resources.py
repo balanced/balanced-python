@@ -200,8 +200,8 @@ class Resource(object):
         return '%s(%s)' % (self.__class__.__name__, attrs)
 
     @classproperty
-    def query(self):
-        uri = uri_discovery(self)
+    def query(cls):
+        uri = uri_discovery(cls)
         return Page.from_uri_and_params(uri, params=None)
 
     @property
@@ -256,7 +256,7 @@ def is_collection(uri):
 def from_uri(uri, **kwargs):
     resource = _RESOURCES.from_uri(uri)
     if is_collection(uri):
-        return resource.query.filter(**kwargs)
+        return Page.from_uri_and_params(uri, params=kwargs)
     else:
         return resource.find(uri, **kwargs)
 
@@ -281,12 +281,15 @@ class _LazyURIDescriptor(object):
 
     def __init__(self, key):
         self.key = key
+        self._cached = None
 
     def __get__(self, obj, objtype=None):
         if obj is None:
             return self
         uri = getattr(obj, self.key)
-        return from_uri(uri)
+        if not self._cached:
+            self._cached = from_uri(uri)
+        return self._cached
 
 
 def make_constructors():
@@ -408,8 +411,8 @@ class Merchant(Resource):
         resides_under_marketplace=False)
 
     @classproperty
-    def me(self):
-        return self.query.one()
+    def me(cls):
+        return cls.query.one()
 
 
 class Marketplace(Resource):
@@ -440,8 +443,8 @@ class Marketplace(Resource):
         ).save()
 
     @classproperty
-    def my_marketplace(self):
-        return self.query.one()
+    def my_marketplace(cls):
+        return cls.query.one()
 
 
 class Debit(Resource):
