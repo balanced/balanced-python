@@ -142,9 +142,10 @@ class Page(object):
         return self._lazy_loaded['total']
 
     def count(self):
-        self.qs['offset'] = 0
-        self.qs['limit'] = 1
-        return self._fetch(self.uri).total
+        copied_dict = self.qs.copy()
+        copied_dict['offset'] = 0
+        copied_dict['limit'] = 1
+        return Page.from_uri_and_params(self.uri, copied_dict).total
 
     @property
     def offset(self):
