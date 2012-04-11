@@ -1,3 +1,4 @@
+import functools
 import itertools
 import re
 import logging
@@ -404,12 +405,29 @@ class Account(Resource):
         ).save()
 
 
+def cached_per_api_key(f):
+
+    _CACHE = {}
+
+    @functools.wraps(f)
+    def wrapped(*args, **kwargs):
+        from balanced import config
+        cached = _CACHE.get(config.api_key_secret)
+        if not cached:
+            cached = f(*args, **kwargs)
+            _CACHE[config.api_key_secret] = cached
+        return cached
+
+    return wrapped
+
+
 class Merchant(Resource):
     __metaclass__ = resource_base(
         collection='merchants',
         resides_under_marketplace=False)
 
     @classproperty
+    @cached_per_api_key
     def me(cls):
         return cls.query.one()
 
@@ -442,6 +460,7 @@ class Marketplace(Resource):
         ).save()
 
     @classproperty
+    @cached_per_api_key
     def my_marketplace(cls):
         return cls.query.one()
 
