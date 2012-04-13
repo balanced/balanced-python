@@ -285,15 +285,12 @@ class _LazyURIDescriptor(object):
 
     def __init__(self, key):
         self.key = key
-        self._cached = None
 
     def __get__(self, obj, objtype=None):
         if obj is None:
             return self
         uri = getattr(obj, self.key)
-        if not self._cached:
-            self._cached = from_uri(uri)
-        return self._cached
+        return from_uri(uri)
 
 
 def make_constructors():
