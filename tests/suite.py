@@ -247,3 +247,14 @@ class BasicUseCases(unittest.TestCase):
         self.assertEqual(len(sliced_debits), 2)
         for debit in sliced_debits:
             self.assertIsInstance(debit, balanced.Debit)
+
+    def test_p_test_merchant_cache_busting(self):
+        # cache it.
+        a_merchant = self.merchant.me
+        a_merchant.bank_account = {
+            'name': 'hald',
+            'bank_code': '1234567890',
+            }
+        self.assertTrue(hasattr(self.merchant.me, 'bank_account'))
+        a_merchant.save()
+        self.assertFalse(hasattr(a_merchant, 'bank_account'))

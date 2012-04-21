@@ -235,6 +235,7 @@ class Resource(object):
 
         resource = method(uri, data=instance_attributes)
         new_klass = self.__class__(**resource.deserialized)
+        self.__dict__.clear()
         self.__dict__.update(new_klass.__dict__)
         return self
 
@@ -402,20 +403,23 @@ class Account(Resource):
         ).save()
 
 
-def cached_per_api_key(f):
+def cached_per_api_key(bust_cache=False):
 
-    _CACHE = {}
+    def cacher(f):
 
-    @functools.wraps(f)
-    def wrapped(*args, **kwargs):
-        from balanced import config
-        cached = _CACHE.get(config.api_key_secret)
-        if not cached:
-            cached = f(*args, **kwargs)
-            _CACHE[config.api_key_secret] = cached
-        return cached
+        _CACHE = {}
 
-    return wrapped
+        @functools.wraps(f)
+        def wrapped(*args, **kwargs):
+            from balanced import config
+            cached = _CACHE.get(config.api_key_secret)
+            if bust_cache or not cached:
+                cached = f(*args, **kwargs)
+                _CACHE[config.api_key_secret] = cached
+            return cached
+
+        return wrapped
+    return cacher
 
 
 class Merchant(Resource):
@@ -424,9 +428,13 @@ class Merchant(Resource):
         resides_under_marketplace=False)
 
     @classproperty
-    @cached_per_api_key
+    @cached_per_api_key()
     def me(cls):
         return cls.query.one()
+
+    @cached_per_api_key(bust_cache=True)
+    def save(self):
+        return super(Merchant, self).save()
 
 
 class Marketplace(Resource):
@@ -457,9 +465,13 @@ class Marketplace(Resource):
         ).save()
 
     @classproperty
-    @cached_per_api_key
+    @cached_per_api_key()
     def my_marketplace(cls):
         return cls.query.one()
+
+    @cached_per_api_key(bust_cache=True)
+    def save(self):
+        return super(Marketplace, self).save()
 
 
 class Debit(Resource):
