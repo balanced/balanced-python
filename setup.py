@@ -33,13 +33,33 @@ def _get_long_description():
     finally:
         fo.close()
 
+
+def parse_requirements(file_name):
+    requirements = []
+    for line in open(file_name, 'r').read().split('\n'):
+        if re.match(r'(\s*#)|(\s*$)', line):
+            continue
+        if re.match(r'\s*-e\s+', line):
+            requirements.append(re.sub(r'\s*-e\s+.*#egg=(.*)$', r'\1', line))
+        elif re.match(r'\s*-f\s+', line):
+            pass
+        else:
+            requirements.append(line)
+
+    return requirements
+
+
+def parse_dependency_links(file_name):
+    dependency_links = []
+    for line in open(file_name, 'r').read().split('\n'):
+        if re.match(r'\s*-[ef]\s+', line):
+            dependency_links.append(re.sub(r'\s*-[ef]\s+', '', line))
+
+    return dependency_links
+
 PATH_TO_FILE = os.path.dirname(__file__)
 VERSION = _get_version()
 LONG_DESCRIPTION = _get_long_description()
-INSTALL_REQUIRES = [
-    'requests==0.10.2',
-    'iso8601==0.1.4',
-]
 
 
 setup(
@@ -53,7 +73,8 @@ setup(
     long_description=LONG_DESCRIPTION,
     packages=['balanced'],
     test_suite='nose.collector',
-    install_requires=INSTALL_REQUIRES,
+    install_requires=parse_requirements('requirements.txt'),
+    dependency_links=parse_dependency_links('requirements.txt'),
     classifiers=[
         'Intended Audience :: Developers',
         'License :: OSI Approved :: BSD License',
