@@ -6,6 +6,29 @@ import requests
 import balanced
 
 
+TEST_CARDS = {
+    'visa': [
+        '4112344112344113',
+        '4110144110144115',
+        '4114360123456785',
+        '4061724061724061',
+    ],
+    'mastercard': [
+        '5111005111051128'
+        '5112345112345114'
+        '5115915115915118'
+        '5116601234567894'
+    ],
+    'amex': [
+        '371144371144376',
+        '341134113411347',
+    ],
+    'discover': [
+        '6011016011016011',
+        '6559906559906557',
+    ]}
+
+
 class BasicUseCases(unittest.TestCase):
 
     @classmethod
@@ -49,8 +72,8 @@ class BasicUseCases(unittest.TestCase):
         mp = self._find_marketplace()
         buyer = mp.create_buyer('m@poundpay.com', card={
             "name": "khalkhalash onastick",
-            "card_number": "4111111111111111",
-            "expiration_month": 4,
+            "card_number": TEST_CARDS['visa'][0],  #"4111111111111111",
+            "expiration_month": 5,
             "expiration_year": 2014,
             "security_code": "807",
             "street_address": "167 West 74th Street",
@@ -77,6 +100,8 @@ class BasicUseCases(unittest.TestCase):
         if not owner:
             for account in accounts:
                 if account.email_address == 'support@example.com':
+                    continue
+                if 'merchant' in account.roles and role == 'buyer':
                     continue
                 break
             accounts = [account]
@@ -192,8 +217,9 @@ class BasicUseCases(unittest.TestCase):
             })
         the_exception = exc.exception
         self.assertEqual(the_exception.status_code, 409)
-        self.assertIn('mahmoud@poundpay.com already exists',
-                      the_exception.description)
+        self.assertIn(
+            "Account with email address 'mahmoud@poundpay.com' already exists",
+            the_exception.description)
 
     def test_k_get_business_merchant_for_crediting(self):
         buyer = self._find_account('buyer')
@@ -252,8 +278,9 @@ class BasicUseCases(unittest.TestCase):
         # cache it.
         a_merchant = self.merchant.me
         a_merchant.bank_account = {
+            'account_number': '112233a',
             'name': 'hald',
-            'bank_code': '1234567890',
+            'bank_code': '121042882',
             }
         self.assertTrue(hasattr(self.merchant.me, 'bank_account'))
         a_merchant.save()
