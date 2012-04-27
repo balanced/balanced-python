@@ -67,6 +67,16 @@ def marketplaces_put(_eid):
     return marketplaces_create()
 
 
+@app.post('/api_keys')
+def api_keys():
+    bottle.response.status = 302
+    bottle.response.content_type = (
+        bottle.request.headers.get('Accept', 'application/json'))
+    bottle.response.set_header('Location', '/v1/your-mom')
+    bottle.response.body = json.dumps('')
+    return bottle.response
+
+
 @app.get('/marketplaces/<_eid>/transactions')
 def marketplaces_transactions(_eid):
     bottle.response.content_type = (

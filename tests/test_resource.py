@@ -25,3 +25,15 @@ class TestResourceConstruction(WSGIServerTest):
                 if isinstance(txn, balanced.Debit):
                     break
             self.assertIsInstance(txn.created_at, datetime.datetime)
+
+    def test_redirects(self):
+        with self.start_server(app):
+            with self.assertRaises(balanced.Redirection) as exc:
+                key = balanced.APIKey().save()
+            exception = exc.exception
+            self.assertEqual(exception.response.status_code, 302)
+            self.assertEqual(
+                exception.response.headers['location'],
+                '/v1/your-mom'
+                )
+

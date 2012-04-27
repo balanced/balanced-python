@@ -3,6 +3,7 @@ import os
 import threading
 
 import requests
+from requests.models import REDIRECT_STATI
 
 from balanced.config import Config
 from balanced.utils import to_json
@@ -18,6 +19,10 @@ deserializers = {
     }
 
 
+class Redirection(requests.HTTPError):
+    pass
+
+
 def wrap_raise_for_status(http_client):
 
     def wrapper(response_instance):
@@ -26,8 +31,14 @@ def wrap_raise_for_status(http_client):
 
         def wrapped():
             try:
-                raise_for_status()
-            except requests.HTTPError:
+                raise_for_status(allow_redirects=False)
+            except requests.HTTPError, exc:
+
+                if exc.response.status_code in REDIRECT_STATI:
+                    redirection = Redirection('%s' % exc)
+                    redirection.response = exc.response
+                    raise redirection
+
                 deserialized = http_client.deserialize(
                     response_instance
                     )
@@ -79,9 +90,9 @@ def munge_request(http_op):
                 fixed_up_body[key] = prepend_version(client.config, value)
         request_body.update(fixed_up_body)
         kwargs['data'] = request_body
-
         # TODO: merge config dictionaries if it exists.
         kwargs['config'] = client.config.requests.copy()
+        kwargs['allow_redirects'] = False
         kwargs['hooks'] = {
             'response': wrap_raise_for_status(client)
             }
