@@ -404,18 +404,14 @@ class Account(Resource):
 
 
 def cached_per_api_key(bust_cache=False):
-
     def cacher(f):
-
-        _CACHE = {}
-
         @functools.wraps(f)
         def wrapped(*args, **kwargs):
-            from balanced import config
-            cached = _CACHE.get(config.api_key_secret)
+            from balanced import config, CACHE
+            cached = CACHE.get(config.api_key_secret)
             if bust_cache or not cached:
                 cached = f(*args, **kwargs)
-                _CACHE[config.api_key_secret] = cached
+                CACHE[config.api_key_secret] = cached
             return cached
 
         return wrapped

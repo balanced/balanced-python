@@ -1,4 +1,4 @@
-__version__ = '0.7.2'
+__version__ = '0.7.3'
 
 import contextlib
 
@@ -26,6 +26,13 @@ __all__ = [
 
 http_client = HTTPClient()
 config = http_client.config
+
+
+CACHE = dict()
+
+
+def bust_cache():
+    CACHE.clear()
 
 
 def configure(api_key_secret):

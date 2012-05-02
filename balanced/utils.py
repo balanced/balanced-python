@@ -7,6 +7,7 @@ import base64
 import hashlib
 import hmac
 import inspect
+
 try:
     import simplejson as json
 except ImportError:
