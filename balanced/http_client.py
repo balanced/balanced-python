@@ -19,6 +19,10 @@ deserializers = {
     }
 
 
+REDIRECT_STATI = list(REDIRECT_STATI)
+REDIRECT_STATI.append(300)
+
+
 class Redirection(requests.HTTPError):
     pass
 
