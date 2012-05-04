@@ -36,4 +36,3 @@ class TestResourceConstruction(WSGIServerTest):
                 exception.response.headers['location'],
                 '/v1/your-mom'
                 )
-

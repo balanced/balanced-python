@@ -371,27 +371,27 @@ class Account(Resource):
     __metaclass__ = resource_base(collection='accounts')
 
     def debit(self, amount=None, appears_on_statement_as=None,
-              authorization_uri=None, meta=None, description=None):
-        if not any((amount, authorization_uri)):
-            raise Exception('Must have an amount or authorization uri')
+              hold_uri=None, meta=None, description=None):
+        if not any((amount, hold_uri)):
+            raise Exception('Must have an amount or hold uri')
 
         meta = meta or {}
         return Debit(
             uri=self.debits_uri,
             amount=amount,
             appears_on_statement_as=appears_on_statement_as,
-            authorization_uri=authorization_uri,
+            hold_uri=hold_uri,
             meta=meta,
             description=description,
         ).save()
 
-    def authorize(self, amount, meta=None):
+    def hold(self, amount, meta=None):
         meta = meta or {}
-        return Authorization(
-            uri=self.authorizations_uri,
+        return Hold(
+            uri=self.holds_uri,
             amount=amount,
             meta=meta
-        ).save()
+            ).save()
 
     def credit(self, amount, description=None, meta=None):
         meta = meta or {}
@@ -400,7 +400,7 @@ class Account(Resource):
             amount=amount,
             meta=meta,
             description=description,
-        ).save()
+            ).save()
 
 
 def cached_per_api_key(bust_cache=False):
@@ -494,15 +494,15 @@ class Refund(Resource):
     __metaclass__ = resource_base(collection='refunds')
 
 
-class Authorization(Resource):
-    __metaclass__ = resource_base(collection='authorizations')
+class Hold(Resource):
+    __metaclass__ = resource_base(collection='holds')
 
     def void(self):
         self.is_void = True
         self.save()
 
     def capture(self, **kwargs):
-        return self.account.debit(authorization_uri=self.uri, **kwargs)
+        return self.account.debit(hold_uri=self.uri, **kwargs)
 
 
 class APIKey(Resource):
