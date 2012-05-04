@@ -9,7 +9,7 @@
           "buyer"
         ], 
         "created_at": "2012-03-27T11:11:34.368584Z", 
-        "authorizations_uri": "/v1/marketplaces/TEST-MP778-071-6386/accounts/AC988-845-0622/authorizations", 
+        "holds_uri": "/v1/marketplaces/TEST-MP778-071-6386/accounts/AC988-845-0622/holds", 
         "uri": "/v1/marketplaces/TEST-MP778-071-6386/accounts/AC988-845-0622", 
         "refunds_uri": "/v1/marketplaces/TEST-MP778-071-6386/accounts/AC988-845-0622/refunds", 
         "meta": {}, 
@@ -31,10 +31,10 @@
         "created_at": "2012-03-27T11:11:34.413653Z", 
         "is_void": false, 
         "expires_at": "2012-04-03T18:11:34.409482Z", 
-        "uri": "/v1/marketplaces/TEST-MP778-071-6386/debits/W181-120-0761/authorizations/AU352-452-3508", 
+        "uri": "/v1/marketplaces/TEST-MP778-071-6386/debits/W181-120-0761/holds/HL352-452-3508", 
         "amount": 5868, 
         "meta": {}, 
-        "debits_uri": "/v1/marketplaces/TEST-MP778-071-6386/authorizations/AU352-452-3508/debits", 
+        "debits_uri": "/v1/marketplaces/TEST-MP778-071-6386/holds/HL352-452-3508/debits", 
         "account_uri": "/v1/marketplaces/TEST-MP778-071-6386/accounts/AC988-845-0622"
       }
     }, 
@@ -47,7 +47,7 @@
           "buyer"
         ], 
         "created_at": "2012-03-27T11:11:34.751693Z", 
-        "authorizations_uri": "/v1/marketplaces/TEST-MP778-071-6386/accounts/AC812-716-3408/authorizations", 
+        "holds_uri": "/v1/marketplaces/TEST-MP778-071-6386/accounts/AC812-716-3408/holds", 
         "uri": "/v1/marketplaces/TEST-MP778-071-6386/accounts/AC812-716-3408", 
         "refunds_uri": "/v1/marketplaces/TEST-MP778-071-6386/accounts/AC812-716-3408/refunds", 
         "meta": {}, 
@@ -69,7 +69,7 @@
           "buyer"
         ], 
         "created_at": "2012-03-27T11:11:34.574993Z", 
-        "authorizations_uri": "/v1/marketplaces/TEST-MP778-071-6386/accounts/AC737-627-5712/authorizations", 
+        "holds_uri": "/v1/marketplaces/TEST-MP778-071-6386/accounts/AC737-627-5712/holds", 
         "uri": "/v1/marketplaces/TEST-MP778-071-6386/accounts/AC737-627-5712", 
         "refunds_uri": "/v1/marketplaces/TEST-MP778-071-6386/accounts/AC737-627-5712/refunds", 
         "meta": {}, 
@@ -91,10 +91,10 @@
         "created_at": "2012-03-27T11:11:34.617509Z", 
         "is_void": false, 
         "expires_at": "2012-04-03T18:11:34.613124Z", 
-        "uri": "/v1/marketplaces/TEST-MP778-071-6386/debits/W985-622-9570/authorizations/AU299-190-9129", 
+        "uri": "/v1/marketplaces/TEST-MP778-071-6386/debits/W985-622-9570/holds/HL299-190-9129", 
         "amount": 2930, 
         "meta": {}, 
-        "debits_uri": "/v1/marketplaces/TEST-MP778-071-6386/authorizations/AU299-190-9129/debits", 
+        "debits_uri": "/v1/marketplaces/TEST-MP778-071-6386/holds/HL299-190-9129/debits", 
         "account_uri": "/v1/marketplaces/TEST-MP778-071-6386/accounts/AC737-627-5712"
       }
     }, 
@@ -104,10 +104,10 @@
       "created_at": "2012-03-27T11:11:34.151807Z", 
       "is_void": false, 
       "expires_at": "2012-04-03T18:11:34.145562Z", 
-      "uri": "/v1/marketplaces/TEST-MP778-071-6386/debits/W366-099-0509/authorizations/AU995-212-1155", 
+      "uri": "/v1/marketplaces/TEST-MP778-071-6386/debits/W366-099-0509/holds/HL995-212-1155", 
       "amount": 330, 
       "meta": {}, 
-      "debits_uri": "/v1/marketplaces/TEST-MP778-071-6386/authorizations/AU995-212-1155/debits", 
+      "debits_uri": "/v1/marketplaces/TEST-MP778-071-6386/holds/HL995-212-1155/debits", 
       "account_uri": "/v1/marketplaces/TEST-MP778-071-6386/accounts/AC435-398-8011"
     }, 
     {
@@ -119,7 +119,7 @@
           "buyer"
         ], 
         "created_at": "2012-03-27T11:11:34.909828Z", 
-        "authorizations_uri": "/v1/marketplaces/TEST-MP778-071-6386/accounts/AC767-701-1063/authorizations", 
+        "holds_uri": "/v1/marketplaces/TEST-MP778-071-6386/accounts/AC767-701-1063/holds", 
         "uri": "/v1/marketplaces/TEST-MP778-071-6386/accounts/AC767-701-1063", 
         "refunds_uri": "/v1/marketplaces/TEST-MP778-071-6386/accounts/AC767-701-1063/refunds", 
         "meta": {}, 
@@ -139,10 +139,10 @@
       "created_at": "2012-03-27T11:11:34.236943Z", 
       "is_void": false, 
       "expires_at": "2012-04-03T18:11:34.232401Z", 
-      "uri": "/v1/marketplaces/TEST-MP778-071-6386/debits/W563-141-3004/authorizations/AU195-571-1604", 
+      "uri": "/v1/marketplaces/TEST-MP778-071-6386/debits/W563-141-3004/holds/HL195-571-1604", 
       "amount": 4674, 
       "meta": {}, 
-      "debits_uri": "/v1/marketplaces/TEST-MP778-071-6386/authorizations/AU195-571-1604/debits", 
+      "debits_uri": "/v1/marketplaces/TEST-MP778-071-6386/holds/HL195-571-1604/debits", 
       "account_uri": "/v1/marketplaces/TEST-MP778-071-6386/accounts/AC435-398-8011"
     }, 
     {
@@ -154,7 +154,7 @@
           "buyer"
         ], 
         "created_at": "2012-03-27T11:11:35.067431Z", 
-        "authorizations_uri": "/v1/marketplaces/TEST-MP778-071-6386/accounts/AC360-287-8313/authorizations", 
+        "holds_uri": "/v1/marketplaces/TEST-MP778-071-6386/accounts/AC360-287-8313/holds", 
         "uri": "/v1/marketplaces/TEST-MP778-071-6386/accounts/AC360-287-8313", 
         "refunds_uri": "/v1/marketplaces/TEST-MP778-071-6386/accounts/AC360-287-8313/refunds", 
         "meta": {}, 

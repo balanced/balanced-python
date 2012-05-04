@@ -49,4 +49,3 @@ class TestClient(unittest.TestCase):
         with balanced.key_switcher('new_key'):
             self.assertEqual(the_config.api_key_secret, 'new_key')
         self.assertEqual(the_config.api_key_secret, current_key)
-

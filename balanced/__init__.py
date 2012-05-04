@@ -1,4 +1,4 @@
-__version__ = '0.7.4'
+__version__ = '0.8.0'
 
 import contextlib
 
@@ -6,7 +6,7 @@ import contextlib
 from balanced.http_client import HTTPClient, Redirection
 from balanced.resources import (
     Resource, Marketplace, Account, APIKey,
-    Authorization, Credit, Debit, Refund,
+    Hold, Credit, Debit, Refund,
     Merchant, Transaction)
 
 
@@ -15,7 +15,7 @@ __all__ = [
     Marketplace.__name__,
     Account.__name__,
     APIKey.__name__,
-    Authorization.__name__,
+    Hold.__name__,
     Credit.__name__,
     Debit.__name__,
     Refund.__name__,

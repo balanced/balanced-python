@@ -8,7 +8,7 @@
         "domain_url": "http://www.balancedpayments.com",
         "name": "Planet Profit",
         "owner_account_uri": "/v1/marketplaces/TEST-MP318-823-1966/accounts/AC360-823-8847",
-        "authorizations_uri": "/v1/marketplaces/TEST-MP318-823-1966/authorizations",
+        "holds_uri": "/v1/marketplaces/TEST-MP318-823-1966/holds",
         "support_email_address": "marshall@poundpay.com",
         "uri": "/v1/marketplaces/TEST-MP318-823-1966",
         "escrow_balance": -743778,
