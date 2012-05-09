@@ -515,6 +515,52 @@ class APIKey(Resource):
 class Card(Resource):
     __meta_class = resource_base(collection='cards')
 
+    def debit(self, amount=None, appears_on_statement_as=None,
+              hold_uri=None, meta=None, description=None):
+        if not any((amount, hold_uri)):
+            raise Exception('Must have an amount or hold uri')
+
+        meta = meta or {}
+        return Debit(
+            uri=self.account.debits_uri,
+            amount=amount,
+            appears_on_statement_as=appears_on_statement_as,
+            hold_uri=hold_uri,
+            meta=meta,
+            description=description,
+        ).save()
+
+    def hold(self, meta=None):
+        meta = meta or {}
+        return Hold(
+            uri=self.account.holds_uri,
+            amount=amount,
+            meta=meta
+        ).save()
+
 
 class BankAccount(Resource):
     __meta_class = resource_base(collection='bank_accounts')
+
+    def debit(self, amount=None, appears_on_statement_as=None,
+              meta=None, description=None):
+        if not amount:
+            raise Exception('Must have an amount')
+
+        meta = meta or {}
+        return Debit(
+            uri=self.account.debits_uri,
+            amount=amount,
+            appears_on_statement_as=appears_on_statement_as,
+            meta=meta,
+            description=description,
+        ).save()
+
+    def credit(self, amount, description=None, meta=None):
+        meta = meta or {}
+        return Credit(
+            uri=self.account.credits_uri,
+            amount=amount,
+            meta=meta,
+            description=description,
+        ).save()
