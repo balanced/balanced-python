@@ -25,7 +25,7 @@
       "amount": 5868, 
       "meta": {}, 
       "appears_on_statement_as": "http://www.balancedpay", 
-      "authorization": {
+      "hold": {
         "fee": 35, 
         "description": null, 
         "created_at": "2012-03-27T11:11:34.413653Z", 
@@ -85,7 +85,7 @@
       "amount": 2930, 
       "meta": {}, 
       "appears_on_statement_as": "http://www.balancedpay", 
-      "authorization": {
+      "hold": {
         "fee": 35, 
         "description": null, 
         "created_at": "2012-03-27T11:11:34.617509Z", 

@@ -127,7 +127,7 @@ class BasicUseCases(unittest.TestCase):
             meta={'fraud': 'yes'})
         self.assertTrue(debit.id.startswith('W'))
         self.assertIsInstance(debit.account, balanced.Account)
-        self.assertIsInstance(debit.authorization, balanced.Authorization)
+        self.assertIsInstance(debit.hold, balanced.Hold)
         self.assertEqual(debit.fee, (1000 * 0.035))
         self.assertEqual(debit.appears_on_statement_as, 'atest')
         self.assertIsNone(debit.description)
@@ -145,21 +145,21 @@ class BasicUseCases(unittest.TestCase):
         another_refund = another_debit.refund()
         self.assertEqual(another_refund.fee + another_debit.fee, 0)
 
-    def test_g_create_authorization_and_void_it(self):
+    def test_g_create_hold_and_void_it(self):
         account = self._find_account('buyer')
-        authorization = account.authorize(amount=1500)
-        self.assertEqual(authorization.fee, 35)
-        self.assertEqual(authorization.account.uri, account.uri)
-        self.assertFalse(authorization.is_void)
-        authorization.void()
-        self.assertTrue(authorization.is_void)
-        self.assertEqual(authorization.fee, 35)  # fee still the same
+        hold = account.hold(amount=1500)
+        self.assertEqual(hold.fee, 35)
+        self.assertEqual(hold.account.uri, account.uri)
+        self.assertFalse(hold.is_void)
+        hold.void()
+        self.assertTrue(hold.is_void)
+        self.assertEqual(hold.fee, 35)  # fee still the same
 
-    def test_g_create_authorization_and_debit_it(self):
+    def test_g_create_hold_and_debit_it(self):
         account = self._find_account('buyer')
-        authorization = account.authorize(amount=1500)
-        self.assertTrue(authorization.id.startswith('AU'))
-        debit = authorization.capture()
+        hold = account.hold(amount=1500)
+        self.assertTrue(hold.id.startswith('HL'))
+        debit = hold.capture()
         self.assertEqual(debit.fee, int((1500 * 0.035)))
 
     def test_h_create_a_person_merchant(self):
@@ -224,7 +224,7 @@ class BasicUseCases(unittest.TestCase):
 
     def test_k_get_business_merchant_for_crediting(self):
         buyer = self._find_account('buyer')
-        debit = buyer.debit(amount=10000)
+        buyer.debit(amount=10000)
         self.merchant = self.merchant.find(self.merchant.uri)
         marketplace = self.merchant.marketplace
         original_balance = marketplace.escrow_balance
@@ -242,7 +242,7 @@ class BasicUseCases(unittest.TestCase):
 
     def test_l_credit_more_than_the_escrow_balance_should_fail(self):
         buyer = self._find_account('buyer')
-        debit = buyer.debit(amount=10000)
+        buyer.debit(amount=10000)
         self.merchant = self.merchant.find(self.merchant.uri)
         marketplace = self.merchant.marketplace
         original_balance = marketplace.escrow_balance

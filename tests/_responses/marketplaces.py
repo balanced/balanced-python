@@ -19,8 +19,7 @@ def anonymous_create():
         'credits_uri':  '/v1/marketplaces/M123-456-7890/credits',
         'refunds_uri':  '/v1/marketplaces/M123-456-7890/refunds',
         'accounts_uri':  '/v1/marketplaces/M123-456-7890/accounts',
-        'authorizations_uri':  ('/v1/marketplaces/M123-456-7890/'
-                                'authorizations'),
+        'holds_uri':  '/v1/marketplaces/M123-456-7890/holds',
         'api_keys_uri': '/v1/marketplaces/TEST-M123-456-7890/api_keys',
         'meta': {}
     }
@@ -77,14 +76,14 @@ def index(limit=10, offset=0, num=1, pages=1):
                 'balance': 0,
                 'debits_uri': ac_uri + '/debits',
                 'credits_uri': ac_uri + '/credits',
-                'authorizations_uri': 'ac_uri' + '/authorizations',
+                'holds_uri': 'ac_uri' + '/holds',
                 'meta': {}
             },
             'debits_uri':  mp_uri + '/debits',
             'credits_uri':  mp_uri + '/credits',
             'refunds_uri':  mp_uri + '/refunds',
             'accounts_uri':  mp_uri + '/accounts',
-            'authorizations_uri':  mp_uri + '/authorizations',
+            'holds_uri':  mp_uri + '/holds',
             'api_keys_uri': mp_uri + '/api_keys',
             'meta': {}
             })

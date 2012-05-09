@@ -510,3 +510,11 @@ class APIKey(Resource):
         singular='api_key',
         collection='api_keys',
         resides_under_marketplace=False)
+
+
+class Card(Resource):
+    __meta_class = resource_base(collection='cards')
+
+
+class BankAccount(Resource):
+    __meta_class = resource_base(collection='bank_accounts')
