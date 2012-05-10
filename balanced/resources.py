@@ -7,7 +7,7 @@ import urlparse
 import iso8601
 
 from balanced.utils import cached_property, url_encode, classproperty
-from balanced.exc import NoResultFound, MultipleResultsFound
+from balanced.exc import NoResultFound, MultipleResultsFound, ResourceError
 
 
 LOGGER = logging.getLogger(__name__)
@@ -360,9 +360,11 @@ class Account(Resource):
     __metaclass__ = resource_base(collection='accounts')
 
     def debit(self, amount=None, appears_on_statement_as=None,
-              hold_uri=None, meta=None, description=None):
+              hold_uri=None, meta=None, description=None, source_uri=None):
         if not any((amount, hold_uri)):
-            raise Exception('Must have an amount or hold uri')
+            raise ResourceError('Must have an amount or hold uri')
+        if all([hold_uri, source_uri]):
+            raise ResourceError('Must specify either hold_uri OR source_uri')
 
         meta = meta or {}
         return Debit(
@@ -372,24 +374,36 @@ class Account(Resource):
             hold_uri=hold_uri,
             meta=meta,
             description=description,
+            source_uri=source_uri,
         ).save()
 
-    def hold(self, amount, meta=None):
+    def hold(self, amount, meta=None, source_uri=None):
         meta = meta or {}
         return Hold(
             uri=self.holds_uri,
             amount=amount,
-            meta=meta
+            meta=meta,
+            source_uri=source_uri,
             ).save()
 
-    def credit(self, amount, description=None, meta=None):
+    def credit(self, amount, description=None, meta=None,
+               destination_uri=None):
         meta = meta or {}
         return Credit(
             uri=self.credits_uri,
             amount=amount,
             meta=meta,
             description=description,
+            source_uri=destination_uri,
             ).save()
+
+    def add_card(self, card_uri):
+        self.card_uri = card_uri
+        self.save()
+
+    def add_bank_account(self, bank_account_uri):
+        self.bank_account_uri = bank_account_uri
+        self.save()
 
 
 def cached_per_api_key(bust_cache=False):
@@ -427,24 +441,24 @@ class Marketplace(Resource):
         collection='marketplaces',
         resides_under_marketplace=False)
 
-    def create_buyer(self, email_address, card, name=None, meta=None):
+    def create_buyer(self, email_address, card_uri, name=None, meta=None):
         meta = meta or {}
         return Account(
             uri=self.accounts_uri,
             email_address=email_address,
-            card=card,
+            card_uri=card_uri,
             name=name,
             meta=meta,
         ).save()
 
-    def create_merchant(self, email_address, merchant, bank_account=None,
+    def create_merchant(self, email_address, merchant, bank_account_uri=None,
                         name=None, meta=None):
         meta = meta or {}
         return Account(
             uri=self.accounts_uri,
             email_address=email_address,
             merchant=merchant,
-            bank_account=bank_account,
+            bank_account_uri=bank_account_uri,
             name=name,
             meta=meta,
         ).save()
@@ -507,7 +521,7 @@ class Card(Resource):
     def debit(self, amount=None, appears_on_statement_as=None,
               hold_uri=None, meta=None, description=None):
         if not any((amount, hold_uri)):
-            raise Exception('Must have an amount or hold uri')
+            raise ResourceError('Must amount or hold_uri')
 
         meta = meta or {}
         return Debit(
@@ -531,10 +545,10 @@ class Card(Resource):
 class BankAccount(Resource):
     __meta_class = resource_base(collection='bank_accounts')
 
-    def debit(self, amount=None, appears_on_statement_as=None,
+    def debit(self, amount, appears_on_statement_as=None,
               meta=None, description=None):
-        if not amount:
-            raise Exception('Must have an amount')
+        if not amount or amount <= 0:
+            raise ResourceError('Must have an amount')
 
         meta = meta or {}
         return Debit(
@@ -546,6 +560,9 @@ class BankAccount(Resource):
         ).save()
 
     def credit(self, amount, description=None, meta=None):
+        if not amount or amount <= 0:
+            raise ResourceError('Must have an amount')
+
         meta = meta or {}
         return Credit(
             uri=self.account.credits_uri,
