@@ -6,7 +6,8 @@ import urlparse
 
 import iso8601
 
-from utils import cached_property, url_encode, classproperty
+from balanced.utils import cached_property, url_encode, classproperty
+from balanced.exc import NoResultFound, MultipleResultsFound
 
 
 LOGGER = logging.getLogger(__name__)
@@ -36,18 +37,6 @@ class _ResourceRegistry(dict):
 
 
 _RESOURCES = _ResourceRegistry()
-
-
-class ResourceError(Exception):
-    pass
-
-
-class NoResultFound(Exception):
-    pass
-
-
-class MultipleResultsFound(Exception):
-    pass
 
 
 class Page(object):

@@ -7,7 +7,7 @@ from requests.models import REDIRECT_STATI
 
 from balanced.config import Config
 from balanced.utils import to_json
-
+from balanced.exc import HTTPError
 
 serializers = {
     'application/json': to_json
@@ -21,10 +21,6 @@ deserializers = {
 
 REDIRECT_STATI = list(REDIRECT_STATI)
 REDIRECT_STATI.append(300)
-
-
-class HTTPError(requests.HTTPError):
-    status_code = None
 
 
 def wrap_raise_for_status(http_client):

@@ -28,7 +28,7 @@ class TestResourceConstruction(WSGIServerTest):
 
     def test_redirects(self):
         with self.start_server(app):
-            with self.assertRaises(balanced.HTTPError) as exc:
+            with self.assertRaises(balanced.exc.HTTPError) as exc:
                 balanced.APIKey().save()
             exception = exc.exception
             self.assertEqual(exception.response.status_code, 302)
