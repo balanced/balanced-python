@@ -405,6 +405,10 @@ class Account(Resource):
         self.bank_account_uri = bank_account_uri
         self.save()
 
+    def add_merchant(self, merchant_data):
+        self.merchant = merchant_data
+        self.save()
+
 
 def cached_per_api_key(bust_cache=False):
     def cacher(f):
@@ -516,7 +520,7 @@ class APIKey(Resource):
 
 
 class Card(Resource):
-    __meta_class = resource_base(collection='cards')
+    __metaclass__ = resource_base(collection='cards')
 
     def debit(self, amount=None, appears_on_statement_as=None,
               hold_uri=None, meta=None, description=None):
@@ -543,7 +547,7 @@ class Card(Resource):
 
 
 class BankAccount(Resource):
-    __meta_class = resource_base(collection='bank_accounts')
+    __metaclass__ = resource_base(collection='bank_accounts')
 
     def debit(self, amount, appears_on_statement_as=None,
               meta=None, description=None):
