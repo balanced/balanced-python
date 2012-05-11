@@ -3,6 +3,9 @@ Balanced
 
 Payments platform for online marketplaces
 
+View our online tutorial and documentation at
+ https://www.balancedpayments.com/docs/python
+
 
 Authentication
 ``````````````

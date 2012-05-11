@@ -11,7 +11,7 @@ def show(marketplace_eid, account_eid):
             'buyer'
         ],
         'created_at': '2012-03-27T11:11:34.104277Z',
-        'authorizations_uri':  ac_uri + '/authorizations',
+        'holds_uri':  ac_uri + '/holds',
         'uri': ac_uri,
         'refunds_uri': ac_uri + '/refunds',
         'meta': {},

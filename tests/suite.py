@@ -224,7 +224,7 @@ class BasicUseCases(unittest.TestCase):
 
     def test_k_get_business_merchant_for_crediting(self):
         buyer = self._find_account('buyer')
-        debit = buyer.debit(amount=10000)
+        buyer.debit(amount=10000)
         self.merchant = self.merchant.find(self.merchant.uri)
         marketplace = self.merchant.marketplace
         original_balance = marketplace.escrow_balance
@@ -242,7 +242,7 @@ class BasicUseCases(unittest.TestCase):
 
     def test_l_credit_more_than_the_escrow_balance_should_fail(self):
         buyer = self._find_account('buyer')
-        debit = buyer.debit(amount=10000)
+        buyer.debit(amount=10000)
         self.merchant = self.merchant.find(self.merchant.uri)
         marketplace = self.merchant.marketplace
         original_balance = marketplace.escrow_balance
