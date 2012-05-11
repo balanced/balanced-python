@@ -1,6 +1,5 @@
 import functools
 import itertools
-import re
 import logging
 import urlparse
 
@@ -11,9 +10,6 @@ from balanced.exc import NoResultFound, MultipleResultsFound, ResourceError
 
 
 LOGGER = logging.getLogger(__name__)
-
-
-_RE_ALLOWED_LITERALS = re.compile(r'[\w]+$')
 
 
 class _ResourceRegistry(dict):
@@ -29,7 +25,7 @@ class _ResourceRegistry(dict):
 
         split_uri = urlparse.urlsplit(uri.rstrip('/'))
         url = split_uri.path.split('/')  # pylint: disable-msg=E1103
-        if _RE_ALLOWED_LITERALS.match(url[-1]):
+        if url[-1] in self:
             resource = self[url[-1]]
         else:
             resource = self[url[-2]]
@@ -244,7 +240,7 @@ def uri_discovery(resource):
 
 def is_collection(uri):
     _, _, end_identifier = uri.rstrip('/').rpartition('/')
-    return _RE_ALLOWED_LITERALS.match(end_identifier)
+    return end_identifier in _RESOURCES
 
 
 def from_uri(uri, **kwargs):
