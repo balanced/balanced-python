@@ -51,7 +51,7 @@ class BasicUseCases(unittest.TestCase):
         marketplace = balanced.Marketplace().save()
         self.assertTrue(marketplace.id.startswith('TEST-MP'))
         self.merchant = balanced.Merchant.find(self.merchant.uri)
-        self.assertEqual(marketplace.escrow_balance, 0)
+        self.assertEqual(marketplace.in_escrow, 0)
 
     def test_b_create_a_second_marketplace_should_fail(self):
         self.assertIsNotNone(balanced.config.api_key_secret)
@@ -227,7 +227,7 @@ class BasicUseCases(unittest.TestCase):
         buyer.debit(amount=10000)
         self.merchant = self.merchant.find(self.merchant.uri)
         marketplace = self.merchant.marketplace
-        original_balance = marketplace.escrow_balance
+        original_balance = marketplace.in_escrow
         merchants = list(marketplace.accounts.filter(
             email_address='mahmoud+khalkhalash@poundpay.com'
             ))
@@ -237,7 +237,7 @@ class BasicUseCases(unittest.TestCase):
         self.assertEqual(credit.amount, 1000)
         marketplace = marketplace.find(marketplace.uri)
         self.assertEqual(
-            marketplace.escrow_balance,
+            marketplace.in_escrow,
             original_balance - credit.amount)
 
     def test_l_credit_more_than_the_escrow_balance_should_fail(self):
@@ -245,7 +245,7 @@ class BasicUseCases(unittest.TestCase):
         buyer.debit(amount=10000)
         self.merchant = self.merchant.find(self.merchant.uri)
         marketplace = self.merchant.marketplace
-        original_balance = marketplace.escrow_balance
+        original_balance = marketplace.in_escrow
         merchant = self._find_account('merchant')
         with self.assertRaises(requests.HTTPError) as exc:
             merchant.credit(amount=original_balance + 1000)

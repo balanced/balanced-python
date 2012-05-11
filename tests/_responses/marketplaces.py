@@ -9,7 +9,7 @@ def anonymous_create():
        'support_email_address': 'support@example.com',
        'support_phone_number': '+16505551234',
        'domain_url': 'example.com',
-       'escrow_balance': 0,
+       'in_escrow': 0,
        'account': {
            'uri': ('/v1/marketplaces/TEST-M123-456-7890'
                    '/accounts/A123-456-7890'),
@@ -67,7 +67,7 @@ def index(limit=10, offset=0, num=1, pages=1):
             'support_email_address': 'support@example.com',
             'support_phone_number': '+16505551234',
             'domain_url': 'example.com',
-            'escrow_balance': 0,
+            'in_escrow': 0,
             'account': {
                 'uri': ac_uri,
                 'name': 'Test Business',

@@ -11,7 +11,7 @@
         "holds_uri": "/v1/marketplaces/TEST-MP318-823-1966/holds",
         "support_email_address": "marshall@poundpay.com",
         "uri": "/v1/marketplaces/TEST-MP318-823-1966",
-        "escrow_balance": -743778,
+        "in_escrow": -743778,
         "accounts_uri": "/v1/marketplaces/TEST-MP318-823-1966/accounts",
         "support_phone_number": "+16505551234",
         "refunds_uri": "/v1/marketplaces/TEST-MP318-823-1966/refunds",
