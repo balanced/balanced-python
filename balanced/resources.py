@@ -451,13 +451,16 @@ class Marketplace(Resource):
             meta=meta,
         ).save()
 
-    def create_merchant(self, email_address, merchant, bank_account_uri=None,
-                        name=None, meta=None):
+    def create_merchant(self, email_address, merchant=None, bank_account_uri=None,
+                        name=None, meta=None, merchant_uri=None):
+        if not any([merchant, merchant_uri]):
+            raise ResourceError('Must have merchant or merchant_uri')
         meta = meta or {}
         return Account(
             uri=self.accounts_uri,
             email_address=email_address,
             merchant=merchant,
+            merchant_uri=merchant_uri,
             bank_account_uri=bank_account_uri,
             name=name,
             meta=meta,
@@ -521,7 +524,7 @@ class Card(Resource):
     def debit(self, amount=None, appears_on_statement_as=None,
               hold_uri=None, meta=None, description=None):
         if not any((amount, hold_uri)):
-            raise ResourceError('Must amount or hold_uri')
+            raise ResourceError('Must have amount or hold_uri')
 
         meta = meta or {}
         return Debit(
