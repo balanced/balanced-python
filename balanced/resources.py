@@ -451,8 +451,9 @@ class Marketplace(Resource):
             meta=meta,
         ).save()
 
-    def create_merchant(self, email_address, merchant=None, bank_account_uri=None,
-                        name=None, meta=None, merchant_uri=None):
+    def create_merchant(self, email_address, merchant=None,
+                        bank_account_uri=None, name=None, meta=None,
+                        merchant_uri=None):
         if not any([merchant, merchant_uri]):
             raise ResourceError('Must have merchant or merchant_uri')
         meta = meta or {}

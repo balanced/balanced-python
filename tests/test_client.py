@@ -1,6 +1,7 @@
 import unittest
 
 import balanced
+import mock
 
 
 class TestConfig(unittest.TestCase):
@@ -49,3 +50,20 @@ class TestClient(unittest.TestCase):
         with balanced.key_switcher('new_key'):
             self.assertEqual(the_config.api_key_secret, 'new_key')
         self.assertEqual(the_config.api_key_secret, current_key)
+
+
+class TestHTTPClient(unittest.TestCase):
+
+    def test_deserialization(self):
+        resp = mock.Mock()
+        resp.headers = {
+            'Content-Type': 'text/html',
+        }
+        resp.content = 'Unhandled Exception'
+        client = balanced.HTTPClient()
+        with self.assertRaises(balanced.exc.BalancedError):
+            client.deserialize(resp)
+        resp.headers['Content-Type'] = 'application/json'
+        resp.content = '{"hi": "world"}'
+        deserialized = client.deserialize(resp)
+        self.assertItemsEqual(deserialized, {u'hi': u'world'})

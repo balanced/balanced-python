@@ -7,7 +7,7 @@ from requests.models import REDIRECT_STATI
 
 from balanced.config import Config
 from balanced.utils import to_json
-from balanced.exc import HTTPError
+from balanced.exc import HTTPError, BalancedError
 
 serializers = {
     'application/json': to_json
@@ -148,7 +148,12 @@ class HTTPClient(threading.local, object):
         return resp
 
     def deserialize(self, resp):
-        return deserializers[resp.headers['Content-Type']](resp.content)
+        try:
+            return deserializers[resp.headers['Content-Type']](resp.content)
+        except KeyError:
+            raise BalancedError('Invalid content type "{}": {}'.format(
+                resp.headers['Content-Type'], resp.content,
+            ))
 
     def serialize(self, kwargs):
         content_type = self.config.requests['base_headers']['Content-Type']
