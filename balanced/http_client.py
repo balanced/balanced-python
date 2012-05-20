@@ -110,6 +110,10 @@ class HTTPClient(threading.local, object):
 
     config = Config()
 
+    def __init__(self, *args, **kwargs):
+        super(HTTPClient, self).__init__(*args, **kwargs)
+        self.session = requests.session()
+
     # we don't use the requests hook here because we want to expose
     # that for any developer to access it directly.
     #
@@ -118,7 +122,7 @@ class HTTPClient(threading.local, object):
     @munge_request
     def get(self, uri, **kwargs):
         kwargs = self.serialize(kwargs.copy())
-        resp = requests.get(uri, **kwargs)
+        resp = self.session.get(uri, **kwargs)
         if kwargs.get('return_response', True):
             resp.deserialized = self.deserialize(resp)
         return resp
@@ -126,7 +130,7 @@ class HTTPClient(threading.local, object):
     @munge_request
     def post(self, uri, data=None, **kwargs):
         data = self.serialize({'data': data}).pop('data')
-        resp = requests.post(uri, data=data, **kwargs)
+        resp = self.session.post(uri, data=data, **kwargs)
         if kwargs.get('return_response', True):
             resp.deserialized = self.deserialize(resp)
         return resp
@@ -134,7 +138,7 @@ class HTTPClient(threading.local, object):
     @munge_request
     def put(self, uri, data=None, **kwargs):
         data = self.serialize({'data': data}).pop('data')
-        resp = requests.put(uri, data=data, **kwargs)
+        resp = self.session.put(uri, data=data, **kwargs)
         if kwargs.get('return_response', True):
             resp.deserialized = self.deserialize(resp)
         return resp
@@ -142,7 +146,7 @@ class HTTPClient(threading.local, object):
     @munge_request
     def delete(self, uri, **kwargs):
         kwargs = self.serialize(kwargs.copy())
-        resp = requests.delete(uri, **kwargs)
+        resp = self.session.delete(uri, **kwargs)
         if kwargs.get('return_response', True):
             resp.deserialized = self.deserialize(resp)
         return resp
