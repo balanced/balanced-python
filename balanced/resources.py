@@ -193,12 +193,6 @@ class Resource(object):
         uri = uri_discovery(cls)
         return Page.from_uri_and_params(uri, params=None)
 
-    @property
-    def id(self):
-        if not hasattr(self, 'uri') or is_collection(self.uri):
-            return None
-        return self.uri.rpartition('/')[-1]
-
     @classmethod
     def find(cls, uri, **kwargs):
         resp = cls.http_client.get(uri, **kwargs)
@@ -301,6 +295,8 @@ def make_constructors():
         return object.__new__(cls, **kwargs)
 
     def the_init(self, **kwargs):
+        self.id = None
+
         # iterate through the schema that comes back
         for key, value in kwargs.iteritems():
             if is_subresource(value):
@@ -411,10 +407,10 @@ def cached_per_api_key(bust_cache=False):
         @functools.wraps(f)
         def wrapped(*args, **kwargs):
             from balanced import config, CACHE
-            cached = CACHE.get(config.api_key_secret)
+            cached = CACHE[config.api_key_secret].get(f.__name__)
             if bust_cache or not cached:
                 cached = f(*args, **kwargs)
-                CACHE[config.api_key_secret] = cached
+                CACHE[config.api_key_secret][f.__name__] = cached
             return cached
 
         return wrapped

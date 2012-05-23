@@ -1,4 +1,5 @@
-__version__ = '0.8.4'
+__version__ = '0.8.5'
+from collections import defaultdict
 import contextlib
 
 
@@ -30,7 +31,7 @@ http_client = HTTPClient()
 config = http_client.config
 
 
-CACHE = dict()
+CACHE = defaultdict(dict)
 
 
 def bust_cache():
