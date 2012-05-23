@@ -74,7 +74,8 @@ class BasicUseCases(unittest.TestCase):
     def test_d_create_a_buyer(self):
         self.assertIsNotNone(balanced.config.api_key_secret)
         mp = self._find_marketplace()
-        buyer = mp.create_buyer('m@poundpay.com', card={
+
+        card = mp.create_card(**{
             "name": "khalkhalash onastick",
             "card_number": TEST_CARDS['visa'][0],  # "4111111111111111",
             "expiration_month": 5,
@@ -84,7 +85,11 @@ class BasicUseCases(unittest.TestCase):
             "postal_code": "10023",
             "country_code": "USA",
             "phone_number": "+16505551234"
-            },
+            })
+
+        buyer = mp.create_buyer(
+            'm@poundpay.com',
+            card_uri=card.uri,
             meta={'test#': 'test_d'}
             )
         #self.assertTrue(buyer.id.startswith('AC'), buyer.id)
@@ -181,6 +186,11 @@ class BasicUseCases(unittest.TestCase):
 
     def test_i_create_a_business_merchant(self):
         mp = self._find_marketplace()
+        ba = mp.create_bank_account(**{
+                "name": "Levain Bakery LLC",
+                "account_number": "28304871049",
+                "bank_code": "121042882",
+            })
         merchant = mp.create_merchant(
             'mahmoud+khalkhalash@poundpay.com', merchant={
             "type": "business",
@@ -199,11 +209,8 @@ class BasicUseCases(unittest.TestCase):
                 "phone_number": "+16505551234",
                 "country_code": "USA",
             }},
-            bank_account={
-                "name": "Levain Bakery LLC",
-                "account_number": "28304871049",
-                "bank_code": "121042882",
-            })
+            bank_account_uri=ba.uri,
+            )
         self.assertItemsEqual(merchant.roles, ['buyer', 'merchant'])
 
     def test_j_create_a_business_merchant_with_existing_email_addr(self):
@@ -278,7 +285,7 @@ class BasicUseCases(unittest.TestCase):
         for debit in sliced_debits:
             self.assertIsInstance(debit, balanced.Debit)
 
-    @unittest.skip('fix this')
+    @unittest.skip('fix it')
     def test_p_test_merchant_cache_busting(self):
         # cache it.
         a_merchant = self.merchant.me
