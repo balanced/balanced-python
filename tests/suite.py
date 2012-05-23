@@ -73,20 +73,27 @@ class BasicUseCases(unittest.TestCase):
 
     def test_d_create_a_buyer(self):
         self.assertIsNotNone(balanced.config.api_key_secret)
+
+        card_number = TEST_CARDS['visa'][0]
+        buyer_name = 'khalkhalash onastick'
+        card_payload = {
+            'street_address': '123 Fake Street',
+            'city': 'Jollywood',
+            'state': 'CA',
+            'postal_code': '90210',
+            'name': buyer_name,
+            'card_number': card_number,
+            'expiration_month': 12,
+            'expiration_year': 2013,
+            }
+        card = balanced.Card(**card_payload).save()
+        card_uri = card.uri
         mp = self._find_marketplace()
-        buyer = mp.create_buyer('m@poundpay.com', card={
-            "name": "khalkhalash onastick",
-            "card_number": TEST_CARDS['visa'][0],  # "4111111111111111",
-            "expiration_month": 5,
-            "expiration_year": 2014,
-            "security_code": "807",
-            "street_address": "167 West 74th Street",
-            "postal_code": "10023",
-            "country_code": "USA",
-            "phone_number": "+16505551234"
-            },
+        
+        buyer = mp.create_buyer(email_address='m@poundpay.com',
+            card_uri=card_uri,
             meta={'test#': 'test_d'}
-            )
+        )
         #self.assertTrue(buyer.id.startswith('AC'), buyer.id)
         self.assertEqual(buyer.name, 'khalkhalash onastick')
         self.assertEqual(buyer.roles, ['buyer'])
@@ -181,6 +188,12 @@ class BasicUseCases(unittest.TestCase):
 
     def test_i_create_a_business_merchant(self):
         mp = self._find_marketplace()
+        payload = {
+            "name": "Levain Bakery LLC",
+            "account_number": "28304871049",
+            "bank_code": "121042882",
+        }
+        bank_account = balanced.BankAccount(**payload).save()
         merchant = mp.create_merchant(
             'mahmoud+khalkhalash@poundpay.com', merchant={
             "type": "business",
@@ -199,11 +212,8 @@ class BasicUseCases(unittest.TestCase):
                 "phone_number": "+16505551234",
                 "country_code": "USA",
             }},
-            bank_account={
-                "name": "Levain Bakery LLC",
-                "account_number": "28304871049",
-                "bank_code": "121042882",
-            })
+            bank_account_uri=bank_account.uri,
+        ) 
         self.assertItemsEqual(merchant.roles, ['buyer', 'merchant'])
 
     def test_j_create_a_business_merchant_with_existing_email_addr(self):
