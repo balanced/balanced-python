@@ -5,7 +5,10 @@ import unittest
 import requests
 
 import balanced
+from balanced.exc import NoResultFound
 
+
+# fixtures
 
 TEST_CARDS = {
     'visa': [
@@ -29,11 +32,59 @@ TEST_CARDS = {
         '6559906559906557',
     ]}
 
+PERSON_MERCHANT = {
+    'type': 'person',
+    'name': 'William James',
+    'tax_id': '393483992',
+    'street_address': '167 West 74th Street',
+    'postal_code': '10023',
+    'dob': '1842-01-01',
+    'phone_number': '+16505551234',
+    'country_code': 'USA',
+    }
+
+BUSINESS_PRINCIPAL = {
+    'name': 'William James',
+    'tax_id': '393483992',
+    'street_address': '167 West 74th Street',
+    'postal_code': '10023',
+    'dob': '1842-01-01',
+    'phone_number': '+16505551234',
+    'country_code': 'USA',
+    }
+
+BUSINESS_MERCHANT = {
+    'type': 'business',
+    'name': 'Levain Bakery',
+    'tax_id': '253912384',
+    'street_address': '167 West 74th Street',
+    'postal_code': '10023',
+    'phone_number': '+16505551234',
+    'country_code': 'USA',
+    'person': BUSINESS_PRINCIPAL,
+    }
+
+CARD = {
+    'street_address': '123 Fake Street',
+    'city': 'Jollywood',
+    'region': 'CA',
+    'postal_code': '90210',
+    'name': 'Johnny Fresh',
+    'card_number': '4' + '1' * 15,
+    'expiration_month': 12,
+    'expiration_year': 2013,
+    }
+
+BANK_ACCOUNT = {
+    'name': 'Homer Jay',
+    'account_number': '112233a',
+    'bank_code': '121042882',
+    }
+
+
+# tests
 
 class BasicUseCases(unittest.TestCase):
-    """
-    FIXME: fix all id issues
-    """
 
     @classmethod
     def setUpClass(cls):
@@ -46,13 +97,13 @@ class BasicUseCases(unittest.TestCase):
     def test_00_merchant_expectations(self):
         self.assertFalse(hasattr(self.merchant, 'principal'))
         self.assertFalse(hasattr(self.merchant, 'payout_method'))
-        #self.assertTrue(self.merchant.id.startswith('TEST-MR'))
+        self.assertTrue(self.merchant.id.startswith('TEST-MR'))
 
     def test_01_create_marketplace(self):
         self.assertTrue(self.merchant.accounts_uri.endswith('/accounts'))
         self.assertIsNotNone(balanced.config.api_key_secret)
         marketplace = balanced.Marketplace().save()
-        #self.assertTrue(marketplace.id.startswith('TEST-MP'))
+        self.assertTrue(marketplace.id.startswith('TEST-MP'))
         self.merchant = balanced.Merchant.find(self.merchant.uri)
         self.assertEqual(marketplace.in_escrow, 0)
 
@@ -94,7 +145,7 @@ class BasicUseCases(unittest.TestCase):
             card_uri=card_uri,
             meta={'test#': 'test_d'}
         )
-        #self.assertTrue(buyer.id.startswith('AC'), buyer.id)
+        self.assertTrue(buyer.id.startswith('AC'), buyer.id)
         self.assertEqual(buyer.name, 'khalkhalash onastick')
         self.assertEqual(buyer.roles, ['buyer'])
         self.assertIsNotNone(buyer.created_at)
@@ -135,7 +186,7 @@ class BasicUseCases(unittest.TestCase):
             amount=1000,
             appears_on_statement_as='atest',
             meta={'fraud': 'yes'})
-        #self.assertTrue(debit.id.startswith('W'))
+        self.assertTrue(debit.id.startswith('W'))
         self.assertIsInstance(debit.account, balanced.Account)
         self.assertIsInstance(debit.hold, balanced.Hold)
         self.assertEqual(debit.fee, (1000 * 0.035))
@@ -168,22 +219,14 @@ class BasicUseCases(unittest.TestCase):
     def test_08_create_hold_and_debit_it(self):
         account = self._find_account('buyer')
         hold = account.hold(amount=1500)
-        #self.assertTrue(hold.id.startswith('HL'))
+        self.assertTrue(hold.id.startswith('HL'))
         debit = hold.capture()
         self.assertEqual(debit.fee, int((1500 * 0.035)))
 
     def test_09_create_a_person_merchant(self):
         mp = self._find_marketplace()
-        merchant = mp.create_merchant('mahmoud@poundpay.com', merchant={
-            "type": "person",
-            "name": "William James",
-            "tax_id": "393483992",
-            "street_address": "167 West 74th Street",
-            "postal_code": "10023",
-            "dob": "1842-01-01",
-            "phone_number": "+16505551234",
-            "country_code": "USA",
-            })
+        merchant = mp.create_merchant('mahmoud@poundpay.com',
+            merchant=PERSON_MERCHANT)
         self.assertEqual(merchant.roles, ['merchant'])
 
     def test_10_create_a_business_merchant(self):
@@ -192,26 +235,11 @@ class BasicUseCases(unittest.TestCase):
             "name": "Levain Bakery LLC",
             "account_number": "28304871049",
             "bank_code": "121042882",
-        }
+            }
         bank_account = balanced.BankAccount(**payload).save()
         merchant = mp.create_merchant(
-            'mahmoud+khalkhalash@poundpay.com', merchant={
-            "type": "business",
-            "name": "Levain Bakery",
-            "tax_id": "253912384",
-            "street_address": "167 West 74th Street",
-            "postal_code": "10023",
-            "phone_number": "+16505551234",
-            "country_code": "USA",
-            "person": {
-                "name": "William James",
-                "tax_id": "393483992",
-                "street_address": "167 West 74th Street",
-                "postal_code": "10023",
-                "dob": "1842-01-01",
-                "phone_number": "+16505551234",
-                "country_code": "USA",
-            }},
+            'mahmoud+khalkhalash@poundpay.com',
+            merchant=BUSINESS_MERCHANT,
             bank_account_uri=bank_account.uri,
         )
         self.assertItemsEqual(merchant.roles, ['buyer', 'merchant'])
@@ -219,16 +247,8 @@ class BasicUseCases(unittest.TestCase):
     def test_11_create_a_business_merchant_with_existing_email_addr(self):
         mp = self._find_marketplace()
         with self.assertRaises(requests.HTTPError) as exc:
-            mp.create_merchant('mahmoud@poundpay.com', merchant={
-            "type": "person",
-            "name": "William James",
-            "tax_id": "393483992",
-            "street_address": "167 West 74th Street",
-            "postal_code": "10023",
-            "dob": "1842-01-01",
-            "phone_number": "+16505551234",
-            "country_code": "USA",
-            })
+            mp.create_merchant('mahmoud@poundpay.com',
+                merchant=PERSON_MERCHANT)
         the_exception = exc.exception
         self.assertEqual(the_exception.status_code, 409)
         self.assertIn(
@@ -246,7 +266,7 @@ class BasicUseCases(unittest.TestCase):
             ))
         merchant = merchants[0]
         credit = merchant.credit(amount=1000)
-        #self.assertTrue(credit.id.startswith('CR'))
+        self.assertTrue(credit.id.startswith('CR'))
         self.assertEqual(credit.amount, 1000)
         marketplace = marketplace.find(marketplace.uri)
         self.assertEqual(
@@ -299,3 +319,25 @@ class BasicUseCases(unittest.TestCase):
         self.assertTrue(hasattr(self.merchant.me, 'bank_account'))
         a_merchant.save()
         self.assertFalse(hasattr(a_merchant, 'bank_account'))
+
+    def test_18_create_and_associate_card(self):
+        try:
+            mp = balanced.Marketplace.query.one()
+        except NoResultFound:
+            mp = balanced.Marketplace().save()
+        card = mp.create_card(**CARD)
+        self.assertTrue(card.id.startswith('CC'))
+        account = mp.create_merchant('randy@pandy.com',
+            merchant=PERSON_MERCHANT)
+        account.add_card(card.uri)
+
+    def test_19_create_and_associate_bank_account(self):
+        try:
+            mp = balanced.Marketplace.query.one()
+        except NoResultFound:
+            mp = balanced.Marketplace().save()
+        bank_account = mp.create_bank_account(**BANK_ACCOUNT)
+        self.assertTrue(bank_account.id.startswith('BA'))
+        account = mp.create_merchant('free@example.com',
+            merchant=PERSON_MERCHANT)
+        account.add_bank_account(bank_account.uri)
