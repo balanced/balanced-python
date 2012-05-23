@@ -193,12 +193,6 @@ class Resource(object):
         uri = uri_discovery(cls)
         return Page.from_uri_and_params(uri, params=None)
 
-    @property
-    def id(self):
-        if not hasattr(self, 'uri') or is_collection(self.uri):
-            return None
-        return self.uri.rpartition('/')[-1]
-
     @classmethod
     def find(cls, uri, **kwargs):
         resp = cls.http_client.get(uri, **kwargs)
@@ -302,6 +296,7 @@ def make_constructors():
 
     def the_init(self, **kwargs):
         # iterate through the schema that comes back
+        self.id = None
         for key, value in kwargs.iteritems():
             if is_subresource(value):
                 # sub resources have a uri in them
@@ -440,6 +435,42 @@ class Marketplace(Resource):
     __metaclass__ = resource_base(
         collection='marketplaces',
         resides_under_marketplace=False)
+
+    def create_card(self,
+            name,
+            card_number,
+            expiration_month,
+            expiration_year,
+            security_code,
+            street_address,
+            postal_code,
+            country_code,
+            phone_number,
+            ):
+        return Card(
+            uri=self.cards_uri,
+            name=name,
+            card_number=card_number,
+            expiration_month=expiration_month,
+            expiration_year=expiration_year,
+            security_code=security_code,
+            street_address=street_address,
+            postal_code=postal_code,
+            country_code=country_code,
+            phone_number=phone_number,
+            ).save()
+
+    def create_bank_account(self,
+            name,
+            account_number,
+            bank_code,
+            ):
+        return BankAccount(
+            uri=self.bank_accounts_uri,
+            name=name,
+            account_number=account_number,
+            bank_code=bank_code,
+            ).save()
 
     def create_buyer(self, email_address, card_uri, name=None, meta=None):
         meta = meta or {}
