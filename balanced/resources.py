@@ -407,10 +407,10 @@ def cached_per_api_key(bust_cache=False):
         @functools.wraps(f)
         def wrapped(*args, **kwargs):
             from balanced import config, CACHE
-            cached = CACHE.get(config.api_key_secret)
+            cached = CACHE[config.api_key_secret].get(f.__name__)
             if bust_cache or not cached:
                 cached = f(*args, **kwargs)
-                CACHE[config.api_key_secret] = cached
+                CACHE[config.api_key_secret][f.__name__] = cached
             return cached
 
         return wrapped
@@ -436,6 +436,44 @@ class Marketplace(Resource):
     __metaclass__ = resource_base(
         collection='marketplaces',
         resides_under_marketplace=False)
+
+    def create_card(self,
+            name,
+            card_number,
+            expiration_month,
+            expiration_year,
+            security_code=None,
+            street_address=None,
+            city=None,
+            region=None,
+            postal_code=None,
+            country_code=None,
+            phone_number=None,
+            ):
+            return Card(
+                card_number=card_number,
+                expiration_month=expiration_month,
+                expiration_year=expiration_year,
+                name=name,
+                security_code=security_code,
+                street_address=street_address,
+                postal_code=postal_code,
+                city=city,
+                region=region,
+                country_code=country_code,
+                phone_number=phone_number,
+                ).save()
+
+    def create_bank_account(self,
+            name,
+            account_number,
+            bank_code,
+            ):
+            return BankAccount(
+                name=name,
+                account_number=account_number,
+                bank_code=bank_code,
+                ).save()
 
     def create_buyer(self, email_address, card_uri, name=None, meta=None):
         meta = meta or {}
