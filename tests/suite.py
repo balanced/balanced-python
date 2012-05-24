@@ -252,7 +252,7 @@ class BasicUseCases(unittest.TestCase):
         the_exception = exc.exception
         self.assertEqual(the_exception.status_code, 409)
         self.assertIn(
-            "Account with email address 'mahmoud@poundpay.com' already exists",
+            'Account with email address "mahmoud@poundpay.com" already exists',
             the_exception.description)
 
     def test_12_get_business_merchant_for_crediting(self):
