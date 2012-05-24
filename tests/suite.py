@@ -89,7 +89,7 @@ class BasicUseCases(unittest.TestCase):
         card = balanced.Card(**card_payload).save()
         card_uri = card.uri
         mp = self._find_marketplace()
-        
+
         buyer = mp.create_buyer(email_address='m@poundpay.com',
             card_uri=card_uri,
             meta={'test#': 'test_d'}
@@ -213,7 +213,7 @@ class BasicUseCases(unittest.TestCase):
                 "country_code": "USA",
             }},
             bank_account_uri=bank_account.uri,
-        ) 
+        )
         self.assertItemsEqual(merchant.roles, ['buyer', 'merchant'])
 
     def test_j_create_a_business_merchant_with_existing_email_addr(self):
