@@ -270,6 +270,8 @@ class _LazyURIDescriptor(object):
         if obj is None:
             return self
         uri = getattr(obj, self.key)
+        if uri is None:
+            return None
         return from_uri(uri)
 
 
