@@ -70,7 +70,6 @@ class TestPage(unittest.TestCase):
              'f[endswith]': 'lo',
              'f[startswith]': 'la',
              })
-        q.all()
 
     def test_sort(self):
         q = balanced.Marketplace.query
