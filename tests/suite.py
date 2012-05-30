@@ -376,3 +376,13 @@ class BasicUseCases(unittest.TestCase):
             .all())
         self.assertEqual(len(debs), 3)
         self.assertEqual([deb.id for deb in debs], [deb2.id, deb3.id, deb1.id])
+
+    def test_21_mask_bank_account(self):
+        try:
+            mp = balanced.Marketplace.query.one()
+        except NoResultFound:
+            mp = balanced.Marketplace().save()
+        payload = BANK_ACCOUNT.copy()
+        payload['account_number'] = '1212121-110-019'
+        bank_account = mp.create_bank_account(**payload)
+        self.assertEqual(bank_account.last_four, '0019')
