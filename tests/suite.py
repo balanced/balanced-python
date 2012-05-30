@@ -343,7 +343,11 @@ class BasicUseCases(unittest.TestCase):
         account.add_bank_account(bank_account.uri)
 
     def test_20_test_filter_and_sort(self):
-        balanced.Marketplace().save()
+        try:
+            self._find_marketplace()
+        except balanced.exc.NoResultFound:
+            balanced.Marketplace().save()
+
         buyer = self._find_account('buyer')
         deb1 = buyer.debit(amount=1122, meta={'tag': '1'})
         deb2 = buyer.debit(amount=3322, meta={'tag': '1'})
@@ -360,12 +364,14 @@ class BasicUseCases(unittest.TestCase):
         self.assertItemsEqual([deb.id for deb in debs], [deb3.id])
 
         debs = (balanced.Debit.query
+            .filter2(balanced.Debit.f.meta.contains('tag'))
             .sort(balanced.Debit.f.amount.asc())
             .all())
         self.assertEqual(len(debs), 3)
         self.assertEqual([deb.id for deb in debs], [deb1.id, deb3.id, deb2.id])
 
         debs = (balanced.Debit.query
+            .filter2(balanced.Debit.f.meta.contains('tag'))
             .sort(balanced.Debit.f.amount.desc())
             .all())
         self.assertEqual(len(debs), 3)
