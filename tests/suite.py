@@ -341,3 +341,32 @@ class BasicUseCases(unittest.TestCase):
         account = mp.create_merchant('free@example.com',
             merchant=PERSON_MERCHANT)
         account.add_bank_account(bank_account.uri)
+
+    def test_20_test_filter_and_sort(self):
+        balanced.Marketplace().save()
+        buyer = self._find_account('buyer')
+        deb1 = buyer.debit(amount=1122, meta={'tag': '1'})
+        deb2 = buyer.debit(amount=3322, meta={'tag': '1'})
+        deb3 = buyer.debit(amount=2211, meta={'tag': '2'})
+
+        debs = (balanced.Debit.query
+            .filter2(balanced.Debit.f.meta.tag == '1')
+            .all())
+        self.assertItemsEqual([deb.id for deb in debs], [deb1.id, deb2.id])
+
+        debs = (balanced.Debit.query
+            .filter2(balanced.Debit.f.meta.tag == '2')
+            .all())
+        self.assertItemsEqual([deb.id for deb in debs], [deb3.id])
+
+        debs = (balanced.Debit.query
+            .sort(balanced.Debit.f.amount.asc())
+            .all())
+        self.assertEqual(len(debs), 3)
+        self.assertEqual([deb.id for deb in debs], [deb1.id, deb3.id, deb2.id])
+
+        debs = (balanced.Debit.query
+            .sort(balanced.Debit.f.amount.desc())
+            .all())
+        self.assertEqual(len(debs), 3)
+        self.assertEqual([deb.id for deb in debs], [deb2.id, deb3.id, deb1.id])
