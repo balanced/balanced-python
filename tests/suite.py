@@ -354,24 +354,24 @@ class BasicUseCases(unittest.TestCase):
         deb3 = buyer.debit(amount=2211, meta={'tag': '2'})
 
         debs = (balanced.Debit.query
-            .filter2(balanced.Debit.f.meta.tag == '1')
+            .filter(balanced.Debit.f.meta.tag == '1')
             .all())
         self.assertItemsEqual([deb.id for deb in debs], [deb1.id, deb2.id])
 
         debs = (balanced.Debit.query
-            .filter2(balanced.Debit.f.meta.tag == '2')
+            .filter(balanced.Debit.f.meta.tag == '2')
             .all())
         self.assertItemsEqual([deb.id for deb in debs], [deb3.id])
 
         debs = (balanced.Debit.query
-            .filter2(balanced.Debit.f.meta.contains('tag'))
+            .filter(balanced.Debit.f.meta.contains('tag'))
             .sort(balanced.Debit.f.amount.asc())
             .all())
         self.assertEqual(len(debs), 3)
         self.assertEqual([deb.id for deb in debs], [deb1.id, deb3.id, deb2.id])
 
         debs = (balanced.Debit.query
-            .filter2(balanced.Debit.f.meta.contains('tag'))
+            .filter(balanced.Debit.f.meta.contains('tag'))
             .sort(balanced.Debit.f.amount.desc())
             .all())
         self.assertEqual(len(debs), 3)

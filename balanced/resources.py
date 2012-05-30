@@ -143,19 +143,6 @@ class Page(object):
     def limit(self):
         return self._lazy_loaded['limit']
 
-    def filter(self, **query_arguments):
-        """
-        Allows query string filters to be passed down as keyword arguments
-        for easier filtering:
-
-          credits = marketplace.credits.filter(limit=10)
-          for c in credits:
-              ....
-
-        """
-        self.qs.update(query_arguments)
-        return self._fetch(self.uri)
-
     @property
     def next_page(self):
         uri = self._lazy_loaded['next_uri']
@@ -176,7 +163,16 @@ class Page(object):
         uri = self._lazy_loaded['previous_uri']
         return self._fetch(uri)
 
-    def filter2(self, *args, **kwargs):
+    def filter(self, *args, **kwargs):
+        """
+        Allows query string filters to be passed down as keyword arguments
+        for easier filtering:
+
+          credits = marketplace.credits.filter(limit=10)
+          for c in credits:
+              ....
+
+        """
         query_arguments = {}
         for expression in args:
             if not isinstance(expression, FilterExpression):
@@ -194,10 +190,8 @@ class Page(object):
             f = '{}'.format(k)
             if not isinstance(values, (list, tuple)):
                 values = [values]
-            if f in query_arguments:
-                query_arguments[f] = []
             v = ','.join(str(v) for v in values)
-            query_arguments[f].append(v)
+            query_arguments[f] = v
         self.qs.update(query_arguments)
         return self
 

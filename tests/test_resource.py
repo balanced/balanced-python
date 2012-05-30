@@ -43,18 +43,19 @@ class TestPage(unittest.TestCase):
 
     def test_filter2(self):
         q = balanced.Marketplace.query
-        q.filter2(balanced.Marketplace.f.a == 'b')
-        q.filter2(balanced.Marketplace.f.a != '101')
-        q.filter2(balanced.Marketplace.f.b < 4)
-        q.filter2(balanced.Marketplace.f.b <= 5)
-        q.filter2(balanced.Marketplace.f.c > 123)
-        q.filter2(balanced.Marketplace.f.c >= 44)
-        q.filter2(balanced.Marketplace.f.d.in_(1, 2, 3))
-        q.filter2(~balanced.Marketplace.f.d.in_(6, 33, 55))
-        q.filter2(balanced.Marketplace.f.e.contains('it'))
-        q.filter2(~balanced.Marketplace.f.e.contains('soda'))
-        q.filter2(balanced.Marketplace.f.f.startswith('la'))
-        q.filter2(balanced.Marketplace.f.f.endswith('lo'))
+        q.filter(balanced.Marketplace.f.a == 'b')
+        q.filter(balanced.Marketplace.f.a != '101')
+        q.filter(balanced.Marketplace.f.b < 4)
+        q.filter(balanced.Marketplace.f.b <= 5)
+        q.filter(balanced.Marketplace.f.c > 123)
+        q.filter(balanced.Marketplace.f.c >= 44)
+        q.filter(balanced.Marketplace.f.d.in_(1, 2, 3))
+        q.filter(~balanced.Marketplace.f.d.in_(6, 33, 55))
+        q.filter(balanced.Marketplace.f.e.contains('it'))
+        q.filter(~balanced.Marketplace.f.e.contains('soda'))
+        q.filter(balanced.Marketplace.f.f.startswith('la'))
+        q.filter(balanced.Marketplace.f.f.endswith('lo'))
+        q.filter(g=12)
         self.assertEqual(
             q.qs,
             {'a': 'b',
@@ -69,6 +70,7 @@ class TestPage(unittest.TestCase):
              'e[contains]': 'it',
              'f[endswith]': 'lo',
              'f[startswith]': 'la',
+             'g': '12',
              })
 
     def test_sort(self):
