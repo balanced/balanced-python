@@ -1,5 +1,6 @@
 from __future__ import unicode_literals
 import datetime
+import unittest
 
 import balanced
 from .application import app
@@ -36,3 +37,44 @@ class TestResourceConstruction(WSGIServerTest):
                 exception.response.headers['location'],
                 '/v1/your-mom'
                 )
+
+
+class TestPage(unittest.TestCase):
+
+    def test_filter2(self):
+        q = balanced.Marketplace.query
+        q.filter2(balanced.Marketplace.f.a == 'b')
+        q.filter2(balanced.Marketplace.f.a != '101')
+        q.filter2(balanced.Marketplace.f.b < 4)
+        q.filter2(balanced.Marketplace.f.b <= 5)
+        q.filter2(balanced.Marketplace.f.c > 123)
+        q.filter2(balanced.Marketplace.f.c >= 44)
+        q.filter2(balanced.Marketplace.f.d.in_(1, 2, 3))
+        q.filter2(~balanced.Marketplace.f.d.in_(6, 33, 55))
+        q.filter2(balanced.Marketplace.f.e.contains('it'))
+        q.filter2(~balanced.Marketplace.f.e.contains('soda'))
+        q.filter2(balanced.Marketplace.f.f.startswith('la'))
+        q.filter2(balanced.Marketplace.f.f.endswith('lo'))
+        self.assertEqual(
+            q.qs,
+            {'a': 'b',
+             'a[!=]': '101',
+             'b[<=]': '5',
+             'b[<]': '4',
+             'c[>=]': '44',
+             'c[>]': '123',
+             'd[!in]': '6,33,55',
+             'd[in]': '1,2,3',
+             'e[!contains]': 'soda',
+             'e[contains]': 'it',
+             'f[endswith]': 'lo',
+             'f[startswith]': 'la',
+             })
+        q.all()
+
+    def test_sort(self):
+        q = balanced.Marketplace.query
+        q.sort(balanced.Marketplace.f.me.asc())
+        self.assertEqual(q.qs, {'sort': ['me,asc']})
+        q.sort(balanced.Marketplace.f.u.desc())
+        self.assertEqual(q.qs, {'sort': ['me,asc', 'u,desc']})

@@ -176,6 +176,47 @@ class Page(object):
         uri = self._lazy_loaded['previous_uri']
         return self._fetch(uri)
 
+    def filter2(self, *args, **kwargs):
+        query_arguments = {}
+        for expression in args:
+            if not isinstance(expression, FilterExpression):
+                raise ValueError('"{}" is not a FilterExpression'.format(
+                    expression))
+            if expression.op == '=':
+                f = '{}'.format(expression.field.name)
+            else:
+                f = '{}[{}]'.format(expression.field.name, expression.op)
+            values = expression.value
+            if not isinstance(values, (list, tuple)):
+                values = [values]
+            query_arguments[f] = ','.join(str(v) for v in values)
+        for k, values in kwargs.iteritems():
+            f = '{}'.format(k)
+            if not isinstance(values, (list, tuple)):
+                values = [values]
+            if f in query_arguments:
+                query_arguments[f] = []
+            v = ','.join(str(v) for v in values)
+            query_arguments[f].append(v)
+        self.qs.update(query_arguments)
+        return self
+
+    def sort(self, *args):
+        sorts = []
+        for expression in args:
+            if not isinstance(expression, SortExpression):
+                raise ValueError('"{}" is not a SortExpression'.format(
+                    expression))
+            v = '{},{}'.format(
+                expression.field.name,
+                'asc' if expression.ascending else 'desc')
+            sorts.append(v)
+        if 'sort' in self.qs:
+            self.qs['sort'].extend(sorts)
+        else:
+            self.qs['sort'] = sorts
+        return self
+
 
 class Resource(object):
 
@@ -323,6 +364,77 @@ def make_constructors():
     return the_init, the_new
 
 
+class _ResourceField(object):
+
+    def __init__(self, name):
+        self.name = name
+
+    def __getattr__(self, name):
+        return _ResourceField('{}.{}'.format(self.name, name))
+
+    def asc(self):
+        return SortExpression(self, ascending=True)
+
+    def desc(self):
+        return SortExpression(self, ascending=False)
+
+    def in_(self, *args):
+        return FilterExpression(self, 'in', args, '!in')
+
+    def startswith(self, prefix):
+        if not isinstance(prefix, basestring):
+            raise ValueError('"startswith" prefix  must be a string')
+        return FilterExpression(self, 'startswith', prefix, None)
+
+    def endswith(self, suffix):
+        if not isinstance(suffix, basestring):
+            raise ValueError('"endswith" suffix  must be a string')
+        return FilterExpression(self, 'endswith', suffix, None)
+
+    def contains(self, fragment):
+        if not isinstance(fragment, basestring):
+            raise ValueError('"contains" fragment must be a string')
+        return FilterExpression(self, 'contains', fragment, '!contains')
+
+    def __lt__(self, other):
+        if isinstance(other, (list, tuple)):
+            raise ValueError('"<" operand must be a single value')
+        return FilterExpression(self, '<', other, '>=')
+
+    def __le__(self, other):
+        if isinstance(other, (list, tuple)):
+            raise ValueError('"<=" operand must be a single value')
+        return FilterExpression(self, '<=', other, '>')
+
+    def __eq__(self, other):
+        if isinstance(other, (list, tuple)):
+            raise ValueError('"==" operand must be a single value')
+        return FilterExpression(self, '=', other, '!=')
+
+    def __ne__(self, other):
+        if isinstance(other, (list, tuple)):
+            raise ValueError('"!=" operand must be a single value')
+        return FilterExpression(self, '!=', other, '=')
+
+    def __gt__(self, other):
+        if isinstance(other, (list, tuple)):
+            raise ValueError('">" operand must be a single value')
+        return FilterExpression(self, '>', other, '<=')
+
+    def __ge__(self, other):
+        if isinstance(other, (list, tuple)):
+            raise ValueError('">=" operand must be a single value')
+        return FilterExpression(self, '>=', other, '<')
+
+
+class _ResourceFields(object):
+
+    def __getattr__(self, name):
+        field = _ResourceField(name)
+        setattr(self, name, field)
+        return field
+
+
 def resource_base(singular=None,
                   collection=None,
                   metadata=None,
@@ -333,6 +445,7 @@ def resource_base(singular=None,
         def __new__(mcs, classname, bases, clsdict):
             the_init, the_new = make_constructors()
 
+            fields = _ResourceFields()
             clsdict.update({
                 'RESOURCE': metadata or {
                     'singular': singular or classname.lower(),
@@ -341,6 +454,8 @@ def resource_base(singular=None,
                 },
                 '__init__': the_init,
                 '__new__': the_new,
+                'fields': fields,
+                'f': fields,
                 })
 
             the_class = type.__new__(mcs, classname, bases, clsdict)
@@ -610,3 +725,29 @@ class BankAccount(Resource):
             meta=meta,
             description=description,
         ).save()
+
+
+class FilterExpression(object):
+    def __init__(self, field, op, value, inv_op):
+        self.field = field
+        self.op = op
+        self.value = value
+        self.inv_op = inv_op
+
+    def __invert__(self):
+        if self.inv_op is None:
+            raise TypeError('"{}" cannot be inverted', self)
+        return FilterExpression(self.field, self.inv_op, self.value, self.op)
+
+    def __str__(self):
+        return '{} {} {}'.format(
+            self.field.name, self.field.op, self.field.values)
+
+
+class SortExpression(object):
+    def __init__(self, field, ascending):
+        self.field = field
+        self.ascending = ascending
+
+    def __invert__(self):
+        return SortExpression(self.field, not self.ascending)
