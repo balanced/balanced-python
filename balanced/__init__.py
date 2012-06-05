@@ -1,5 +1,5 @@
-__version__ = '0.8.3'
-
+__version__ = '0.8.6'
+from collections import defaultdict
 import contextlib
 
 
@@ -9,6 +9,7 @@ from balanced.resources import (
     Hold, Credit, Debit, Refund,
     Merchant, Transaction, BankAccount, Card)
 from balanced import exc
+
 
 __all__ = [
     Resource.__name__,
@@ -23,14 +24,14 @@ __all__ = [
     Transaction.__name__,
     Card.__name__,
     BankAccount.__name__,
-    exc.__name__,
+    exc.__name__.partition('.')[-1],
     ]
 
 http_client = HTTPClient()
 config = http_client.config
 
 
-CACHE = dict()
+CACHE = defaultdict(dict)
 
 
 def bust_cache():

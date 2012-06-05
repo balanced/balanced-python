@@ -38,3 +38,4 @@ dist/
 .dir-locals.el
 .idea/
 _build/
+coverage.xml

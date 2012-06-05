@@ -143,19 +143,6 @@ class Page(object):
     def limit(self):
         return self._lazy_loaded['limit']
 
-    def filter(self, **query_arguments):
-        """
-        Allows query string filters to be passed down as keyword arguments
-        for easier filtering:
-
-          credits = marketplace.credits.filter(limit=10)
-          for c in credits:
-              ....
-
-        """
-        self.qs.update(query_arguments)
-        return self._fetch(self.uri)
-
     @property
     def next_page(self):
         uri = self._lazy_loaded['next_uri']
@@ -176,6 +163,54 @@ class Page(object):
         uri = self._lazy_loaded['previous_uri']
         return self._fetch(uri)
 
+    def filter(self, *args, **kwargs):
+        """
+        Allows query string filters to be passed down as keyword arguments
+        for easier filtering:
+
+          credits = marketplace.credits.filter(limit=10)
+          for c in credits:
+              ....
+
+        """
+        query_arguments = {}
+        for expression in args:
+            if not isinstance(expression, FilterExpression):
+                raise ValueError('"{}" is not a FilterExpression'.format(
+                    expression))
+            if expression.op == '=':
+                f = '{}'.format(expression.field.name)
+            else:
+                f = '{}[{}]'.format(expression.field.name, expression.op)
+            values = expression.value
+            if not isinstance(values, (list, tuple)):
+                values = [values]
+            query_arguments[f] = ','.join(str(v) for v in values)
+        for k, values in kwargs.iteritems():
+            f = '{}'.format(k)
+            if not isinstance(values, (list, tuple)):
+                values = [values]
+            v = ','.join(str(v) for v in values)
+            query_arguments[f] = v
+        self.qs.update(query_arguments)
+        return self
+
+    def sort(self, *args):
+        sorts = []
+        for expression in args:
+            if not isinstance(expression, SortExpression):
+                raise ValueError('"{}" is not a SortExpression'.format(
+                    expression))
+            v = '{},{}'.format(
+                expression.field.name,
+                'asc' if expression.ascending else 'desc')
+            sorts.append(v)
+        if 'sort' in self.qs:
+            self.qs['sort'].extend(sorts)
+        else:
+            self.qs['sort'] = sorts
+        return self
+
 
 class Resource(object):
 
@@ -192,12 +227,6 @@ class Resource(object):
     def query(cls):
         uri = uri_discovery(cls)
         return Page.from_uri_and_params(uri, params=None)
-
-    @property
-    def id(self):
-        if not hasattr(self, 'uri') or is_collection(self.uri):
-            return None
-        return self.uri.rpartition('/')[-1]
 
     @classmethod
     def find(cls, uri, **kwargs):
@@ -276,6 +305,8 @@ class _LazyURIDescriptor(object):
         if obj is None:
             return self
         uri = getattr(obj, self.key)
+        if uri is None:
+            return None
         return from_uri(uri)
 
 
@@ -301,6 +332,8 @@ def make_constructors():
         return object.__new__(cls, **kwargs)
 
     def the_init(self, **kwargs):
+        self.id = None
+
         # iterate through the schema that comes back
         for key, value in kwargs.iteritems():
             if is_subresource(value):
@@ -325,6 +358,77 @@ def make_constructors():
     return the_init, the_new
 
 
+class _ResourceField(object):
+
+    def __init__(self, name):
+        self.name = name
+
+    def __getattr__(self, name):
+        return _ResourceField('{}.{}'.format(self.name, name))
+
+    def asc(self):
+        return SortExpression(self, ascending=True)
+
+    def desc(self):
+        return SortExpression(self, ascending=False)
+
+    def in_(self, *args):
+        return FilterExpression(self, 'in', args, '!in')
+
+    def startswith(self, prefix):
+        if not isinstance(prefix, basestring):
+            raise ValueError('"startswith" prefix  must be a string')
+        return FilterExpression(self, 'startswith', prefix, None)
+
+    def endswith(self, suffix):
+        if not isinstance(suffix, basestring):
+            raise ValueError('"endswith" suffix  must be a string')
+        return FilterExpression(self, 'endswith', suffix, None)
+
+    def contains(self, fragment):
+        if not isinstance(fragment, basestring):
+            raise ValueError('"contains" fragment must be a string')
+        return FilterExpression(self, 'contains', fragment, '!contains')
+
+    def __lt__(self, other):
+        if isinstance(other, (list, tuple)):
+            raise ValueError('"<" operand must be a single value')
+        return FilterExpression(self, '<', other, '>=')
+
+    def __le__(self, other):
+        if isinstance(other, (list, tuple)):
+            raise ValueError('"<=" operand must be a single value')
+        return FilterExpression(self, '<=', other, '>')
+
+    def __eq__(self, other):
+        if isinstance(other, (list, tuple)):
+            raise ValueError('"==" operand must be a single value')
+        return FilterExpression(self, '=', other, '!=')
+
+    def __ne__(self, other):
+        if isinstance(other, (list, tuple)):
+            raise ValueError('"!=" operand must be a single value')
+        return FilterExpression(self, '!=', other, '=')
+
+    def __gt__(self, other):
+        if isinstance(other, (list, tuple)):
+            raise ValueError('">" operand must be a single value')
+        return FilterExpression(self, '>', other, '<=')
+
+    def __ge__(self, other):
+        if isinstance(other, (list, tuple)):
+            raise ValueError('">=" operand must be a single value')
+        return FilterExpression(self, '>=', other, '<')
+
+
+class _ResourceFields(object):
+
+    def __getattr__(self, name):
+        field = _ResourceField(name)
+        setattr(self, name, field)
+        return field
+
+
 def resource_base(singular=None,
                   collection=None,
                   metadata=None,
@@ -335,6 +439,7 @@ def resource_base(singular=None,
         def __new__(mcs, classname, bases, clsdict):
             the_init, the_new = make_constructors()
 
+            fields = _ResourceFields()
             clsdict.update({
                 'RESOURCE': metadata or {
                     'singular': singular or classname.lower(),
@@ -343,6 +448,8 @@ def resource_base(singular=None,
                 },
                 '__init__': the_init,
                 '__new__': the_new,
+                'fields': fields,
+                'f': fields,
                 })
 
             the_class = type.__new__(mcs, classname, bases, clsdict)
@@ -411,10 +518,10 @@ def cached_per_api_key(bust_cache=False):
         @functools.wraps(f)
         def wrapped(*args, **kwargs):
             from balanced import config, CACHE
-            cached = CACHE.get(config.api_key_secret)
+            cached = CACHE[config.api_key_secret].get(f.__name__)
             if bust_cache or not cached:
                 cached = f(*args, **kwargs)
-                CACHE[config.api_key_secret] = cached
+                CACHE[config.api_key_secret][f.__name__] = cached
             return cached
 
         return wrapped
@@ -440,6 +547,44 @@ class Marketplace(Resource):
     __metaclass__ = resource_base(
         collection='marketplaces',
         resides_under_marketplace=False)
+
+    def create_card(self,
+            name,
+            card_number,
+            expiration_month,
+            expiration_year,
+            security_code=None,
+            street_address=None,
+            city=None,
+            region=None,
+            postal_code=None,
+            country_code=None,
+            phone_number=None,
+            ):
+            return Card(
+                card_number=card_number,
+                expiration_month=expiration_month,
+                expiration_year=expiration_year,
+                name=name,
+                security_code=security_code,
+                street_address=street_address,
+                postal_code=postal_code,
+                city=city,
+                region=region,
+                country_code=country_code,
+                phone_number=phone_number,
+                ).save()
+
+    def create_bank_account(self,
+            name,
+            account_number,
+            bank_code,
+            ):
+            return BankAccount(
+                name=name,
+                account_number=account_number,
+                bank_code=bank_code,
+                ).save()
 
     def create_buyer(self, email_address, card_uri, name=None, meta=None):
         meta = meta or {}
@@ -574,3 +719,29 @@ class BankAccount(Resource):
             meta=meta,
             description=description,
         ).save()
+
+
+class FilterExpression(object):
+    def __init__(self, field, op, value, inv_op):
+        self.field = field
+        self.op = op
+        self.value = value
+        self.inv_op = inv_op
+
+    def __invert__(self):
+        if self.inv_op is None:
+            raise TypeError('"{}" cannot be inverted', self)
+        return FilterExpression(self.field, self.inv_op, self.value, self.op)
+
+    def __str__(self):
+        return '{} {} {}'.format(
+            self.field.name, self.field.op, self.field.values)
+
+
+class SortExpression(object):
+    def __init__(self, field, ascending):
+        self.field = field
+        self.ascending = ascending
+
+    def __invert__(self):
+        return SortExpression(self.field, not self.ascending)
