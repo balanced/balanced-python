@@ -257,6 +257,22 @@ class AcceptanceUseCases(unittest.TestCase):
         the_exception = exc.exception
         self.assertEqual(the_exception.status_code, 409)
 
+        # try to debit
+        with self.assertRaises(requests.HTTPError) as exc:
+            merchant.debit(600)
+        the_exception = exc.exception
+        self.assertEqual(the_exception.status_code, 409)
+
+        # add a card, make sure we can use it
+        card_payload = dict(self.us_card_payload)
+        card = balanced.Card(**card_payload).save()
+        card_uri = card.uri
+        merchant.add_card(card_uri=card_uri)
+
+        # try to debit again
+        debit = merchant.debit(601)
+        self.assertEqual(debit.source.id, card.id)
+
     def test_add_funding_destination_to_nonmerchant(self):
         mp = balanced.Marketplace.query.one()
         card_payload = dict(self.us_card_payload)
