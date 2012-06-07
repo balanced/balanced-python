@@ -237,3 +237,28 @@ class AcceptanceUseCases(unittest.TestCase):
         self.assertEqual(the_exception.status_code, 409)
         self.assertEqual(the_exception.category_code,
             'illegal-credit')
+
+    def test_add_funding_destination_to_nonmerchant(self):
+        mp = balanced.Marketplace.query.one()
+        card_payload = dict(self.us_card_payload)
+        card = balanced.Card(**card_payload).save()
+        card_uri = card.uri
+        buyer = mp.create_buyer(
+            email_address='irene@adler.com',
+            card_uri=card_uri,
+            meta={'foo': 'bar'},
+        )
+        # Debit money from this buyer to ensure the marketplace has enough to
+        # credit her later
+        buyer.debit(2 * 700)
+        bank_account_payload = dict(self.bank_account_payload)
+        bank_account = balanced.BankAccount(**bank_account_payload).save()
+        bank_account_uri = bank_account.uri
+        buyer.add_bank_account(bank_account_uri=bank_account_uri)
+
+        # Implicit
+        credit = buyer.credit(700)
+        self.assertEqual(credit.destination.id, bank_account.id)
+        # Explicit
+        credit = buyer.credit(700, destination_uri=bank_account_uri)
+        self.assertEqual(credit.destination.id, bank_account.id)
