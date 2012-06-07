@@ -2,6 +2,7 @@
 from __future__ import unicode_literals
 
 import balanced
+import copy
 import requests
 import unittest
 
@@ -237,6 +238,24 @@ class AcceptanceUseCases(unittest.TestCase):
         self.assertEqual(the_exception.status_code, 409)
         self.assertEqual(the_exception.category_code,
             'illegal-credit')
+
+    def test_merchant_no_bank_account(self):
+        mp = balanced.Marketplace.query.one()
+        merchant_payload = copy.deepcopy(merchants.BUSINESS_MERCHANT)
+        merchant_payload['tax_id'] = '123456789'
+
+        merchant = mp.create_merchant(
+            'pauli@exclusion.com',
+            merchant=merchant_payload,
+        )
+        # now try to credit
+        amount = 10000
+        buyer_account = self._find_buyer_account()
+        buyer_account.debit(amount=amount)
+        with self.assertRaises(requests.HTTPError) as exc:
+            merchant.credit(amount)
+        the_exception = exc.exception
+        self.assertEqual(the_exception.status_code, 409)
 
     def test_add_funding_destination_to_nonmerchant(self):
         mp = balanced.Marketplace.query.one()
