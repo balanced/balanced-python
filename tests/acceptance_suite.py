@@ -3,12 +3,15 @@ from __future__ import unicode_literals
 import inspect
 import time
 
+import balanced
+import copy
+import requests
 import unittest
 
-import balanced
+from fixtures import cards, merchants, bank_accounts
 
 
-class AcceptanceUseCases(unittest.TestCase):
+class TestCases(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
@@ -20,69 +23,351 @@ class AcceptanceUseCases(unittest.TestCase):
             cls.merchant = api_key.merchant
             balanced.Marketplace().save()
 
+
+class AcceptanceUseCases(TestCases):
+
+    def setUp(self):
+        self.valid_international_address = {
+            'street_address': '24 Grosvenor Square London, Mayfair, London',
+            'country_code': 'GBR',
+        }
+        self.person = {
+            'name': 'James Bond',
+        }
+        self.valid_us_address = {
+            'street_address': '1 Large Prime St',
+            'city': 'Gaussian',
+            'state': 'CA',
+            'postal_code': '99971',
+        }
+        self.us_card_payload = {
+            'name': 'Richard Feynman',
+            'card_number': cards.TEST_CARDS['visa'][0],
+            'expiration_month': 12,
+            'expiration_year': 2013,
+        }
+        self.us_card_payload.update(self.valid_us_address)
+
+        self.bank_account_payload = {
+            'name': 'Galileo Galilei',
+            'account_number': '28304871049',
+            'bank_code': '121042882',
+         }
+
     def test_00_merchant_expectations(self):
         mps = balanced.Marketplace.query.all()
         self.assertEqual(len(mps), 1)
 
+    def _find_buyer_account(self):
+        mp = balanced.Marketplace.query.one()
+        accounts = list(mp.accounts)
+        filtered_accounts = [
+            account for account in accounts if account.roles == ['buyer']
+            ]
+        if not filtered_accounts:
+            card_payload = dict(self.us_card_payload)
+            card = balanced.Card(**card_payload).save()
+            card_uri = card.uri
+            buyer = mp.create_buyer(
+                email_address='albert@einstein.com',
+                card_uri=card_uri,
+                meta={'foo': 'bar'},
+            )
+        else:
+            buyer = filtered_accounts[0]
+        return buyer
 
-CARD = {
-    'street_address': '801 High Street',
-    'city': 'Palo Alto',
-    'region': 'CA',
-    'postal_code': '94301',
-    'name': 'Johnny Fresh',
-    'card_number': '4' + '1' * 15,
-    'expiration_month': 12,
-    'expiration_year': 2013,
-    }
+    def test_merchant_expectations(self):
+        mps = balanced.Marketplace.query.all()
+        self.assertEqual(len(mps), 1)
 
-CARD_NO_ADDRESS = {
-    'name': 'Johnny Fresh',
-    'card_number': '4' + '1' * 15,
-    'expiration_month': 12,
-    'expiration_year': 2013,
-    }
+    @unittest.skip('need balanced fix')
+    def test_valid_non_us_address_no_postal_code(self):
+        card_number = cards.TEST_CARDS['visa'][0]
+        card_payload = {
+            'card_number': card_number,
+            'expiration_month': 12,
+            'expiration_year': 2013,
+        }
+        card_payload.update(self.valid_international_address)
+        card_payload.update(self.person)
+        balanced.Card(**card_payload).save()
 
-BANK_ACCOUNT = {
-    'name': 'Homer Jay',
-    'account_number': '112233a',
-    'bank_code': '121042882',
-    }
+    def test_valid_us_address(self):
+        buyer = self._find_buyer_account()
+        self.assertTrue(buyer.id.startswith('AC'), buyer.id)
+        self.assertEqual(buyer.roles, ['buyer'])
+        self.assertDictEqual(buyer.meta, {'foo': 'bar'})
 
-PERSON_MERCHANT = {
-    'type': 'person',
-    'name': 'William James',
-    'tax_id': '393-48-3992',              # Should work w/ and w/o dashes
-    'street_address': '167 West 74th Street',
-    'postal_code': '10023',
-    'dob': '1842-01-01',
-    'phone_number': '+16505551234',
-    'country_code': 'USA',
-    }
+    def test_fractional_debit(self):
+        buyer_account = self._find_buyer_account()
+        bad_amount = (3.14, 100.32)
+        for amount in bad_amount:
+            with self.assertRaises(requests.HTTPError) as exc:
+                buyer_account.debit(
+                    amount=amount,
+                    appears_on_statement_as='pi',
+                )
+            the_exception = exc.exception
+            self.assertEqual(the_exception.status_code, 400)
 
-BUSINESS_PRINCIPAL = {
-    'name': 'William James',
-    'tax_id': '393483992',
-    'street_address': '167 West 74th Street',
-    'postal_code': '10023',
-    'dob': '1842-01-01',
-    'phone_number': '+16505551234',
-    'country_code': 'USA',
-    }
+    def test_create_simple_credit(self):
+        mp = balanced.Marketplace.query.one()
+        payload = dict(self.bank_account_payload)
+        bank_account = balanced.BankAccount(**payload).save()
+        merchant = mp.create_merchant(
+            'cvraman@spectroscopy.com',
+            merchant=merchants.BUSINESS_MERCHANT,
+            bank_account_uri=bank_account.uri,
+        )
+        self.assertItemsEqual(merchant.roles, ['buyer', 'merchant'])
 
-BUSINESS_MERCHANT = {
-    'type': 'business',
-    'name': 'Levain Bakery',
-    'tax_id': '253912384',
-    'street_address': '167 West 74th Street',
-    'postal_code': '10023',
-    'phone_number': '+16505551234',
-    'country_code': 'USA',
-    'person': BUSINESS_PRINCIPAL,
-    }
+        amount = 10000
+        buyer_account = self._find_buyer_account()
+        buyer_account.debit(amount=amount)
+        merchant.credit(amount)
+
+    def test_credit_lower_than_escrow(self):
+        mp = balanced.Marketplace.query.one()
+        escrow_balance = mp.in_escrow
+        credit_amount = escrow_balance + 10000
+        merchants = mp.accounts
+        merchant = merchants[0]
+        with self.assertRaises(requests.HTTPError) as exc:
+            merchant.credit(amount=credit_amount)
+        the_exception = exc.exception
+        self.assertEqual(the_exception.status_code, 409)
+
+    def test_valid_international_address(self):
+        for card_payload in cards.generate_international_card_payloads():
+            card = balanced.Card(**card_payload).save()
+            self.assertEqual(card.street_address,
+                card_payload['street_address'])
+
+    def test_transactions_using_second_card(self):
+        mp = balanced.Marketplace.query.one()
+        card_payload = dict(self.us_card_payload)
+        old_card = balanced.Card(**card_payload).save()
+        old_card_uri = old_card.uri
+        buyer = mp.create_buyer(
+            email_address='inspector@lestrade.com',
+            card_uri=old_card_uri,
+            meta={'foo': 'bar'},
+        )
+
+        card_payload = dict(self.us_card_payload)
+        new_card = balanced.Card(**card_payload).save()
+        new_card_uri = new_card.uri
+        buyer.add_card(card_uri=new_card_uri)
+
+        # Test default card
+        debit = buyer.debit(777)
+        self.assertEqual(debit.source.id, new_card.id)
+
+        # Test explicit card
+        debit = buyer.debit(777, source_uri=new_card_uri)
+        self.assertEqual(debit.source.id, new_card.id)
+
+    def test_associate_bad_cards(self):
+        mp = balanced.Marketplace.query.one()
+        card_payload = dict(self.us_card_payload)
+        card = balanced.Card(**card_payload).save()
+        card_uri = card.uri
+        buyer = mp.create_buyer(
+            email_address='james@watson.com',
+            card_uri=card_uri,
+            meta={'foo': 'bar'},
+        )
+        # Invalid card
+        card_payload = dict(self.us_card_payload)
+        card_payload['is_valid'] = False
+        card = balanced.Card(**card_payload).save()
+        card_uri = card.uri
+        with self.assertRaises(requests.HTTPError) as exc:
+            buyer.add_card(card_uri=card_uri)
+        the_exception = exc.exception
+        self.assertEqual(the_exception.status_code, 409)
+        self.assertEqual(the_exception.category_code,
+            'funding-source-not-valid')
+
+        # Already-associated card
+        card_payload = dict(self.us_card_payload)
+        card = balanced.Card(**card_payload).save()
+        card_uri = card.uri
+        mp.create_buyer(
+            email_address='james@moriarty.com',
+            card_uri=card_uri,
+            meta={'foo': 'bar'},
+        )
+        with self.assertRaises(requests.HTTPError) as exc:
+            buyer.add_card(card_uri=card_uri)
+        the_exception = exc.exception
+        self.assertEqual(the_exception.status_code, 409)
+        self.assertEqual(the_exception.category_code,
+            'card-already-funding-src')
+
+        # Completely fake card uri
+        with self.assertRaises(requests.HTTPError) as exc:
+            buyer.add_card(card_uri='/completely/fake')
+        the_exception = exc.exception
+        self.assertEqual(the_exception.status_code, 400)
+
+    def test_transactions_invalid_funding_sources(self):
+        mp = balanced.Marketplace.query.one()
+        card_payload = dict(self.us_card_payload)
+        card = balanced.Card(**card_payload).save()
+        card_uri = card.uri
+        buyer = mp.create_buyer(
+            email_address='sherlock@holmes.com',
+            card_uri=card_uri,
+            meta={'foo': 'bar'},
+        )
+        # invalidate card
+        card.is_valid = False
+        card.save()
+
+        # Now use the card
+        with self.assertRaises(requests.HTTPError) as exc:
+            # ...implicitly
+            buyer.debit(6000)
+        the_exception = exc.exception
+        self.assertEqual(the_exception.status_code, 409)
+        self.assertEqual(the_exception.category_code,
+            'funding-source-not-valid')
+
+        with self.assertRaises(requests.HTTPError) as exc:
+            # ... and explicitly
+            buyer.debit(7000, source_uri=card.uri)
+        the_exception = exc.exception
+        self.assertEqual(the_exception.status_code, 409)
+        self.assertEqual(the_exception.category_code,
+            'funding-source-not-valid')
+
+        with self.assertRaises(requests.HTTPError) as exc:
+            buyer.credit(8000)
+        the_exception = exc.exception
+        self.assertEqual(the_exception.status_code, 409)
+        self.assertEqual(the_exception.category_code,
+            'illegal-credit')
+
+    def test_merchant_no_bank_account(self):
+        mp = balanced.Marketplace.query.one()
+        merchant_payload = copy.deepcopy(merchants.BUSINESS_MERCHANT)
+        merchant_payload['tax_id'] = '123456789'
+
+        merchant = mp.create_merchant(
+            'pauli@exclusion.com',
+            merchant=merchant_payload,
+        )
+        # now try to credit
+        amount = 10000
+        buyer_account = self._find_buyer_account()
+        buyer_account.debit(amount=amount)
+        with self.assertRaises(requests.HTTPError) as exc:
+            merchant.credit(amount)
+        the_exception = exc.exception
+        self.assertEqual(the_exception.status_code, 409)
+
+        # try to debit
+        with self.assertRaises(requests.HTTPError) as exc:
+            merchant.debit(600)
+        the_exception = exc.exception
+        self.assertEqual(the_exception.status_code, 409)
+
+        # add a card, make sure we can use it
+        card_payload = dict(self.us_card_payload)
+        card = balanced.Card(**card_payload).save()
+        card_uri = card.uri
+        merchant.add_card(card_uri=card_uri)
+
+        # try to debit again
+        debit = merchant.debit(601)
+        self.assertEqual(debit.source.id, card.id)
+
+    def test_add_funding_destination_to_nonmerchant(self):
+        mp = balanced.Marketplace.query.one()
+        card_payload = dict(self.us_card_payload)
+        card = balanced.Card(**card_payload).save()
+        card_uri = card.uri
+        buyer = mp.create_buyer(
+            email_address='irene@adler.com',
+            card_uri=card_uri,
+            meta={'foo': 'bar'},
+        )
+        # Debit money from this buyer to ensure the marketplace has enough to
+        # credit her later
+        buyer.debit(2 * 700)
+        bank_account_payload = dict(self.bank_account_payload)
+        bank_account = balanced.BankAccount(**bank_account_payload).save()
+        bank_account_uri = bank_account.uri
+        buyer.add_bank_account(bank_account_uri=bank_account_uri)
+
+        # Implicit
+        credit = buyer.credit(700)
+        self.assertEqual(credit.destination.id, bank_account.id)
+        # Explicit
+        credit = buyer.credit(700, destination_uri=bank_account_uri)
+        self.assertEqual(credit.destination.id, bank_account.id)
+
+    def test_update_stupid_values(self):
+        mp = balanced.Marketplace.query.one()
+        card_payload = dict(self.us_card_payload)
+        card = balanced.Card(**card_payload).save()
+        card_uri = card.uri
+        buyer = mp.create_buyer(
+            email_address='inspector@gregson.com',
+            card_uri=card_uri,
+            meta={'foo': 'bar'},
+        )
+        # Add a bank account to test crediting
+        bank_account_payload = dict(self.bank_account_payload)
+        bank_account = balanced.BankAccount(**bank_account_payload).save()
+        bank_account_uri = bank_account.uri
+        buyer.add_bank_account(bank_account_uri=bank_account_uri)
+
+        name = buyer.name
+        buyer.name = 's' * 1000
+        with self.assertRaises(requests.HTTPError) as exc:
+            buyer.save()
+        the_exception = exc.exception
+        self.assertIn('must have length <=', the_exception.description)
+        buyer.name = name
+
+        with self.assertRaises(requests.HTTPError) as exc:
+            buyer.debit(100 ** 100)
+        the_exception = exc.exception
+        self.assertEqual(the_exception.status_code, 400)
+        self.assertIn('must be <=', the_exception.description)
+
+        with self.assertRaises(requests.HTTPError) as exc:
+            buyer.credit(100 ** 100)
+        the_exception = exc.exception
+        self.assertEqual(the_exception.status_code, 400)
+        self.assertIn('must be <=', the_exception.description)
+
+    def test_zzz_remove_owner_merchant_account_bank_account(self):
+        mp = balanced.Marketplace.query.one()
+        owner = mp.owner_account
+        ba = owner.bank_accounts[0]
+        ba.is_valid = False
+        ba.save()
+
+        with self.assertRaises(requests.HTTPError) as exc:
+            owner.debit(600)
+        the_exception = exc.exception
+        self.assertEqual(the_exception.status_code, 409)
+        self.assertEqual('funding-source-not-valid',
+            the_exception.category_code)
+
+        with self.assertRaises(requests.HTTPError) as exc:
+            owner.credit(900)
+        the_exception = exc.exception
+        self.assertEqual(the_exception.status_code, 409)
+        self.assertEqual('funding-destination-not-valid',
+            the_exception.category_code)
 
 
-class AICases(AcceptanceUseCases):
+class AICases(TestCases):
 
     email_address_counter = 0
 
@@ -158,15 +443,17 @@ class AICases(AcceptanceUseCases):
         self._test_transaction_failures(cases)
 
     def test_hold_card_uri(self):
-        cases = []
+        cases = [
+            ]
         self._test_transaction_successes(cases)
 
     def test_debit_card_uri(self):
-        cases = []
+        cases = [
+            ]
         self._test_transaction_successes(cases)
 
     def test_upgrade_account_to_merchant_invalid_uri(self):
-        card = self.mp.create_card(**CARD)
+        card = self.mp.create_card(**cards.CARD)
         buyer = self.mp.create_buyer('a@b.com', card.uri)
         buyer.merchant_uri = '/no/a/merchant'
         with self.assertRaises(balanced.exc.HTTPError) as ex_ctx:
@@ -178,7 +465,7 @@ class AICases(AcceptanceUseCases):
             str(ex))
 
     def test_upgrade_account_to_merchant_success(self):
-        card = self.mp.create_card(**CARD)
+        card = self.mp.create_card(**cards.CARD)
         with balanced.key_switcher(None):
             api_key = balanced.APIKey().save()
         merchant = api_key.merchant
@@ -189,10 +476,11 @@ class AICases(AcceptanceUseCases):
         self.assertItemsEqual(buyer.roles, ['buyer', 'merchant'])
 
     def test_debit_uses_newly_added_funding_src(self):
-        bank_account = balanced.BankAccount(**BANK_ACCOUNT).save()
+        bank_account = balanced.BankAccount(
+            **bank_accounts.BANK_ACCOUNT).save()
         merchant_account = self.mp.create_merchant(
             self._email_address(),
-            merchant=BUSINESS_MERCHANT,
+            merchant=merchants.BUSINESS_MERCHANT,
             bank_account_uri=bank_account.uri,
             )
 
@@ -201,7 +489,7 @@ class AICases(AcceptanceUseCases):
         self.assertEqual(debit.source.id, bank_account.id)
 
         # debit card
-        card = balanced.Card(**CARD).save()
+        card = balanced.Card(**cards.CARD).save()
         merchant_account.add_card(card.uri)
         debit = merchant_account.debit(amount=100)
         self.assertEqual(debit.source.id, card.id)
@@ -213,10 +501,11 @@ class AICases(AcceptanceUseCases):
         self.assertEqual(debit.source.id, bank_account.id)
 
     def test_maximum_credit_amount(self):
-        bank_account = balanced.BankAccount(**BANK_ACCOUNT).save()
+        bank_account = balanced.BankAccount(
+            **bank_accounts.BANK_ACCOUNT).save()
         merchant_account = self.mp.create_merchant(
             self._email_address(),
-            merchant=BUSINESS_MERCHANT,
+            merchant=merchants.BUSINESS_MERCHANT,
             bank_account_uri=bank_account.uri,
             )
         balanced.bust_cache()
@@ -227,34 +516,44 @@ class AICases(AcceptanceUseCases):
             merchant_account.credit(100)
         ex = ex_ctx.exception
         self.assertIn('has insufficient funds to cover a transfer of', str(ex))
-        card = self.mp.create_card(**CARD)
+        card = self.mp.create_card(**cards.CARD)
         buyer = self.mp.create_buyer(self._email_address(), card.uri)
         buyer.debit(200)
         merchant_account.credit(100)
 
     def test_maximum_debit_amount(self):
-        card = self.mp.create_card(**CARD)
+        card = self.mp.create_card(**cards.CARD)
         buyer = self.mp.create_buyer(self._email_address(), card.uri)
         with self.assertRaises(balanced.exc.HTTPError) as ex_ctx:
             buyer.debit(10 ** 9 + 1)
         ex = ex_ctx.exception
         self.assertIn('must be <= 1000000000', str(ex))
 
+    def test_maximum_hold_amount(self):
+        card = self.mp.create_card(**cards.CARD)
+        buyer = self.mp.create_buyer(self._email_address(), card.uri)
+        with self.assertRaises(balanced.exc.HTTPError) as ex_ctx:
+            buyer.hold(10 ** 9 + 1)
+        ex = ex_ctx.exception
+        self.assertIn('must be <= 1000000000', str(ex))
+
     def test_maximum_refund_amount(self):
-        bank_account = balanced.BankAccount(**BANK_ACCOUNT).save()
+        bank_account = balanced.BankAccount(
+            **bank_accounts.BANK_ACCOUNT).save()
         merchant = self.mp.create_merchant(
             self._email_address(),
-            merchant=BUSINESS_MERCHANT,
+            merchant=merchants.BUSINESS_MERCHANT,
             bank_account_uri=bank_account.uri,
             )
         balanced.bust_cache()
         self.mp = balanced.Marketplace.my_marketplace
         if self.mp.in_escrow:
             merchant.credit(self.mp.in_escrow)
-        card = self.mp.create_card(**CARD)
+        card = self.mp.create_card(**cards.CARD)
         buyer = self.mp.create_buyer(self._email_address(), card.uri)
         debit = buyer.debit(200)
-        bank_account = balanced.BankAccount(**BANK_ACCOUNT).save()
+        bank_account = balanced.BankAccount(
+            **bank_accounts.BANK_ACCOUNT).save()
         merchant.credit(100)
         with self.assertRaises(balanced.exc.HTTPError) as ex_ctx:
             debit.refund()
@@ -265,13 +564,15 @@ class AICases(AcceptanceUseCases):
         debit.refund()
 
     def test_view_credits_once_bank_account_has_been_invalidated(self):
-        bank_account = balanced.BankAccount(**BANK_ACCOUNT).save()
+        bank_account = balanced.BankAccount(
+            **bank_accounts.BANK_ACCOUNT).save()
         merchant = self.mp.create_merchant(
             self._email_address(),
-            merchant=BUSINESS_MERCHANT,
+            merchant=merchants.BUSINESS_MERCHANT,
             bank_account_uri=bank_account.uri,
             )
-        card = self.mp.create_card(**CARD)
+        card = self.mp.create_card(
+            **cards.CARD)
         buyer = self.mp.create_buyer(self._email_address(), card.uri)
         buyer.debit(100 + 200 + 300)
         credit1 = merchant.credit(100)
@@ -298,4 +599,4 @@ class AICases(AcceptanceUseCases):
         self.assertEqual(merch_account_2.roles, ['merchant'])
 
     def test_tokenize_card_without_address(self):
-        card = balanced.Card(**CARD_NO_ADDRESS).save()
+        card = balanced.Card(**cards.CARD_NO_ADDRESS).save()
