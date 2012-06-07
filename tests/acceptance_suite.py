@@ -333,3 +333,24 @@ class AcceptanceUseCases(unittest.TestCase):
         the_exception = exc.exception
         self.assertEqual(the_exception.status_code, 400)
         self.assertIn('must be <=', the_exception.description)
+
+    def test_zzz_remove_owner_merchant_account_bank_account(self):
+        mp = balanced.Marketplace.query.one()
+        owner = mp.owner_account
+        ba = owner.bank_accounts[0]
+        ba.is_valid = False
+        ba.save()
+
+        with self.assertRaises(requests.HTTPError) as exc:
+            owner.debit(600)
+        the_exception = exc.exception
+        self.assertEqual(the_exception.status_code, 409)
+        self.assertEqual('funding-source-not-valid',
+            the_exception.category_code)
+
+        with self.assertRaises(requests.HTTPError) as exc:
+            owner.credit(900)
+        the_exception = exc.exception
+        self.assertEqual(the_exception.status_code, 409)
+        self.assertEqual('funding-destination-not-valid',
+            the_exception.category_code)
