@@ -94,7 +94,45 @@ class AcceptanceUseCases(unittest.TestCase):
             self.assertEqual(the_exception.status_code, 400)
 
     def test_valid_international_address(self):
-        for card_payload in cards.generate_international_cards():
+        for card_payload in cards.generate_international_card_payloads():
             card = balanced.Card(**card_payload).save()
             self.assertEqual(card.street_address,
                 card_payload['street_address'])
+
+    def test_transactions_invalid_funding_sources(self):
+        mp = balanced.Marketplace.query.one()
+        card_payload = dict(self.us_card_payload)
+        card = balanced.Card(**card_payload).save()
+        card_uri = card.uri
+        buyer = mp.create_buyer(
+            email_address='sherlock@holmes.com',
+            card_uri=card_uri,
+            meta={'foo': 'bar'},
+        )
+        # invalidate card
+        card.is_valid = False
+        card.save()
+
+        # Now use the card
+        with self.assertRaises(requests.HTTPError) as exc:
+            # ...implicitly
+            buyer.debit(6000)
+        the_exception = exc.exception
+        self.assertEqual(the_exception.status_code, 409)
+        self.assertEqual(the_exception.category_code,
+            'funding-source-not-valid')
+
+        with self.assertRaises(requests.HTTPError) as exc:
+            # ... and explicitly
+            buyer.debit(7000, source_uri=card.uri)
+        the_exception = exc.exception
+        self.assertEqual(the_exception.status_code, 409)
+        self.assertEqual(the_exception.category_code,
+            'funding-source-not-valid')
+
+        with self.assertRaises(requests.HTTPError) as exc:
+            buyer.credit(8000)
+        the_exception = exc.exception
+        self.assertEqual(the_exception.status_code, 409)
+        self.assertEqual(the_exception.category_code,
+            'illegal-credit')

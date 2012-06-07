@@ -26,7 +26,7 @@ TEST_CARDS = {
 }
 
 
-def generate_international_cards():
+def generate_international_card_payloads():
     cards = [
         {
             'street_address': '田原３ー８ー１',
