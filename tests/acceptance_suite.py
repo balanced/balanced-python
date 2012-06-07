@@ -58,6 +58,18 @@ class AcceptanceUseCases(TestCases):
         mps = balanced.Marketplace.query.all()
         self.assertEqual(len(mps), 1)
 
+    def _create_buyer_account(self):
+        mp = balanced.Marketplace.query.one()
+        card_payload = dict(self.us_card_payload)
+        card = balanced.Card(**card_payload).save()
+        card_uri = card.uri
+        buyer = mp.create_buyer(
+            email_address='albert@einstein.com',
+            card_uri=card_uri,
+            meta={'foo': 'bar'},
+        )
+        return buyer
+
     def _find_buyer_account(self):
         mp = balanced.Marketplace.query.one()
         accounts = list(mp.accounts)
@@ -65,14 +77,7 @@ class AcceptanceUseCases(TestCases):
             account for account in accounts if account.roles == ['buyer']
             ]
         if not filtered_accounts:
-            card_payload = dict(self.us_card_payload)
-            card = balanced.Card(**card_payload).save()
-            card_uri = card.uri
-            buyer = mp.create_buyer(
-                email_address='albert@einstein.com',
-                card_uri=card_uri,
-                meta={'foo': 'bar'},
-            )
+            buyer = self._create_buyer_account()
         else:
             buyer = filtered_accounts[0]
         return buyer
@@ -94,7 +99,7 @@ class AcceptanceUseCases(TestCases):
         balanced.Card(**card_payload).save()
 
     def test_valid_us_address(self):
-        buyer = self._find_buyer_account()
+        buyer = self._create_buyer_account()
         self.assertTrue(buyer.id.startswith('AC'), buyer.id)
         self.assertEqual(buyer.roles, ['buyer'])
         self.assertDictEqual(buyer.meta, {'foo': 'bar'})
@@ -233,7 +238,7 @@ class AcceptanceUseCases(TestCases):
         the_exception = exc.exception
         self.assertEqual(the_exception.status_code, 409)
         self.assertEqual(the_exception.category_code,
-            'funding-source-not-valid')
+            'bad-funding-info')
 
         with self.assertRaises(requests.HTTPError) as exc:
             # ... and explicitly
@@ -241,7 +246,7 @@ class AcceptanceUseCases(TestCases):
         the_exception = exc.exception
         self.assertEqual(the_exception.status_code, 409)
         self.assertEqual(the_exception.category_code,
-            'funding-source-not-valid')
+            'bad-funding-info')
 
         with self.assertRaises(requests.HTTPError) as exc:
             buyer.credit(8000)
@@ -356,14 +361,14 @@ class AcceptanceUseCases(TestCases):
             owner.debit(600)
         the_exception = exc.exception
         self.assertEqual(the_exception.status_code, 409)
-        self.assertEqual('funding-source-not-valid',
+        self.assertEqual('bad-funding-info',
             the_exception.category_code)
 
         with self.assertRaises(requests.HTTPError) as exc:
             owner.credit(900)
         the_exception = exc.exception
         self.assertEqual(the_exception.status_code, 409)
-        self.assertEqual('funding-destination-not-valid',
+        self.assertEqual('bad-funding-info',
             the_exception.category_code)
 
 
