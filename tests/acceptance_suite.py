@@ -5,7 +5,7 @@ import balanced
 import requests
 import unittest
 
-from fixtures import cards
+from fixtures import cards, merchants
 
 
 class AcceptanceUseCases(unittest.TestCase):
@@ -41,6 +41,12 @@ class AcceptanceUseCases(unittest.TestCase):
             'expiration_year': 2013,
         }
         self.us_card_payload.update(self.valid_us_address)
+
+        self.bank_account_payload = {
+            'name': 'Galileo Galilei',
+            'account_number': '28304871049',
+            'bank_code': '121042882',
+         }
 
     def _find_buyer_account(self):
         mp = balanced.Marketplace.query.one()
@@ -92,3 +98,30 @@ class AcceptanceUseCases(unittest.TestCase):
                 )
             the_exception = exc.exception
             self.assertEqual(the_exception.status_code, 400)
+
+    def test_create_simple_credit(self):
+        mp = balanced.Marketplace.query.one()
+        payload = dict(self.bank_account_payload)
+        bank_account = balanced.BankAccount(**payload).save()
+        merchant = mp.create_merchant(
+            'cvraman@spectroscopy.com',
+            merchant=merchants.BUSINESS_MERCHANT,
+            bank_account_uri=bank_account.uri,
+        )
+        self.assertItemsEqual(merchant.roles, ['buyer', 'merchant'])
+
+        amount = 10000
+        buyer_account = self._find_buyer_account()
+        buyer_account.debit(amount=amount)
+        merchant.credit(amount)
+
+    def test_credit_lower_than_escrow(self):
+        mp = balanced.Marketplace.query.one()
+        escrow_balance = mp.in_escrow 
+        credit_amount = escrow_balance + 10000
+        merchants = mp.accounts
+        merchant = merchants[0]
+        with self.assertRaises(requests.HTTPError) as exc:
+            merchant.credit(amount=credit_amount)
+        the_exception = exc.exception
+        self.assertEqual(the_exception.status_code, 409)
