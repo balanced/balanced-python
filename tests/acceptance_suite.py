@@ -2,6 +2,7 @@
 from __future__ import unicode_literals
 
 import balanced
+import requests
 import unittest
 
 from fixtures import cards
@@ -41,6 +42,23 @@ class AcceptanceUseCases(unittest.TestCase):
         }
         self.us_card_payload.update(self.valid_us_address)
 
+    def _find_buyer_account(self):
+        mp = balanced.Marketplace.query.one()
+        accounts = list(mp.accounts)
+        filtered_accounts = [account for account in accounts if account.roles == ['buyer']]
+        if not filtered_accounts:
+            card_payload = dict(self.us_card_payload)
+            card = balanced.Card(**card_payload).save()
+            card_uri = card.uri
+            buyer = mp.create_buyer(
+                email_address='albert@einstein.com',
+                card_uri=card_uri,
+                meta={'foo': 'bar'},
+            )
+        else:
+            buyer = filtered_accounts[0]
+        return buyer
+
     def test_merchant_expectations(self):
         mps = balanced.Marketplace.query.all()
         self.assertEqual(len(mps), 1)
@@ -58,16 +76,19 @@ class AcceptanceUseCases(unittest.TestCase):
         balanced.Card(**card_payload).save()
 
     def test_valid_us_address(self):
-        card_payload = dict(self.us_card_payload)
-        card = balanced.Card(**card_payload).save()
-        card_uri = card.uri
-        mp = balanced.Marketplace.query.one()
-        buyer = mp.create_buyer(
-            email_address='albert@einstein.com',
-            card_uri=card_uri,
-            meta={'foo': 'bar'},
-        )
+        buyer = self._find_buyer_account()
         self.assertTrue(buyer.id.startswith('AC'), buyer.id)
         self.assertEqual(buyer.roles, ['buyer'])
         self.assertDictEqual(buyer.meta, {'foo': 'bar'})
-        self.assertTrue(buyer.uri.startswith(mp.uri + '/accounts'))
+
+    def test_fractional_debit(self):
+        buyer_account = self._find_buyer_account()
+        bad_amount = (3.14, 100.32)
+        for amount in bad_amount:
+            with self.assertRaises(requests.HTTPError) as exc:
+                buyer_account.debit(
+                    amount=amount,
+                    appears_on_statement_as='pi',
+                )
+            the_exception = exc.exception
+            self.assertEqual(the_exception.status_code, 400)
