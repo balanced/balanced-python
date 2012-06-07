@@ -92,3 +92,9 @@ class AcceptanceUseCases(unittest.TestCase):
                 )
             the_exception = exc.exception
             self.assertEqual(the_exception.status_code, 400)
+
+    def test_valid_international_address(self):
+        for card_payload in cards.generate_international_cards():
+            card = balanced.Card(**card_payload).save()
+            self.assertEqual(card.street_address,
+                card_payload['street_address'])
