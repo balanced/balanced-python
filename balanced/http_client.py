@@ -33,13 +33,11 @@ def wrap_raise_for_status(http_client):
             try:
                 raise_for_status(allow_redirects=False)
             except requests.HTTPError, exc:
-
                 if exc.response.status_code in REDIRECT_STATI:
                     redirection = HTTPError('%s' % exc)
                     redirection.status_code = exc.response.status_code
                     redirection.response = exc.response
                     raise redirection
-
                 deserialized = http_client.deserialize(
                     response_instance
                     )
@@ -50,8 +48,8 @@ def wrap_raise_for_status(http_client):
                 error_msg = '{name}: {code}: {msg} {extra}'.format(
                         name=deserialized['status'],
                         code=deserialized['status_code'],
-                        msg=deserialized['description'],
-                        extra=extra,
+                        msg=deserialized['description'].encode('utf8'),
+                        extra=extra.encode('utf8'),
                     )
                 http_error = HTTPError(error_msg)
                 for error, value in response_instance.deserialized.iteritems():
