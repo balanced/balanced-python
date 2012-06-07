@@ -262,3 +262,39 @@ class AcceptanceUseCases(unittest.TestCase):
         # Explicit
         credit = buyer.credit(700, destination_uri=bank_account_uri)
         self.assertEqual(credit.destination.id, bank_account.id)
+
+    def test_update_stupid_values(self):
+        mp = balanced.Marketplace.query.one()
+        card_payload = dict(self.us_card_payload)
+        card = balanced.Card(**card_payload).save()
+        card_uri = card.uri
+        buyer = mp.create_buyer(
+            email_address='inspector@gregson.com',
+            card_uri=card_uri,
+            meta={'foo': 'bar'},
+        )
+        # Add a bank account to test crediting
+        bank_account_payload = dict(self.bank_account_payload)
+        bank_account = balanced.BankAccount(**bank_account_payload).save()
+        bank_account_uri = bank_account.uri
+        buyer.add_bank_account(bank_account_uri=bank_account_uri)
+
+        name = buyer.name
+        buyer.name = 's' * 1000
+        with self.assertRaises(requests.HTTPError) as exc:
+            buyer.save()
+        the_exception = exc.exception
+        self.assertIn('must have length <=', the_exception.description)
+        buyer.name = name
+
+        with self.assertRaises(requests.HTTPError) as exc:
+            buyer.debit(100 ** 100)
+        the_exception = exc.exception
+        self.assertEqual(the_exception.status_code, 400)
+        self.assertIn('must be <=', the_exception.description)
+
+        with self.assertRaises(requests.HTTPError) as exc:
+            buyer.credit(100 ** 100)
+        the_exception = exc.exception
+        self.assertEqual(the_exception.status_code, 400)
+        self.assertIn('must be <=', the_exception.description)
