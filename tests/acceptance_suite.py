@@ -132,6 +132,30 @@ class AcceptanceUseCases(unittest.TestCase):
             self.assertEqual(card.street_address,
                 card_payload['street_address'])
 
+    def test_transactions_using_second_card(self):
+        mp = balanced.Marketplace.query.one()
+        card_payload = dict(self.us_card_payload)
+        old_card = balanced.Card(**card_payload).save()
+        old_card_uri = old_card.uri
+        buyer = mp.create_buyer(
+            email_address='inspector@lestrade.com',
+            card_uri=old_card_uri,
+            meta={'foo': 'bar'},
+        )
+
+        card_payload = dict(self.us_card_payload)
+        new_card = balanced.Card(**card_payload).save()
+        new_card_uri = new_card.uri
+        buyer.add_card(card_uri=new_card_uri)
+
+        # Test default card
+        debit = buyer.debit(777)
+        self.assertEqual(debit.source.id, new_card.id)
+
+        # Test explicit card
+        debit = buyer.debit(777, source_uri=new_card_uri)
+        self.assertEqual(debit.source.id, new_card.id)
+
     def test_associate_bad_cards(self):
         mp = balanced.Marketplace.query.one()
         card_payload = dict(self.us_card_payload)
