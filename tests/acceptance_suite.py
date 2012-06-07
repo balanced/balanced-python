@@ -117,7 +117,7 @@ class AcceptanceUseCases(unittest.TestCase):
 
     def test_credit_lower_than_escrow(self):
         mp = balanced.Marketplace.query.one()
-        escrow_balance = mp.in_escrow 
+        escrow_balance = mp.in_escrow
         credit_amount = escrow_balance + 10000
         merchants = mp.accounts
         merchant = merchants[0]
@@ -131,6 +131,50 @@ class AcceptanceUseCases(unittest.TestCase):
             card = balanced.Card(**card_payload).save()
             self.assertEqual(card.street_address,
                 card_payload['street_address'])
+
+    def test_associate_bad_cards(self):
+        mp = balanced.Marketplace.query.one()
+        card_payload = dict(self.us_card_payload)
+        card = balanced.Card(**card_payload).save()
+        card_uri = card.uri
+        buyer = mp.create_buyer(
+            email_address='james@watson.com',
+            card_uri=card_uri,
+            meta={'foo': 'bar'},
+        )
+        # Invalid card
+        card_payload = dict(self.us_card_payload)
+        card_payload['is_valid'] = False
+        card = balanced.Card(**card_payload).save()
+        card_uri = card.uri
+        with self.assertRaises(requests.HTTPError) as exc:
+            buyer.add_card(card_uri=card_uri)
+        the_exception = exc.exception
+        self.assertEqual(the_exception.status_code, 409)
+        self.assertEqual(the_exception.category_code,
+            'funding-source-not-valid')
+
+        # Already-associated card
+        card_payload = dict(self.us_card_payload)
+        card = balanced.Card(**card_payload).save()
+        card_uri = card.uri
+        mp.create_buyer(
+            email_address='james@moriarty.com',
+            card_uri=card_uri,
+            meta={'foo': 'bar'},
+        )
+        with self.assertRaises(requests.HTTPError) as exc:
+            buyer.add_card(card_uri=card_uri)
+        the_exception = exc.exception
+        self.assertEqual(the_exception.status_code, 409)
+        self.assertEqual(the_exception.category_code,
+            'card-already-funding-src')
+
+        # Completely fake card uri
+        with self.assertRaises(requests.HTTPError) as exc:
+            buyer.add_card(card_uri='/completely/fake')
+        the_exception = exc.exception
+        self.assertEqual(the_exception.status_code, 400)
 
     def test_transactions_invalid_funding_sources(self):
         mp = balanced.Marketplace.query.one()
