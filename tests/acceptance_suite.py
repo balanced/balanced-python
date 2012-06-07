@@ -383,74 +383,278 @@ class AICases(TestCases):
             time.time(), self.email_address_counter)
 
     def _test_transaction_successes(self, cases):
+        results = []
         for callable, kwargs, validate_cls, validate_kwargs in cases:
             if inspect.isclass(callable):
                 resource = callable(**kwargs).save()
             else:
                 resource = callable(**kwargs)
-            self.assertTrue(isinstance(resource, validate_cls))
-            for k, v in validate_kwargs.iteritems():
-                self.assertEqual(getattr(resource, k), v)
+            if validate_cls is not None:
+                self.assertTrue(isinstance(resource, validate_cls))
+                for k, v in validate_kwargs.iteritems():
+                    resource_v = getattr(resource, k)
+                    if isinstance(v, balanced.Resource):
+                        self.assertEqual(v.id, resource_v.id)
+                    else:
+                        self.assertEqual(v, resource_v)
+            results.append(resource)
+        return results
 
     def _test_transaction_failures(self, cases):
-        for callable, kwargs, exc, validate_kwargs in cases:
+        for callable, kwargs, exc, message in cases:
             with self.assertRaises(exc) as ex_ctx:
                 if inspect.isclass(callable):
                     callable(**kwargs).save()
                 else:
                     callable(**kwargs)
-            for k, v in validate_kwargs.iteritems():
-                self.assertEqual(getattr(ex_ctx, k), v)
+            ex = ex_ctx.exception
+            self.assertIn(message, str(ex))
 
     def test_hold_successes(self):
+        card1 = self.mp.create_card(**cards.CARD)
+        card2 = self.mp.create_card(**cards.CARD)
+        buyer = self.mp.create_buyer(self._email_address(), card1.uri)
+        buyer.add_card(card2.uri)
+
         cases = [
+            (buyer.hold,
+             dict(amount=100),
+             balanced.Hold,
+             dict(amount=100, account=buyer, source=card2),
+             ),
+            (buyer.hold,
+             dict(amount=123, source_uri=card1.uri),
+             balanced.Hold,
+             dict(amount=123, account=buyer, source=card1),
+             ),
+            ]
+
+        holds = self._test_transaction_successes(cases)
+
+        cases = [
+            (holds[0].capture,
+             dict(),
+             balanced.Debit,
+             dict(amount=100, account=buyer, source=card2)),
+            (holds[1].void,
+             dict(),
+             None,
+             dict())
             ]
         self._test_transaction_successes(cases)
 
     def test_hold_failures(self):
+        card1 = self.mp.create_card(**cards.CARD)
+        buyer1 = self.mp.create_buyer(self._email_address(), card1.uri)
+        card2 = self.mp.create_card(**cards.CARD)
+        buyer2 = self.mp.create_buyer(self._email_address(), card2.uri)
+
         cases = [
+            (buyer1.hold,
+             dict(amount=-100),
+             balanced.exc.HTTPError,
+             'Invalid field "amount" - "-100"',
+             ),
+            (buyer1.hold,
+             dict(amount=100, source_uri=card2.uri),
+             balanced.exc.HTTPError,
+             'Funding source is not associated with account',
+             ),
             ]
         self._test_transaction_failures(cases)
 
     def test_refund_successes(self):
+        card1 = self.mp.create_card(**cards.CARD)
+        card2 = self.mp.create_card(**cards.CARD)
+        buyer = self.mp.create_buyer(self._email_address(), card1.uri)
+        buyer.add_card(card2.uri)
+
+        debit1 = buyer.debit(amount=101)
+        debit2 = buyer.hold(amount=102).capture()
+        debit3 = buyer.debit(amount=103, source_uri=card2.uri)
+
         cases = [
+            (debit1.refund,
+             dict(amount=11, description='TestDesc'),
+             balanced.Refund,
+             dict(debit=debit1, amount=11, description='TestDesc'),
+             ),
+            (debit2.refund,
+             dict(amount=12),
+             balanced.Refund,
+             dict(debit=debit2, amount=12, description=None),
+             ),
+            (debit3.refund,
+             dict(),
+             balanced.Refund,
+             dict(debit=debit3, amount=103, description=None),
+             ),
             ]
         self._test_transaction_successes(cases)
 
     def test_refund_failures(self):
+        card1 = self.mp.create_card(**cards.CARD)
+        card2 = self.mp.create_card(**cards.CARD)
+        buyer = self.mp.create_buyer(self._email_address(), card1.uri)
+        buyer.add_card(card2.uri)
+
+        debit1 = buyer.debit(amount=101)
+        debit1.refund()
+        debit2 = buyer.debit(amount=102)
+
         cases = [
+            (debit1.refund,
+             dict(),
+             balanced.exc.HTTPError,
+             'Invalid amount',
+             ),
+            (debit2.refund,
+             dict(amount=1000002),
+             balanced.exc.HTTPError,
+             'Invalid amount',
+             ),
             ]
         self._test_transaction_failures(cases)
 
     def test_credit_successes(self):
+        card = self.mp.create_card(**cards.CARD)
+        buyer = self.mp.create_buyer(self._email_address(), card.uri)
+        buyer.debit(555)
+
+        ba1 = balanced.BankAccount(
+            **bank_accounts.BANK_ACCOUNT).save()
+        ba2 = balanced.BankAccount(
+            **bank_accounts.BANK_ACCOUNT).save()
+        merchant = self.mp.create_merchant(
+            self._email_address(),
+            merchant=merchants.BUSINESS_MERCHANT,
+            bank_account_uri=ba1.uri,
+            )
+        merchant.add_bank_account(ba2.uri)
+
         cases = [
+            (merchant.credit,
+             dict(amount=51),
+             balanced.Credit,
+             dict(destination=ba2, amount=51),
+             ),
+            (merchant.credit,
+             dict(amount=52, destination_uri=ba1.uri),
+             balanced.Credit,
+             dict(destination=ba1, amount=52),
+             ),
             ]
         self._test_transaction_successes(cases)
 
     def test_credit_failures(self):
+        card = self.mp.create_card(**cards.CARD)
+        buyer = self.mp.create_buyer(self._email_address(), card.uri)
+
+        ba1 = balanced.BankAccount(
+            **bank_accounts.BANK_ACCOUNT).save()
+        ba2 = balanced.BankAccount(
+            **bank_accounts.BANK_ACCOUNT).save()
+        merchant = self.mp.create_merchant(
+            self._email_address(),
+            merchant=merchants.BUSINESS_MERCHANT,
+            bank_account_uri=ba1.uri,
+            )
+
         cases = [
+            (merchant.credit,
+             dict(amount=52, destination_uri=ba1.uri),
+             balanced.exc.HTTPError,
+             'has insufficient funds to cover a transfer of',
+             ),
+            (merchant.credit,
+             dict(amount=52.12),
+             balanced.exc.HTTPError,
+             '"52.12" is not an integer',
+             ),
+            (merchant.credit,
+             dict(amount=-52),
+             balanced.exc.HTTPError,
+             '"-52" must be >=',
+             ),
             ]
         self._test_transaction_failures(cases)
 
-    def test_debits_success(self):
+        buyer.debit(555)
+
         cases = [
+            (merchant.credit,
+             dict(amount=52, destination_uri=ba2.uri),
+             balanced.exc.HTTPError,
+             'Funding destination is not associated with account',
+             ),
+            ]
+        self._test_transaction_failures(cases)
+
+        ba1.is_invalid = True
+        ba1.save()
+
+        cases = [
+            (merchant.credit,
+             dict(amount=52),
+             balanced.exc.HTTPError,
+             'has no funding destination',
+             ),
+            ]
+        self._test_transaction_failures(cases)
+
+    def test_debits_successes(self):
+        buyer_card = self.mp.create_card(**cards.CARD)
+        buyer = self.mp.create_buyer(self._email_address(), buyer_card.uri)
+
+        ba = balanced.BankAccount(
+            **bank_accounts.BANK_ACCOUNT).save()
+        merchant = self.mp.create_merchant(
+            self._email_address(),
+            merchant=merchants.BUSINESS_MERCHANT,
+            bank_account_uri=ba.uri,
+            )
+        merchant_card = self.mp.create_card(**cards.CARD)
+        merchant.add_card(merchant_card.uri)
+
+        cases = [
+            (merchant.debit,
+             dict(amount=52),
+             balanced.Debit,
+             dict(account=merchant,
+                  source=merchant_card,
+                  amount=52,
+                  description=None),
+             ),
+            (buyer.debit,
+             dict(amount=112, description='都留市'),
+             balanced.Debit,
+             dict(account=buyer,
+                  source=buyer_card,
+                  amount=112,
+                  description='都留市'),
+             ),
             ]
         self._test_transaction_successes(cases)
 
     def test_debits_failures(self):
+        buyer_card = self.mp.create_card(**cards.CARD)
+        buyer = self.mp.create_buyer(self._email_address(), buyer_card.uri)
+
+        ba = balanced.BankAccount(
+            **bank_accounts.BANK_ACCOUNT).save()
+        merchant = self.mp.create_merchant(
+            self._email_address(),
+            merchant=merchants.BUSINESS_MERCHANT,
+            bank_account_uri=ba.uri,
+            )
+        merchant_card = self.mp.create_card(**cards.CARD)
+        merchant.add_card(merchant_card.uri)
+        merchant_card.is_valid = False
+        merchant_card.save()
+
         cases = [
             ]
         self._test_transaction_failures(cases)
-
-    def test_hold_card_uri(self):
-        cases = [
-            ]
-        self._test_transaction_successes(cases)
-
-    def test_debit_card_uri(self):
-        cases = [
-            ]
-        self._test_transaction_successes(cases)
 
     def test_upgrade_account_to_merchant_invalid_uri(self):
         card = self.mp.create_card(**cards.CARD)
