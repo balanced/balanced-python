@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
+AUTH_INVALID_CARD = '4444444444444448'
+
+VERIFY_FAILED_CARD_NUMBER = '4222222222222220'
 
 TEST_CARDS = {
     'visa': [

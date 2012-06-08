@@ -79,7 +79,11 @@ class AcceptanceUseCases(TestCases):
         if not filtered_accounts:
             buyer = self._create_buyer_account()
         else:
-            buyer = filtered_accounts[0]
+            for account in filtered_accounts:
+                # this account will fail any debit, so don't use it
+                if account.email_address == 'stephen@hawking.com':
+                    continue
+                buyer = account
         return buyer
 
     def test_merchant_expectations(self):
@@ -148,6 +152,23 @@ class AcceptanceUseCases(TestCases):
             card = balanced.Card(**card_payload).save()
             self.assertEqual(card.street_address,
                 card_payload['street_address'])
+
+    def test_bad_card(self):
+        mp = balanced.Marketplace.query.one()
+        card_payload = dict(self.us_card_payload)
+        card_payload['card_number'] = cards.AUTH_INVALID_CARD
+        bad_card = balanced.Card(**card_payload).save()
+        bad_card_uri = bad_card.uri
+        buyer = mp.create_buyer(
+            email_address='stephen@hawking.com',
+            card_uri=bad_card_uri,
+            meta={'foo': 'bar'},
+        )
+        with self.assertRaises(requests.HTTPError) as exc:
+            buyer.debit(777)
+        the_exception = exc.exception
+        self.assertEqual(the_exception.status_code, 402)
+        self.assertEqual(the_exception.category_code, 'card-declined')
 
     def test_transactions_using_second_card(self):
         mp = balanced.Marketplace.query.one()
