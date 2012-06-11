@@ -392,6 +392,18 @@ class AcceptanceUseCases(TestCases):
         self.assertEqual('bad-funding-info',
             the_exception.category_code)
 
+    def test_redirect_on_merchant_failure(self):
+
+        mp = balanced.Marketplace.query.one()
+        merchant = copy.deepcopy(merchants.PERSON_MERCHANT)
+        merchant['region'] = 'EX'
+        merchant['postal_code'] = '99999'
+        with self.assertRaises(requests.HTTPError) as ex:
+            merchant = mp.create_merchant('testing@redirect.com',
+                merchant=merchant)
+        the_exception = ex.exception
+        self.assertEqual(the_exception.status_code, 300)
+
 
 class AICases(TestCases):
 
