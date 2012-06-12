@@ -214,7 +214,7 @@ class AcceptanceUseCases(TestCases):
         the_exception = exc.exception
         self.assertEqual(the_exception.status_code, 409)
         self.assertEqual(the_exception.category_code,
-            'funding-source-not-valid')
+            'card-not-valid')
 
         # Already-associated card
         card_payload = dict(self.us_card_payload)
@@ -544,12 +544,12 @@ class AICases(TestCases):
             (debit1.refund,
              dict(),
              balanced.exc.HTTPError,
-             'Invalid amount',
+             'Refund amount must be less than the debit amount',
              ),
             (debit2.refund,
              dict(amount=1000002),
              balanced.exc.HTTPError,
-             'Invalid amount',
+             'Refund amount must be less than the debit amount',
              ),
             ]
         self._test_transaction_failures(cases)
