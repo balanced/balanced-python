@@ -14,6 +14,7 @@ class Config(threading.local, object):
         super(Config, self).__init__()
         self.api_key_secret = None
         self.api_version = '1'
+        self.session = None
         self.root_uri = 'https://api.balancedpayments.com'
         # this is requests' config that get passed down on
         # every http operation.
