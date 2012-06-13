@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 from __future__ import unicode_literals
 
 import unittest
@@ -73,6 +75,18 @@ CARD = {
     'card_number': '4' + '1' * 15,
     'expiration_month': 12,
     'expiration_year': 2013,
+    }
+
+INTERNATIONAL_CARD = {
+    'street_address': '田原３ー８ー１',
+    'city': '都留市',
+    'region': '山梨県',
+    'postal_code': '4020054',
+    'country_code': 'JPN',
+    'name': 'Johnny Fresh',
+    'card_number': '4' + '1' * 15,
+    'expiration_month': 12,
+    'expiration_year': 2014,
     }
 
 BANK_ACCOUNT = {
@@ -386,3 +400,13 @@ class BasicUseCases(unittest.TestCase):
         payload['account_number'] = '1212121-110-019'
         bank_account = mp.create_bank_account(**payload)
         self.assertEqual(bank_account.last_four, '0019')
+
+    def test_22_create_international_card(self):
+        try:
+            mp = balanced.Marketplace.query.one()
+        except NoResultFound:
+            mp = balanced.Marketplace().save()
+        card = mp.create_card(**INTERNATIONAL_CARD)
+        self.assertTrue(card.id.startswith('CC'))
+        self.assertEqual(card.street_address,
+            INTERNATIONAL_CARD['street_address'])

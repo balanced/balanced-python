@@ -497,7 +497,7 @@ class Account(Resource):
             amount=amount,
             meta=meta,
             description=description,
-            source_uri=destination_uri,
+            destination_uri=destination_uri,
             ).save()
 
     def add_card(self, card_uri):
