@@ -14,8 +14,7 @@ class TestConfig(unittest.TestCase):
         # for example, it won't detect any @property methods..
         self.assertItemsEqual(
             config.__dict__.keys(),
-            ['api_key_secret', 'api_version', 'root_uri', 'requests',
-             'session']
+            ['api_key_secret', 'api_version', 'root_uri', 'requests']
         )
         self.assertEqual(config.root_uri, 'https://api.balancedpayments.com')
         self.assertEqual(config.api_version, '1')

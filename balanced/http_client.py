@@ -95,8 +95,6 @@ def munge_request(http_op):
         kwargs['hooks'] = {
             'response': wrap_raise_for_status(client)
             }
-        if client.config.session:
-            kwargs['session'] = client.config.session
 
         if client.config.api_key_secret:
             kwargs['auth'] = (client.config.api_key_secret, None)
