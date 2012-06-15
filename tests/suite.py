@@ -199,13 +199,14 @@ class BasicUseCases(unittest.TestCase):
         debit = account.debit(
             amount=1000,
             appears_on_statement_as='atest',
-            meta={'fraud': 'yes'})
+            meta={'fraud': 'yes'},
+            description='Descripty')
         self.assertTrue(debit.id.startswith('W'))
         self.assertIsInstance(debit.account, balanced.Account)
         self.assertIsInstance(debit.hold, balanced.Hold)
+        self.assertEqual(debit.description, 'Descripty')
         self.assertEqual(debit.fee, (1000 * 0.035))
         self.assertEqual(debit.appears_on_statement_as, 'atest')
-        self.assertIsNone(debit.description)
 
         refund = debit.refund(amount=100)
         #self.assertTrue(refund.id.startswith('RF'))

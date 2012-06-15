@@ -682,12 +682,13 @@ class Card(Resource):
             description=description,
         ).save()
 
-    def hold(self, amount, meta=None):
+    def hold(self, amount, meta=None, description=None):
         meta = meta or {}
         return Hold(
             uri=self.account.holds_uri,
             amount=amount,
-            meta=meta
+            meta=meta,
+            description=description
         ).save()
 
 
