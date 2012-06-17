@@ -480,12 +480,13 @@ class Account(Resource):
             source_uri=source_uri,
         ).save()
 
-    def hold(self, amount, meta=None, source_uri=None):
+    def hold(self, amount, description=None, meta=None, source_uri=None):
         meta = meta or {}
         return Hold(
             uri=self.holds_uri,
             amount=amount,
             meta=meta,
+            description=description,
             source_uri=source_uri,
             ).save()
 
@@ -561,30 +562,30 @@ class Marketplace(Resource):
             country_code=None,
             phone_number=None,
             ):
-            return Card(
-                card_number=card_number,
-                expiration_month=expiration_month,
-                expiration_year=expiration_year,
-                name=name,
-                security_code=security_code,
-                street_address=street_address,
-                postal_code=postal_code,
-                city=city,
-                region=region,
-                country_code=country_code,
-                phone_number=phone_number,
-                ).save()
+        return Card(
+            card_number=card_number,
+            expiration_month=expiration_month,
+            expiration_year=expiration_year,
+            name=name,
+            security_code=security_code,
+            street_address=street_address,
+            postal_code=postal_code,
+            city=city,
+            region=region,
+            country_code=country_code,
+            phone_number=phone_number,
+            ).save()
 
     def create_bank_account(self,
             name,
             account_number,
             bank_code,
             ):
-            return BankAccount(
-                name=name,
-                account_number=account_number,
-                bank_code=bank_code,
-                ).save()
+        return BankAccount(
+            name=name,
+            account_number=account_number,
+            bank_code=bank_code,
+            ).save()
 
     def create_buyer(self, email_address, card_uri, name=None, meta=None):
         meta = meta or {}
@@ -625,12 +626,14 @@ class Marketplace(Resource):
 class Debit(Resource):
     __metaclass__ = resource_base(collection='debits')
 
-    def refund(self, amount=None, description=None):
+    def refund(self, amount=None, description=None, meta=None):
+        meta = meta or {}
         return Refund(
             uri=self.refunds_uri,
             debit_uri=self.uri,
             amount=amount,
-            description=description
+            description=description,
+            meta=meta,
         ).save()
 
 

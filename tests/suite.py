@@ -223,10 +223,11 @@ class BasicUseCases(unittest.TestCase):
 
     def test_07_create_hold_and_void_it(self):
         account = self._find_account('buyer')
-        hold = account.hold(amount=1500)
+        hold = account.hold(amount=1500, description='Hold me')
         self.assertEqual(hold.fee, 35)
         self.assertEqual(hold.account.uri, account.uri)
         self.assertFalse(hold.is_void)
+        self.assertEqual(hold.description, 'Hold me')
         hold.void()
         self.assertTrue(hold.is_void)
         self.assertEqual(hold.fee, 35)  # fee still the same
