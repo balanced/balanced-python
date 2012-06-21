@@ -74,6 +74,8 @@ class TestHTTPClient(unittest.TestCase):
             }
         resp.content = 'Unhandled Exception'
         client = balanced.HTTPClient()
+        with self.assertRaises(balanced.exc.BalancedError):
+            client.deserialize(resp)
         resp.headers['Content-Type'] = 'application/json'
         resp.content = ('{"\\uc800\\uac74 \\ub610 \\ubb50\\uc57c": "second", '
                         '"third": "\\u06a9\\u0647 \\u0686\\u0647 '
