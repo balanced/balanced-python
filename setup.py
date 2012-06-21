@@ -18,9 +18,6 @@ except ImportError:
 else:
     setup = setuptools.setup
 
-from boto.s3.connection import S3Connection
-from boto.s3.key import Key
-
 
 class DocumentationCommand(Command):
     description = 'build documentation and upload to s3'
@@ -53,6 +50,9 @@ class DocumentationCommand(Command):
         return unpickled['body']
 
     def _upload_to_s3(self, data, bucket, key_name):
+        from boto.s3.connection import S3Connection
+        from boto.s3.key import Key
+
         conn = S3Connection()
         bucket = conn.get_bucket(bucket)
 
