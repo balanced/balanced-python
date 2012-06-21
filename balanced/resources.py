@@ -460,10 +460,21 @@ def resource_base(singular=None,
 
 
 class Account(Resource):
+    """
+    An Account represents a user within your Marketplace. An Account can have
+    two `roles`. If the Account has the `buyer` role then you may create
+    Debits using this Account. If they have the `merchant` role then you may
+    create Credits to transfer funds to this Account.
+    """
     __metaclass__ = resource_base(collection='accounts')
 
     def debit(self, amount=None, appears_on_statement_as=None,
               hold_uri=None, meta=None, description=None, source_uri=None):
+        """
+        :rtype: A `Debit` representing a flow of money from this Account to
+            your Marketplace's escrow account.
+
+        """
         if not any((amount, hold_uri)):
             raise ResourceError('Must have an amount or hold uri')
         if all([hold_uri, source_uri]):
@@ -481,6 +492,21 @@ class Account(Resource):
         ).save()
 
     def hold(self, amount, description=None, meta=None, source_uri=None):
+        """
+        Creates a new Hold that represents a reservation of money on this
+        Account which can be transferred via a Debit to your Marketplace
+        up to 7 days later.
+
+        :param amount: Amount to hold in cents, must be >= 50
+        :param description: Human readable description
+        :param source_uri: A specific funding source such as a `Card`
+            associated with this account. If not specified the `Card` most
+            recently added to this `Account` is used.
+        :param meta: Key/value collection
+
+        :rtype: A `Hold` representing the reservation of funds from this
+            Account to your Marketplace.
+        """
         meta = meta or {}
         return Hold(
             uri=self.holds_uri,
@@ -492,6 +518,18 @@ class Account(Resource):
 
     def credit(self, amount, description=None, meta=None,
                destination_uri=None):
+        """
+        Returns a new Credit representing a transfer of funds from your
+        Marketplace's escrow account to this Account.
+
+        Args:
+            destination_uri: A specific funding destination such as a
+                `BankAccount` associated with this account.
+
+        Returns:
+            A `Credit` representing the transfer of funds from your
+            Marketplace's escrow account to this Account.
+        """
         meta = meta or {}
         return Credit(
             uri=self.credits_uri,
@@ -502,14 +540,24 @@ class Account(Resource):
             ).save()
 
     def add_card(self, card_uri):
+        """
+        Associates the `Card` represented by `card_uri` with this `Account`.
+        """
         self.card_uri = card_uri
         self.save()
 
     def add_bank_account(self, bank_account_uri):
+        """
+        Associates the BankAccount represented by `bank_account_uri` with this
+        Account.
+        """
         self.bank_account_uri = bank_account_uri
         self.save()
 
     def add_merchant(self, merchant_data):
+        """
+        Adds the `merchant` role to this Account.
+        """
         self.merchant = merchant_data
         self.save()
 
@@ -530,6 +578,9 @@ def cached_per_api_key(bust_cache=False):
 
 
 class Merchant(Resource):
+    """
+
+    """
     __metaclass__ = resource_base(
         collection='merchants',
         resides_under_marketplace=False)
@@ -537,6 +588,10 @@ class Merchant(Resource):
     @classproperty
     @cached_per_api_key()
     def me(cls):
+        """
+        Returns the Merchant associated with your Marketplace.
+        :rtype: `Merchant`
+        """
         return cls.query.one()
 
     @cached_per_api_key(bust_cache=True)
@@ -545,6 +600,9 @@ class Merchant(Resource):
 
 
 class Marketplace(Resource):
+    """
+
+    """
     __metaclass__ = resource_base(
         collection='marketplaces',
         resides_under_marketplace=False)
@@ -562,6 +620,11 @@ class Marketplace(Resource):
             country_code=None,
             phone_number=None,
             ):
+        """
+        Tokenizes a `Card` which can then be associated with an Account.
+
+        :rtype: `Card`
+        """
         return Card(
             card_number=card_number,
             expiration_month=expiration_month,
@@ -581,6 +644,11 @@ class Marketplace(Resource):
             account_number,
             bank_code,
             ):
+        """
+        Tokenizes a `BankAccount` which can then be associated with an Account.
+
+        :rtype: `BankAccount`
+        """
         return BankAccount(
             name=name,
             account_number=account_number,
@@ -588,6 +656,9 @@ class Marketplace(Resource):
             ).save()
 
     def create_buyer(self, email_address, card_uri, name=None, meta=None):
+        """
+        Create a buyer Account associated with this Marketplace.
+        """
         meta = meta or {}
         return Account(
             uri=self.accounts_uri,
@@ -600,6 +671,27 @@ class Marketplace(Resource):
     def create_merchant(self, email_address, merchant=None,
                         bank_account_uri=None, name=None, meta=None,
                         merchant_uri=None):
+        """
+        Creates an Account associated with this Marketplace with the role
+        `merchant`.
+
+        This method may return 300 if you have not supplied enough information
+        for Balanced to identify the Merchant. You may re-submit the request
+        with more information, or redirect the Merchant to the supplied url
+        so they may manually sign up.
+
+        When you receive a `merchant_uri` from balanced, pass it in:
+
+            Account.create_merchant('mrch@example.com',
+                merchant_uri='/v1/TEST-MRxxxx')
+
+        :rtype: Account
+        :raises: balanced.exc.HTTPError
+
+            Check the `status_code` and `category_code` properties of the
+            exception.
+
+        """
         if not any([merchant, merchant_uri]):
             raise ResourceError('Must have merchant or merchant_uri')
         meta = meta or {}
@@ -616,6 +708,10 @@ class Marketplace(Resource):
     @classproperty
     @cached_per_api_key()
     def my_marketplace(cls):
+        """
+        Returns an instance representing the marketplace associated with the
+        current API key used for this request.
+        """
         return cls.query.one()
 
     @cached_per_api_key(bust_cache=True)
@@ -624,9 +720,29 @@ class Marketplace(Resource):
 
 
 class Debit(Resource):
+    """
+    A Debit represents a transfer of funds from a buyer's Account to your
+    Marketplace's escrow account.
+
+    A Debit may be created directly, or it will be created as a side-effect
+    of capturing a Hold. If you create a Debit directly it will implicitly
+    create the associated Hold if the funding source supports this.
+
+    If no Hold is specified, the Debit will by default be created using the
+    most recently added funding source associated with the Account. You
+    cannot change the funding source between creating a Hold and capturing
+    it.
+    """
     __metaclass__ = resource_base(collection='debits')
 
     def refund(self, amount=None, description=None, meta=None):
+        """
+        Refunds this Debit. If no amount is specified it will refund the entire
+        amount of the Debit, you may create many Refunds up to the sum total
+        of the original Debit's amount.
+
+        :rtype: Refund
+        """
         meta = meta or {}
         return Refund(
             uri=self.refunds_uri,
@@ -638,29 +754,76 @@ class Debit(Resource):
 
 
 class Transaction(Resource):
+    """
+    Any transfer, or potential transfer of, funds from or to, your Marketplace.
+    E.g. a Credit, Debit, Refund, or Hold.
+    """
     __metaclass__ = resource_base(collection='transactions')
 
 
 class Credit(Resource):
+    """
+    A Credit represents a transfer of funds from your Marketplace's
+    escrow account to a Merchant's Account within your Marketplace.
+
+    By default, a Credit is sent to the most recently added funding
+    destination associated with an Account. You may specify a specific
+    funding source.
+    """
     __metaclass__ = resource_base(collection='credits')
 
 
 class Refund(Resource):
+    """
+    A Refund represents a reversal of funds from a Debit. A Debit can have
+    many Refunds associated with it up to the total amount of the original
+    Debit. Funds are returned to your Marketplace's Merchant Account
+    proportional to the amount of the Refund.
+    """
     __metaclass__ = resource_base(collection='refunds')
 
 
 class Hold(Resource):
+    """
+    A Hold is a reservation of funds on a funding source such as a Card. This
+    reservation is guaranteed until the `expires_at` date. You may capture
+    the Hold at any time before then which will create a Debit and transfer
+    the funds to your Marketplace. If you do not capture the Hold it will
+    be marked as invalid which is represented by the `is_void` field being
+    set to `True`.
+
+    By default a Hold is created using the most recently added funding source
+    on the Account. You may specify a specific funding source such as a `Card`
+    or `BankAccount`.
+
+    """
     __metaclass__ = resource_base(collection='holds')
 
     def void(self):
+        """
+        Cancels an active Hold.
+        """
         self.is_void = True
         self.save()
 
     def capture(self, **kwargs):
+        """
+        Captures a valid Hold and returns a Debit representing the transfer of
+        funds from the buyer's Account to your Marketplace.
+
+        :rtype: Debit
+        """
         return self.account.debit(hold_uri=self.uri, **kwargs)
 
 
 class APIKey(Resource):
+    """
+    Your ApiKey is used to authenticate when performing operations on the
+    Balanced API.
+
+    **NOTE:** Never give out or expose your ApiKey. You may POST to this
+    endpoint to create new ApiKeys and then DELETE any old keys.
+    """
     __metaclass__ = resource_base(
         singular='api_key',
         collection='api_keys',
@@ -668,10 +831,23 @@ class APIKey(Resource):
 
 
 class Card(Resource):
+    """
+    A card represents a source of funds for an Account. You may Hold or Debit
+    funds from the account associated with the Card.
+    """
     __metaclass__ = resource_base(collection='cards')
 
     def debit(self, amount=None, appears_on_statement_as=None,
               hold_uri=None, meta=None, description=None):
+        """
+        Creates a Debit of funds from this Card to your Marketplace's escrow
+        account.
+
+        If `appears_on_statement_as` is nil, then Balanced will use the
+        `domain_name` property from your Marketplace.
+
+        :rtype: Debit
+        """
         if not any((amount, hold_uri)):
             raise ResourceError('Must have amount or hold_uri')
 
@@ -686,6 +862,11 @@ class Card(Resource):
         ).save()
 
     def hold(self, amount, meta=None, description=None):
+        """
+        Creates a Hold of funds from this Card to your Marketplace.
+
+        :rtype: Hold
+        """
         meta = meta or {}
         return Hold(
             uri=self.account.holds_uri,
@@ -696,10 +877,24 @@ class Card(Resource):
 
 
 class BankAccount(Resource):
+    """
+    A BankAccount is both a source, and a destination of, funds. You may
+    create Debits and Credits to and from, this funding source.
+
+    *NOTE:* The BankAccount resource does not support creating a Hold.
+    """
     __metaclass__ = resource_base(collection='bank_accounts')
 
     def debit(self, amount, appears_on_statement_as=None,
               meta=None, description=None):
+        """
+        Creates a Debit of funds from this BankAccount to your Marketplace's
+        escrow account.
+
+        :param appears_on_statement_as: If None then Balanced will use the
+            `domain_name` property from your Marketplace.
+        :rtype: Debit
+        """
         if not amount or amount <= 0:
             raise ResourceError('Must have an amount')
 
@@ -713,6 +908,12 @@ class BankAccount(Resource):
         ).save()
 
     def credit(self, amount, description=None, meta=None):
+        """
+        Creates a Credit of funds from your Marketplace's escrow account to
+        the Account associated with this BankAccount.
+
+        :rtype: Credit
+        """
         if not amount or amount <= 0:
             raise ResourceError('Must have an amount')
 
