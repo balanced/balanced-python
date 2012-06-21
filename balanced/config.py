@@ -5,7 +5,7 @@ from balanced import __version__
 
 
 def _make_user_agent():
-    return 'balanced/python/' + __version__
+    return 'balanced-python/' + __version__
 
 
 class Config(threading.local, object):

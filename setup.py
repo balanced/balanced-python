@@ -4,15 +4,62 @@ Balanced Python client library.
 See ``README.rst`` for usage advice.
 """
 import os
+import pickle
 import re
+import subprocess
+from distutils.core import Command
 
 try:
     import setuptools
 except ImportError:
     import distutils.core
+
     setup = distutils.core.setup
 else:
     setup = setuptools.setup
+
+
+class DocumentationCommand(Command):
+    description = 'build documentation and upload to s3'
+    path_to_pickled_file = 'docs/build/pickle/api_reference.fpickle'
+    destination_file = 'docs/build/python_api_reference.html'
+    user_options = []
+
+    def initialize_options(self):
+        pass
+
+    def finalize_options(self):
+        pass
+
+    def run(self):
+        self._build_docs()
+        self._upload_to_s3(self._unpickle(),
+                           'justice.web',
+                           'docs/python_api_reference.html')
+
+    def _build_docs(self):
+        p = subprocess.Popen('make clean'.split(), cwd='docs')
+        p.wait()
+        p = subprocess.Popen('make pickle'.split(), cwd='docs')
+        p.wait()
+
+    def _unpickle(self):
+        with open(self.path_to_pickled_file) as f:
+            pickled = f.read()
+        unpickled = pickle.loads(pickled)
+        return unpickled['body']
+
+    def _upload_to_s3(self, data, bucket, key_name):
+        from boto.s3.connection import S3Connection
+        from boto.s3.key import Key
+
+        conn = S3Connection()
+        bucket = conn.get_bucket(bucket)
+
+        key = Key(bucket)
+        key.key = key_name
+        key.set_contents_from_string(data)
+        key.set_acl('public-read')
 
 
 def _get_version():
@@ -61,7 +108,6 @@ PATH_TO_FILE = os.path.dirname(__file__)
 VERSION = _get_version()
 LONG_DESCRIPTION = _get_long_description()
 
-
 setup(
     name='balanced',
     version=VERSION,
@@ -81,4 +127,7 @@ setup(
         'Programming Language :: Python',
         'Topic :: Software Development :: Libraries :: Python Modules',
         ],
-    )
+    cmdclass={
+        'docs': DocumentationCommand,
+        }
+)

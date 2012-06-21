@@ -1,4 +1,4 @@
-__version__ = '0.8.7'
+__version__ = '0.8.9'
 from collections import defaultdict
 import contextlib
 
