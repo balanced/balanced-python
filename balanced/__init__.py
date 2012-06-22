@@ -1,4 +1,4 @@
-__version__ = '0.8.12'
+__version__ = '0.8.13'
 from collections import defaultdict
 import contextlib
 
@@ -53,7 +53,6 @@ Resource.http_client = http_client
 def key_switcher(the_new_api_key_secret):
     old_api_key = config.api_key_secret
     config.api_key_secret = the_new_api_key_secret
-    Resource.http_client = http_client = HTTPClient()
     try:
         yield
     finally:
