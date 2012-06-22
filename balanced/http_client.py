@@ -108,9 +108,9 @@ class HTTPClient(threading.local, object):
 
     config = Config()
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, keep_alive=True, *args, **kwargs):
         super(HTTPClient, self).__init__(*args, **kwargs)
-        self.interface = requests.session()
+        self.interface = requests.session() if keep_alive else requests
 
     # we don't use the requests hook here because we want to expose
     # that for any developer to access it directly.
