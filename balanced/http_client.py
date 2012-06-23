@@ -44,7 +44,7 @@ def wrap_raise_for_status(http_client):
                 response_instance.deserialized = deserialized
                 extra = deserialized.get('additional') or ''
                 if extra:
-                    extra = ' -- ' + extra + '.'
+                    extra = ' -- {}.'.format(extra)
                 error_msg = '{name}: {code}: {msg} {extra}'.format(
                         name=deserialized['status'],
                         code=deserialized['status_code'],
