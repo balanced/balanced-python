@@ -491,7 +491,8 @@ class Account(Resource):
             source_uri=source_uri,
         ).save()
 
-    def hold(self, amount, description=None, meta=None, source_uri=None):
+    def hold(self, amount, description=None, meta=None, source_uri=None,
+             appears_on_statement_as=None):
         """
         Creates a new Hold that represents a reservation of money on this
         Account which can be transferred via a Debit to your Marketplace
@@ -514,10 +515,11 @@ class Account(Resource):
             meta=meta,
             description=description,
             source_uri=source_uri,
+            appears_on_statement_as=appears_on_statement_as,
             ).save()
 
     def credit(self, amount, description=None, meta=None,
-               destination_uri=None):
+               destination_uri=None, appears_on_statement_as=None):
         """
         Returns a new Credit representing a transfer of funds from your
         Marketplace's escrow account to this Account.
@@ -536,6 +538,7 @@ class Account(Resource):
             amount=amount,
             meta=meta,
             description=description,
+            appears_on_statement_as=appears_on_statement_as,
             destination_uri=destination_uri,
             ).save()
 
