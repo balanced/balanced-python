@@ -258,7 +258,7 @@ class BasicUseCases(unittest.TestCase):
             merchant=BUSINESS_MERCHANT,
             bank_account_uri=bank_account.uri,
         )
-        self.assertItemsEqual(merchant.roles, ['buyer', 'merchant'])
+        self.assertItemsEqual(merchant.roles, ['merchant'])
 
     def test_11_create_a_business_merchant_with_existing_email_addr(self):
         mp = self._find_marketplace()
