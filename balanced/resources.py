@@ -91,7 +91,7 @@ class Page(object):
 
     def __repr__(self):
         _resource = _RESOURCES.from_uri(self.uri)
-        return '<Page{}{}>'.format(_resource, self.qs)
+        return '<Page{0}{1}>'.format(_resource, self.qs)
 
     def all(self):
         return list(self)
@@ -176,18 +176,18 @@ class Page(object):
         query_arguments = {}
         for expression in args:
             if not isinstance(expression, FilterExpression):
-                raise ValueError('"{}" is not a FilterExpression'.format(
+                raise ValueError('"{0}" is not a FilterExpression'.format(
                     expression))
             if expression.op == '=':
-                f = '{}'.format(expression.field.name)
+                f = '{0}'.format(expression.field.name)
             else:
-                f = '{}[{}]'.format(expression.field.name, expression.op)
+                f = '{0}[{1}]'.format(expression.field.name, expression.op)
             values = expression.value
             if not isinstance(values, (list, tuple)):
                 values = [values]
             query_arguments[f] = ','.join(str(v) for v in values)
         for k, values in kwargs.iteritems():
-            f = '{}'.format(k)
+            f = '{0}'.format(k)
             if not isinstance(values, (list, tuple)):
                 values = [values]
             v = ','.join(str(v) for v in values)
@@ -199,9 +199,9 @@ class Page(object):
         sorts = []
         for expression in args:
             if not isinstance(expression, SortExpression):
-                raise ValueError('"{}" is not a SortExpression'.format(
+                raise ValueError('"{0}" is not a SortExpression'.format(
                     expression))
-            v = '{},{}'.format(
+            v = '{0},{1}'.format(
                 expression.field.name,
                 'asc' if expression.ascending else 'desc')
             sorts.append(v)
@@ -260,7 +260,7 @@ class Resource(object):
 def uri_discovery(resource):
     uri = resource.RESOURCE['collection']
     if resource.RESOURCE['resides_under_marketplace']:
-        uri = '{}/{}'.format(
+        uri = '{0}/{1}'.format(
             Marketplace.my_marketplace.uri,
             resource.RESOURCE['collection']
             )
@@ -364,7 +364,7 @@ class _ResourceField(object):
         self.name = name
 
     def __getattr__(self, name):
-        return _ResourceField('{}.{}'.format(self.name, name))
+        return _ResourceField('{0}.{1}'.format(self.name, name))
 
     def asc(self):
         return SortExpression(self, ascending=True)
@@ -938,11 +938,11 @@ class FilterExpression(object):
 
     def __invert__(self):
         if self.inv_op is None:
-            raise TypeError('"{}" cannot be inverted', self)
+            raise TypeError('"{0}" cannot be inverted', self)
         return FilterExpression(self.field, self.inv_op, self.value, self.op)
 
     def __str__(self):
-        return '{} {} {}'.format(
+        return '{0} {1} {2}'.format(
             self.field.name, self.field.op, self.field.values)
 
 

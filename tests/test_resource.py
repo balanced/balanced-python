@@ -25,13 +25,17 @@ class TestResourceConstruction(WSGIServerTest):
             for txn in balanced.Transaction.query:
                 if isinstance(txn, balanced.Debit):
                     break
-            self.assertIsInstance(txn.created_at, datetime.datetime)
+            self.assertTrue(isinstance(txn.created_at, datetime.datetime))
 
     def test_redirects(self):
         with self.start_server(app):
-            with self.assertRaises(balanced.exc.HTTPError) as exc:
+            has_error = False
+            try:
                 balanced.APIKey().save()
-            exception = exc.exception
+            except balanced.exc.HTTPError as exc:
+                has_error = True
+            self.assertTrue(has_error)
+            exception = exc
             self.assertEqual(exception.response.status_code, 302)
             self.assertEqual(
                 exception.response.headers['location'],

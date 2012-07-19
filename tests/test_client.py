@@ -9,13 +9,12 @@ import mock
 class TestConfig(unittest.TestCase):
     def test_default_config(self):
         config = balanced.config.__class__()
-        # this is here because it tests taht if you add anything new
+        # this is here because it tests that if you add anything new
         # then you should test it here..it's not really all encompassing though
         # for example, it won't detect any @property methods..
-        self.assertItemsEqual(
-            config.__dict__.keys(),
-            ['api_key_secret', 'api_version', 'root_uri', 'requests']
-        )
+        for key in config.__dict__.keys():
+            self.assertTrue(key in ['api_key_secret', 'api_version',
+                                    'root_uri', 'requests'])
         self.assertEqual(config.root_uri, 'https://api.balancedpayments.com')
         self.assertEqual(config.api_version, '1')
         self.assertEqual(config.api_key_secret, None)
@@ -38,7 +37,7 @@ class TestClient(unittest.TestCase):
 
     def test_client_reference_config(self):
         the_config = balanced.config
-        self.assertIsNone(balanced.http_client.config.api_key_secret)
+        self.assertEqual(balanced.http_client.config.api_key_secret, None)
         the_config.api_key_secret = 'khalkhalash'
         self.assertEqual(
             balanced.http_client.config.api_key_secret, 'khalkhalash'
@@ -60,12 +59,16 @@ class TestHTTPClient(unittest.TestCase):
             }
         resp.content = 'Unhandled Exception'
         client = balanced.HTTPClient()
-        with self.assertRaises(balanced.exc.BalancedError):
+        has_error = False
+        try:
             client.deserialize(resp)
+        except balanced.exc.BalancedError:
+            has_error = True
+        self.assertTrue(has_error)
         resp.headers['Content-Type'] = 'application/json'
         resp.content = '{"hi": "world"}'
         deserialized = client.deserialize(resp)
-        self.assertItemsEqual(deserialized, {u'hi': u'world'})
+        self.assertEqual(deserialized, {u'hi': u'world'})
 
     def test_deserialization_unicode(self):
         resp = mock.Mock()
@@ -74,14 +77,18 @@ class TestHTTPClient(unittest.TestCase):
             }
         resp.content = 'Unhandled Exception'
         client = balanced.HTTPClient()
-        with self.assertRaises(balanced.exc.BalancedError):
+        has_error = False
+        try:
             client.deserialize(resp)
+        except balanced.exc.BalancedError:
+            has_error = True
+        self.assertTrue(has_error)
         resp.headers['Content-Type'] = 'application/json'
         resp.content = ('{"\\uc800\\uac74 \\ub610 \\ubb50\\uc57c": "second", '
                         '"third": "\\u06a9\\u0647 \\u0686\\u0647 '
                         '\\u06a9\\u062b\\u0627\\u0641\\u062a\\u06cc"}')
         deserialized = client.deserialize(resp)
-        self.assertItemsEqual(deserialized, {
+        self.assertEqual(deserialized, {
             u'third': (u'\u06a9\u0647 \u0686\u0647 '
                        u'\u06a9\u062b\u0627\u0641\u062a\u06cc'),
             u'\uc800\uac74 \ub610 \ubb50\uc57c': u'second'})
@@ -106,6 +113,10 @@ class TestHTTPClient(unittest.TestCase):
         wrapped = wrap_raise_for_status(client)
         wrapped(response)
 
-        with self.assertRaises(balanced.exc.HTTPError) as ex:
+        has_error = False
+        try:
             response.raise_for_status()
-        self.assertEqual(ex.exception.description, api_response['description'])
+        except balanced.exc.HTTPError as ex:
+            has_error = True
+        self.assertTrue(has_error)
+        self.assertEqual(ex.description, api_response['description'])
