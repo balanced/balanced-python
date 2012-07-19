@@ -101,7 +101,7 @@ class Page(object):
 
         if len(ret) == 1:
             return ret[0]
-        elif len(ret) == 0:
+        elif not len(ret):
             raise NoResultFound(
                 'Nothing found for one(). Make sure balanced.configure() '
                 'is invoked with your API key secret')
