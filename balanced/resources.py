@@ -2,6 +2,7 @@ import functools
 import itertools
 import logging
 import urlparse
+import warnings
 
 import iso8601
 
@@ -628,6 +629,12 @@ class Marketplace(Resource):
 
         :rtype: `Card`
         """
+
+        if region:
+            warnings.warn('The region parameter will be deprecated in the '
+                          'next minor version of balanced-python',
+                          PendingDeprecationWarning)
+
         return Card(
             card_number=card_number,
             expiration_month=expiration_month,
@@ -640,7 +647,7 @@ class Marketplace(Resource):
             region=region,
             country_code=country_code,
             phone_number=phone_number,
-            ).save()
+        ).save()
 
     def create_bank_account(self,
             name,
