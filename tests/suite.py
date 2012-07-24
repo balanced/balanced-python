@@ -330,10 +330,16 @@ class BasicUseCases(unittest.TestCase):
     def test_16_slice_syntax(self):
         total_debit = balanced.Debit.query.count()
         self.assertNotEqual(total_debit, 2)
+        self.assertEqual(len(balanced.Debit.query), total_debit)
         sliced_debits = balanced.Debit.query[:2]
         self.assertEqual(len(sliced_debits), 2)
         for debit in sliced_debits:
             self.assertIsInstance(debit, balanced.Debit)
+        all_debits = balanced.Debit.query.all()
+        last = total_debit * - 1
+        for index, debit in enumerate(all_debits):
+            self.assertEqual(debit.uri,
+                             balanced.Debit.query[last + index].uri)
 
     def test_17_test_merchant_cache_busting(self):
         # cache it.
@@ -429,7 +435,7 @@ class BasicUseCases(unittest.TestCase):
             mp = balanced.Marketplace.query.one()
         except NoResultFound:
             mp = balanced.Marketplace().save()
-            
+
         redirect_pattern = ('https://www.balancedpayments.com'
             '/marketplaces/(.*)/kyc')
 

@@ -63,6 +63,8 @@ class Page(object):
             else:
                 return list(res)
         else:
+            if item < 0:
+                return list(self[len(self) + item:len(self)])[0]
             return list(self[item:item + 1])[0]
 
     def _slice(self, start, stop):
@@ -74,6 +76,9 @@ class Page(object):
         elif start is not None:
             self.qs['offset'] = (self.offset or 0) + start
         return itertools.islice(self, start, stop)
+
+    def __len__(self):
+        return self.total
 
     def __iter__(self):
         for resource in itertools.chain(self.items, self.next_page):
