@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
 
 from __future__ import unicode_literals
-
+import re
 import unittest
 
 import requests
 
 import balanced
-from balanced.exc import NoResultFound
+from balanced.exc import NoResultFound, MoreInformationRequiredError
 
 
 # fixtures
@@ -412,3 +412,28 @@ class BasicUseCases(unittest.TestCase):
         self.assertTrue(card.id.startswith('CC'))
         self.assertEqual(card.street_address,
             INTERNATIONAL_CARD['street_address'])
+
+    def test_23_kyc_redirect(self):
+        try:
+            mp = balanced.Marketplace.query.one()
+        except NoResultFound:
+            mp = balanced.Marketplace().save()
+        merchant = {
+            'type': 'person',
+            'name': 'Marshall Jones',
+            'dob': '1980-05-27',
+            'phone_number': '9046281796',
+            'street_address': '801 High St',
+            'postal_code': '99999',
+            'region': 'EX',
+            'country_code': 'USA',
+        }
+        redirect_pattern = ('https://www.balancedpayments.com'
+            '/marketplaces/(.*)/kyc')
+
+        with self.assertRaises(MoreInformationRequiredError) as ex:
+            mp.create_merchant('marshall@poundpay.com', merchant)
+
+        redirect_uri = ex.exception.redirect_uri
+        result = re.search(redirect_pattern, redirect_uri)
+        self.assertTrue(result)

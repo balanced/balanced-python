@@ -7,7 +7,7 @@ from requests.models import REDIRECT_STATI
 
 from balanced.config import Config
 from balanced.utils import to_json
-from balanced.exc import HTTPError, BalancedError
+from balanced.exc import HTTPError, BalancedError, MoreInformationRequiredError
 
 serializers = {
     'application/json': to_json
@@ -34,9 +34,10 @@ def wrap_raise_for_status(http_client):
                 raise_for_status(allow_redirects=False)
             except requests.HTTPError, exc:
                 if exc.response.status_code in REDIRECT_STATI:
-                    redirection = HTTPError('%s' % exc)
+                    redirection = MoreInformationRequiredError('%s' % exc)
                     redirection.status_code = exc.response.status_code
                     redirection.response = exc.response
+                    redirection.redirect_uri = exc.response.headers['Location']
                     raise redirection
                 deserialized = http_client.deserialize(
                     response_instance
