@@ -95,6 +95,17 @@ BANK_ACCOUNT = {
     'bank_code': '121042882',
     }
 
+PERSON_FAILING_KYC = {
+    'type': 'person',
+    'name': 'William James',
+    'dob': '1842-01-01',
+    'phone_number': '+16505551234',
+    'street_address': '801 High St',
+    'postal_code': '99999',
+    'region': 'EX',
+    'country_code': 'USA',
+    }
+
 
 # tests
 
@@ -418,21 +429,12 @@ class BasicUseCases(unittest.TestCase):
             mp = balanced.Marketplace.query.one()
         except NoResultFound:
             mp = balanced.Marketplace().save()
-        merchant = {
-            'type': 'person',
-            'name': 'Marshall Jones',
-            'dob': '1980-05-27',
-            'phone_number': '9046281796',
-            'street_address': '801 High St',
-            'postal_code': '99999',
-            'region': 'EX',
-            'country_code': 'USA',
-        }
+            
         redirect_pattern = ('https://www.balancedpayments.com'
             '/marketplaces/(.*)/kyc')
 
         with self.assertRaises(MoreInformationRequiredError) as ex:
-            mp.create_merchant('marshall@poundpay.com', merchant)
+            mp.create_merchant('marshall@poundpay.com', PERSON_FAILING_KYC)
 
         redirect_uri = ex.exception.redirect_uri
         result = re.search(redirect_pattern, redirect_uri)
