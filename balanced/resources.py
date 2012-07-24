@@ -63,8 +63,16 @@ class Page(object):
             else:
                 return list(res)
         else:
+            # negative index
             if item < 0:
-                return list(self[len(self) + item:len(self)])[0]
+                # e.g. let len(self) = 3 and item = -1
+                # self[length of collection - item : length of collection]
+                # self[3 - 1: 3]
+                length = len(self)
+                return list(self[length + item:length])[0]
+            # positive index
+            # let item = 2
+            # self[2:3][0]
             return list(self[item:item + 1])[0]
 
     def _slice(self, start, stop):
