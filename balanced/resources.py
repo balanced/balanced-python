@@ -482,12 +482,26 @@ class Account(Resource):
     """
     __metaclass__ = resource_base(collection='accounts')
 
-    def debit(self, amount=None, appears_on_statement_as=None,
-              hold_uri=None, meta=None, description=None, source_uri=None):
+    def debit(self,
+              amount=None,
+              appears_on_statement_as=None,
+              hold_uri=None,
+              meta=None,
+              description=None,
+              source_uri=None,
+              merchant_uri=None):
         """
         :rtype: A `Debit` representing a flow of money from this Account to
             your Marketplace's escrow account.
-
+        :param amount: Amount to hold in cents, must be >= 50
+        :param appears_on_statement_as: description of the payment as it needs
+        to appear on customers card statement
+        :param meta: Key/value collection
+        :param description: Human readable description
+        :param source_uri: A specific funding source such as a `Card`
+            associated with this account. If not specified the `Card` most
+            recently added to this `Account` is used.
+        :param merchant_uri: merchant providing service or delivering product.
         """
         if not any((amount, hold_uri)):
             raise ResourceError('Must have an amount or hold uri')
@@ -503,6 +517,7 @@ class Account(Resource):
             meta=meta,
             description=description,
             source_uri=source_uri,
+            merchant_uri=merchant_uri,
         ).save()
 
     def hold(self, amount, description=None, meta=None, source_uri=None,
@@ -532,15 +547,24 @@ class Account(Resource):
             appears_on_statement_as=appears_on_statement_as,
             ).save()
 
-    def credit(self, amount, description=None, meta=None,
-               destination_uri=None, appears_on_statement_as=None):
+    def credit(self,
+               amount,
+               description=None,
+               meta=None,
+               destination_uri=None,
+               appears_on_statement_as=None,
+               debit_uri=None):
         """
         Returns a new Credit representing a transfer of funds from your
         Marketplace's escrow account to this Account.
 
-        Args:
-            destination_uri: A specific funding destination such as a
+        :param amount: Amount to hold in cents
+        :param description: Human readable description
+        :param meta: Key/value collection
+        :param destination_uri: A specific funding destination such as a
                 `BankAccount` associated with this account.
+        :param appears_on_statement_as: description of the payment as it needs
+        :param debit_uri: the debit corresponding to this particular credit
 
         Returns:
             A `Credit` representing the transfer of funds from your
@@ -554,6 +578,7 @@ class Account(Resource):
             description=description,
             appears_on_statement_as=appears_on_statement_as,
             destination_uri=destination_uri,
+            debit_uri=debit_uri,
             ).save()
 
     def add_card(self, card_uri):
