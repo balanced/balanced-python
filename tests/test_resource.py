@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 import datetime
 import unittest
+import mock
 
 import balanced
 from balanced.resources import Resource
@@ -146,3 +147,18 @@ class TestPage(unittest.TestCase):
         self.assertEqual(q.qs, {'sort': ['me,asc']})
         q.sort(balanced.Marketplace.f.u.desc())
         self.assertEqual(q.qs, {'sort': ['me,asc', 'u,desc']})
+
+
+class TestMarketplace(unittest.TestCase):
+
+    @mock.patch('balanced.resources.Card')
+    @mock.patch('balanced.resources.warnings')
+    def test_region_deprecation(self, warnings, _):
+        mkt = balanced.Marketplace()
+        mkt.create_card('John Name', '341111111111111', '12', '2020',
+                        region='CA')
+        call_args, _ = warnings.warn.call_args
+        self.assertEqual(call_args[0],
+            ('The region parameter will be deprecated in the '
+             'next minor version of balanced-python'))
+        self.assertEqual(call_args[1], PendingDeprecationWarning)

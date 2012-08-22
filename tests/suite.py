@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
 
 from __future__ import unicode_literals
-
+import re
 import unittest
 
 import requests
 
 import balanced
-from balanced.exc import NoResultFound
+from balanced.exc import NoResultFound, MoreInformationRequiredError
 
 
 # fixtures
@@ -93,6 +93,17 @@ BANK_ACCOUNT = {
     'name': 'Homer Jay',
     'account_number': '112233a',
     'bank_code': '121042882',
+    }
+
+PERSON_FAILING_KYC = {
+    'type': 'person',
+    'name': 'William James',
+    'dob': '1842-01-01',
+    'phone_number': '+16505551234',
+    'street_address': '801 High St',
+    'postal_code': '99999',
+    'region': 'EX',
+    'country_code': 'USA',
     }
 
 
@@ -319,10 +330,16 @@ class BasicUseCases(unittest.TestCase):
     def test_16_slice_syntax(self):
         total_debit = balanced.Debit.query.count()
         self.assertNotEqual(total_debit, 2)
+        self.assertEqual(len(balanced.Debit.query), total_debit)
         sliced_debits = balanced.Debit.query[:2]
         self.assertEqual(len(sliced_debits), 2)
         for debit in sliced_debits:
             self.assertIsInstance(debit, balanced.Debit)
+        all_debits = balanced.Debit.query.all()
+        last = total_debit * - 1
+        for index, debit in enumerate(all_debits):
+            self.assertEqual(debit.uri,
+                             balanced.Debit.query[last + index].uri)
 
     def test_17_test_merchant_cache_busting(self):
         # cache it.
@@ -412,3 +429,19 @@ class BasicUseCases(unittest.TestCase):
         self.assertTrue(card.id.startswith('CC'))
         self.assertEqual(card.street_address,
             INTERNATIONAL_CARD['street_address'])
+
+    def test_23_kyc_redirect(self):
+        try:
+            mp = balanced.Marketplace.query.one()
+        except NoResultFound:
+            mp = balanced.Marketplace().save()
+
+        redirect_pattern = ('https://www.balancedpayments.com'
+            '/marketplaces/(.*)/kyc')
+
+        with self.assertRaises(MoreInformationRequiredError) as ex:
+            mp.create_merchant('marshall@poundpay.com', PERSON_FAILING_KYC)
+
+        redirect_uri = ex.exception.redirect_uri
+        result = re.search(redirect_pattern, redirect_uri)
+        self.assertTrue(result)
