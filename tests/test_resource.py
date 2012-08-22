@@ -4,6 +4,7 @@ import unittest
 import mock
 
 import balanced
+from balanced.resources import Resource
 from .application import app
 from .utils import WSGIServerTest
 
@@ -38,6 +39,72 @@ class TestResourceConstruction(WSGIServerTest):
                 exception.response.headers['location'],
                 '/v1/your-mom'
                 )
+
+
+class MyResource(Resource):
+    def __init__(self):
+        pass
+
+class TestRepr(unittest.TestCase):
+
+    def test_repr_basically_works(self):
+        resource = Resource()
+        self.assertEqual(repr(resource), "Resource()")
+
+    def test_repr_works_more_complicately(self):
+        resource = MyResource()
+        resource.cheese = u'balls'
+        self.assertEqual(repr(resource), "MyResource(cheese = u'balls')")
+
+    def test_repr_lines_up_attrs(self):
+        resource = MyResource()
+        resource.cheese = u'balls'
+        resource.gee = u'whiz'
+        self.assertEqual(repr(resource), """\
+MyResource(cheese       = u'balls',
+           gee          = u'whiz')""")
+
+    def test_repr_keeps_lining_up_attrs_and_does_other_stuff(self):
+        resource = MyResource()
+        resource.cheese = u'balls'
+        resource.gee = u'whiz'
+        resource.foo = u'alleroo'
+        resource.bar = u'blah'
+        resource.baz_baz_baz_baz = u'blooo'
+        resource.buz = u'blam'
+        self.assertEqual(repr(resource), """\
+MyResource(bar          = u'blah',
+           baz_baz_baz_baz = u'blooo',
+           buz          = u'blam',
+           cheese       = u'balls',
+           foo          = u'alleroo',
+           gee          = u'whiz')"""),
+
+    def test_repr_nests_Resources(self):
+        resource = MyResource()
+        resource.cheese = u'balls'
+        resource.gee = u'whiz'
+        resource.blah = MyResource()
+        resource.blah.beach = u'weather'
+        self.assertEqual(repr(resource), """\
+MyResource(blah         = MyResource(beach = u'weather'),
+           cheese       = u'balls',
+           gee          = u'whiz')""")
+
+    def test_repr_lines_up_nested_Resources(self):
+        resource = MyResource()
+        resource.cheese = u'balls'
+        resource.gee = u'whiz'
+        resource.blah = MyResource()
+        resource.blah.beach = u'weather'
+        resource.blah.weather = u'man'
+        resource.blah.man = u'child'
+        self.assertEqual(repr(resource), """\
+MyResource(blah         = MyResource(beach        = u'weather',
+                                     man          = u'child',
+                                     weather      = u'man'),
+           cheese       = u'balls',
+           gee          = u'whiz')""")
 
 
 class TestPage(unittest.TestCase):
