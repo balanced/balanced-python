@@ -1,6 +1,7 @@
 import functools
 import itertools
 import logging
+import os
 import urlparse
 
 import iso8601
@@ -219,9 +220,21 @@ class Resource(object):
     http_client = None
 
     def __repr__(self):
-        attrs = ', '.join(['%s=%s' % (k, repr(v)) for k, v in
-                           self.__dict__.iteritems()])
-        return '%s(%s)' % (self.__class__.__name__, attrs)
+        indent = " " * (len(self.__class__.__name__) + 1)
+        attrs = []
+        nitems = len(self.__dict__)
+        for k, v in sorted(self.__dict__.iteritems()):
+            if nitems > 1:
+                k = k.ljust(12)
+            out = repr(v)
+            if isinstance(v, Resource):
+                indent2 = indent
+                indent2 += " " * (len(k) + 3 + len(v.__class__.__name__) + 1)
+                out = [indent2 + line.strip() for line in out.splitlines()]
+                out = os.linesep.join(out).lstrip()
+            attrs.append(indent + '%s = %s' % (k, out))
+        attrs = (',' + os.linesep).join(attrs)
+        return '%s(%s)' % (self.__class__.__name__, attrs.lstrip())
 
     @classproperty
     def query(cls):
