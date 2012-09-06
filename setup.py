@@ -114,7 +114,7 @@ setup(
     url='https://balancedpayments.com/',
     license='BSD',
     author='Mahmoud Abdelkader',
-    author_email='devsupport@poundpay.com',
+    author_email='support@balancedpayments.com',
     description='Payments platform for marketplaces',
     long_description=LONG_DESCRIPTION,
     packages=['balanced'],

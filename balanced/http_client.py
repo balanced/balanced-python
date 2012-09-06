@@ -1,5 +1,4 @@
 import json
-import os
 import threading
 
 import requests
@@ -64,21 +63,24 @@ def wrap_raise_for_status(http_client):
 
 def munge_request(http_op):
 
+    def urljoin(*args):
+        return '/'.join(map(lambda x: str(x).strip('/'), args))
+
     # follows the spec for requests.<http operation>
     def transform_into_absolute_url(config, url):
         if url.startswith(config.uri):
             return url
         url = url.lstrip('/')
         if url.startswith(config.version):
-            url = os.path.join(config.root_uri, url)
+            url = urljoin(config.root_uri, url)
         else:
-            url = os.path.join(config.uri, url)
+            url = urljoin(config.uri, url)
         return url
 
     def prepend_version(config, url):
         url = url.lstrip('/')
         if not url.startswith(config.version):
-            url = os.path.join(config.version, url)
+            url = urljoin(config.version, url)
         return url
 
     def make_absolute_url(client, url, **kwargs):
