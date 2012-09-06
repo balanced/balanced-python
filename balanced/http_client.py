@@ -1,12 +1,11 @@
 import json
-import os
 import threading
 
 import requests
 from requests.models import REDIRECT_STATI
 
 from balanced.config import Config
-from balanced.utils import to_json
+from balanced.utils import to_json, urljoin
 from balanced.exc import HTTPError, BalancedError, MoreInformationRequiredError
 
 serializers = {
@@ -70,15 +69,15 @@ def munge_request(http_op):
             return url
         url = url.lstrip('/')
         if url.startswith(config.version):
-            url = os.path.join(config.root_uri, url)
+            url = urljoin(config.root_uri, url)
         else:
-            url = os.path.join(config.uri, url)
+            url = urljoin(config.uri, url)
         return url
 
     def prepend_version(config, url):
         url = url.lstrip('/')
         if not url.startswith(config.version):
-            url = os.path.join(config.version, url)
+            url = urljoin(config.version, url)
         return url
 
     def make_absolute_url(client, url, **kwargs):

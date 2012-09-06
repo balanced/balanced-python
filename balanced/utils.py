@@ -260,3 +260,7 @@ def to_json(*args, **kwargs):
     return json.dumps(dict(*args, **kwargs),
         use_decimal=True,
         default=json_serializer)
+
+
+def urljoin(*args):
+    return '/'.join(map(lambda x: str(x).strip('/'), args))
