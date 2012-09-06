@@ -5,7 +5,7 @@ import requests
 from requests.models import REDIRECT_STATI
 
 from balanced.config import Config
-from balanced.utils import to_json
+from balanced.utils import to_json, urljoin
 from balanced.exc import HTTPError, BalancedError, MoreInformationRequiredError
 
 serializers = {
@@ -62,9 +62,6 @@ def wrap_raise_for_status(http_client):
 
 
 def munge_request(http_op):
-
-    def urljoin(*args):
-        return '/'.join(map(lambda x: str(x).strip('/'), args))
 
     # follows the spec for requests.<http operation>
     def transform_into_absolute_url(config, url):

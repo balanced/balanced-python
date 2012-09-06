@@ -1,7 +1,7 @@
-import os
 import threading
 
 from balanced import __version__
+from balanced.utils import urljoin
 
 
 def _make_user_agent():
@@ -30,7 +30,7 @@ class Config(threading.local, object):
 
     @property
     def uri(self):
-        return os.path.join(self.root_uri, self.version)
+        return urljoin(self.root_uri, self.version)
 
     @property
     def version(self):
