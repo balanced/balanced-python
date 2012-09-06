@@ -7,7 +7,7 @@ from requests.models import REDIRECT_STATI
 
 from balanced.config import Config
 from balanced.utils import to_json
-from balanced.exc import HTTPError, BalancedError
+from balanced.exc import HTTPError, BalancedError, MoreInformationRequiredError
 
 serializers = {
     'application/json': to_json
@@ -34,9 +34,10 @@ def wrap_raise_for_status(http_client):
                 raise_for_status(allow_redirects=False)
             except requests.HTTPError, exc:
                 if exc.response.status_code in REDIRECT_STATI:
-                    redirection = HTTPError('%s' % exc)
+                    redirection = MoreInformationRequiredError('%s' % exc)
                     redirection.status_code = exc.response.status_code
                     redirection.response = exc.response
+                    redirection.redirect_uri = exc.response.headers['Location']
                     raise redirection
                 deserialized = http_client.deserialize(
                     response_instance
@@ -44,7 +45,7 @@ def wrap_raise_for_status(http_client):
                 response_instance.deserialized = deserialized
                 extra = deserialized.get('additional') or ''
                 if extra:
-                    extra = ' -- ' + extra + '.'
+                    extra = ' -- {}.'.format(extra)
                 error_msg = '{name}: {code}: {msg} {extra}'.format(
                         name=deserialized['status'],
                         code=deserialized['status_code'],
@@ -108,9 +109,9 @@ class HTTPClient(threading.local, object):
 
     config = Config()
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, keep_alive=True, *args, **kwargs):
         super(HTTPClient, self).__init__(*args, **kwargs)
-        self.session = requests.session()
+        self.interface = requests.session() if keep_alive else requests
 
     # we don't use the requests hook here because we want to expose
     # that for any developer to access it directly.
@@ -120,7 +121,7 @@ class HTTPClient(threading.local, object):
     @munge_request
     def get(self, uri, **kwargs):
         kwargs = self.serialize(kwargs.copy())
-        resp = self.session.get(uri, **kwargs)
+        resp = self.interface.get(uri, **kwargs)
         if kwargs.get('return_response', True):
             resp.deserialized = self.deserialize(resp)
         return resp
@@ -128,7 +129,7 @@ class HTTPClient(threading.local, object):
     @munge_request
     def post(self, uri, data=None, **kwargs):
         data = self.serialize({'data': data}).pop('data')
-        resp = self.session.post(uri, data=data, **kwargs)
+        resp = self.interface.post(uri, data=data, **kwargs)
         if kwargs.get('return_response', True):
             resp.deserialized = self.deserialize(resp)
         return resp
@@ -136,7 +137,7 @@ class HTTPClient(threading.local, object):
     @munge_request
     def put(self, uri, data=None, **kwargs):
         data = self.serialize({'data': data}).pop('data')
-        resp = self.session.put(uri, data=data, **kwargs)
+        resp = self.interface.put(uri, data=data, **kwargs)
         if kwargs.get('return_response', True):
             resp.deserialized = self.deserialize(resp)
         return resp
@@ -144,7 +145,7 @@ class HTTPClient(threading.local, object):
     @munge_request
     def delete(self, uri, **kwargs):
         kwargs = self.serialize(kwargs.copy())
-        resp = self.session.delete(uri, **kwargs)
+        resp = self.interface.delete(uri, **kwargs)
         if kwargs.get('return_response', True):
             resp.deserialized = self.deserialize(resp)
         return resp

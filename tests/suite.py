@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
 
 from __future__ import unicode_literals
-
+import re
 import unittest
 
 import requests
 
 import balanced
-from balanced.exc import NoResultFound
+from balanced.exc import NoResultFound, MoreInformationRequiredError
 
 
 # fixtures
@@ -93,6 +93,17 @@ BANK_ACCOUNT = {
     'name': 'Homer Jay',
     'account_number': '112233a',
     'bank_code': '121042882',
+    }
+
+PERSON_FAILING_KYC = {
+    'type': 'person',
+    'name': 'William James',
+    'dob': '1842-01-01',
+    'phone_number': '+16505551234',
+    'street_address': '801 High St',
+    'postal_code': '99999',
+    'region': 'EX',
+    'country_code': 'USA',
     }
 
 
@@ -205,13 +216,13 @@ class BasicUseCases(unittest.TestCase):
         self.assertIsInstance(debit.account, balanced.Account)
         self.assertIsInstance(debit.hold, balanced.Hold)
         self.assertEqual(debit.description, 'Descripty')
-        self.assertEqual(debit.fee, (1000 * 0.035))
+        self.assertEqual(debit.fee, (1000 * 0.029))
         self.assertEqual(debit.appears_on_statement_as, 'atest')
 
         refund = debit.refund(amount=100)
         #self.assertTrue(refund.id.startswith('RF'))
         self.assertEqual(refund.debit.uri, debit.uri)
-        self.assertEqual(refund.fee, -1 * int((100 * 0.035)))
+        self.assertEqual(refund.fee, -1 * int((100 * 0.029)))
 
         another_debit = account.debit(
             amount=1000,
@@ -224,20 +235,20 @@ class BasicUseCases(unittest.TestCase):
     def test_07_create_hold_and_void_it(self):
         account = self._find_account('buyer')
         hold = account.hold(amount=1500, description='Hold me')
-        self.assertEqual(hold.fee, 35)
+        self.assertEqual(hold.fee, 30)
         self.assertEqual(hold.account.uri, account.uri)
         self.assertFalse(hold.is_void)
         self.assertEqual(hold.description, 'Hold me')
         hold.void()
         self.assertTrue(hold.is_void)
-        self.assertEqual(hold.fee, 35)  # fee still the same
+        self.assertEqual(hold.fee, 30)  # fee still the same
 
     def test_08_create_hold_and_debit_it(self):
         account = self._find_account('buyer')
         hold = account.hold(amount=1500)
         self.assertTrue(hold.id.startswith('HL'))
         debit = hold.capture()
-        self.assertEqual(debit.fee, int((1500 * 0.035)))
+        self.assertEqual(debit.fee, int((1500 * 0.029)))
 
     def test_09_create_a_person_merchant(self):
         mp = self._find_marketplace()
@@ -258,7 +269,7 @@ class BasicUseCases(unittest.TestCase):
             merchant=BUSINESS_MERCHANT,
             bank_account_uri=bank_account.uri,
         )
-        self.assertItemsEqual(merchant.roles, ['buyer', 'merchant'])
+        self.assertItemsEqual(merchant.roles, ['merchant'])
 
     def test_11_create_a_business_merchant_with_existing_email_addr(self):
         mp = self._find_marketplace()
@@ -319,10 +330,16 @@ class BasicUseCases(unittest.TestCase):
     def test_16_slice_syntax(self):
         total_debit = balanced.Debit.query.count()
         self.assertNotEqual(total_debit, 2)
+        self.assertEqual(len(balanced.Debit.query), total_debit)
         sliced_debits = balanced.Debit.query[:2]
         self.assertEqual(len(sliced_debits), 2)
         for debit in sliced_debits:
             self.assertIsInstance(debit, balanced.Debit)
+        all_debits = balanced.Debit.query.all()
+        last = total_debit * - 1
+        for index, debit in enumerate(all_debits):
+            self.assertEqual(debit.uri,
+                             balanced.Debit.query[last + index].uri)
 
     def test_17_test_merchant_cache_busting(self):
         # cache it.
@@ -412,3 +429,19 @@ class BasicUseCases(unittest.TestCase):
         self.assertTrue(card.id.startswith('CC'))
         self.assertEqual(card.street_address,
             INTERNATIONAL_CARD['street_address'])
+
+    def test_23_kyc_redirect(self):
+        try:
+            mp = balanced.Marketplace.query.one()
+        except NoResultFound:
+            mp = balanced.Marketplace().save()
+
+        redirect_pattern = ('https://www.balancedpayments.com'
+            '/marketplaces/(.*)/kyc')
+
+        with self.assertRaises(MoreInformationRequiredError) as ex:
+            mp.create_merchant('marshall@poundpay.com', PERSON_FAILING_KYC)
+
+        redirect_uri = ex.exception.redirect_uri
+        result = re.search(redirect_pattern, redirect_uri)
+        self.assertTrue(result)
