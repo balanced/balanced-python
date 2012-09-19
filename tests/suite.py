@@ -313,13 +313,6 @@ class BasicUseCases(unittest.TestCase):
         self.assertEqual(the_exception.status_code, 409)
         print the_exception
 
-    def test_14_appends_marketplace_for_creating_account(self):
-        with self.assertRaises(requests.HTTPError) as exc:
-            balanced.Account().save()
-        the_exception = exc.exception
-        self.assertEqual(the_exception.status_code, 400)
-        print the_exception
-
     def test_15_debits_without_an_account(self):
         with self.assertRaises(requests.HTTPError) as exc:
             balanced.Debit().save()
