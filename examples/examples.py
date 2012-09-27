@@ -57,8 +57,6 @@ print "our buyer account: " + buyer.uri
 print "hold some amount of funds on the buyer, lets say 15$"
 the_hold = buyer.hold(1500)
 
-print "the hold has a fee of {} cents".format(the_hold.fee)
-
 print "ok, no more holds! lets just capture it (for the full amount)"
 debit = the_hold.capture()
 
@@ -71,11 +69,6 @@ print "i have {} in escrow!".format(marketplace.in_escrow)
 
 print "cool. now let me refund the full amount"
 refund = debit.refund()  # the full amount!
-
-print "notice how Balanced refunds you your fees? refund fees: {}".format(
-    refund.fee)
-if refund.fee + debit.fee:
-    raise Exception("Woah, fees are incorrect")
 
 print ("ok, we have a merchant that's signing up, let's create an account for "
        "them first, lets create their bank account.")
