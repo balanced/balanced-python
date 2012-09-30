@@ -5,6 +5,8 @@ import balanced
 from balanced.http_client import wrap_raise_for_status
 import mock
 
+import threading
+
 
 class TestConfig(unittest.TestCase):
     def test_default_config(self):
@@ -109,3 +111,36 @@ class TestHTTPClient(unittest.TestCase):
         with self.assertRaises(balanced.exc.HTTPError) as ex:
             response.raise_for_status()
         self.assertEqual(ex.exception.description, api_response['description'])
+
+class MultiThreadedUserCases( unittest.TestCase ):
+		def setUp( self ):
+			balanced.configure( "test" )
+
+		def tearDown( self ):
+			balanced.configure( None )
+
+		def test_multithreading_does_not_break_the_client_and_cause_the_api_key_to_change( self ):
+			class TestThread( threading.Thread ):
+				def __init__( self ):
+					threading.Thread.__init__( self )
+					self.key = False
+
+				def run( self ):
+					config = balanced.config
+
+					print config.api_key_secret
+					self.key = balanced.config.api_key_secret == "test" 
+					 
+			threads = []
+
+			for _ in xrange( 2 ):
+				t = TestThread()
+				threads.append( t )
+
+			for t in threads:
+				t.start()
+
+			for t in threads:
+				t.join( len( threads ) )
+
+				self.assertTrue( t.key )
