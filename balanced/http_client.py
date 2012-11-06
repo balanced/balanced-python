@@ -145,7 +145,7 @@ class HTTPClient(threading.local, object):
     def delete(self, uri, **kwargs):
         kwargs = self.serialize(kwargs.copy())
         resp = self.interface.delete(uri, **kwargs)
-        if kwargs.get('return_response', True):
+        if kwargs.get('return_response', True) and resp.status_code != 204:
             resp.deserialized = self.deserialize(resp)
         return resp
 
