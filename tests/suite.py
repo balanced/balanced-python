@@ -6,7 +6,7 @@ import unittest
 
 import requests
 
-import balanced
+import balanced.accounts
 from balanced.exc import NoResultFound, MoreInformationRequiredError
 
 
@@ -89,7 +89,7 @@ INTERNATIONAL_CARD = {
     'expiration_year': 2014,
 }
 
-MARKETPLACE_BANK_ACCOUNT = {
+ACCOUNT_BANK_ACCOUNT = {
     'name': 'Homer Jay',
     'account_number': '112233a',
     'bank_code': '121042882',
@@ -274,7 +274,7 @@ class BasicUseCases(unittest.TestCase):
             "account_number": "28304871049",
             "bank_code": "121042882",
         }
-        bank_account = balanced.MarketplaceBankAccount(**payload).save()
+        bank_account = balanced.accounts.BankAccount(**payload).save()
         merchant = mp.create_merchant(
             'mahmoud+khalkhalash@poundpay.com',
             merchant=BUSINESS_MERCHANT,
@@ -373,7 +373,7 @@ class BasicUseCases(unittest.TestCase):
             mp = balanced.Marketplace.query.one()
         except NoResultFound:
             mp = balanced.Marketplace().save()
-        bank_account = mp.create_bank_account(**MARKETPLACE_BANK_ACCOUNT)
+        bank_account = mp.create_bank_account(**ACCOUNT_BANK_ACCOUNT)
         self.assertTrue(bank_account.id.startswith('BA'))
         self.assertTrue(hasattr(bank_account, 'last_four'))
         self.assertTrue(hasattr(bank_account, 'bank_code'))
@@ -422,7 +422,7 @@ class BasicUseCases(unittest.TestCase):
             mp = balanced.Marketplace.query.one()
         except NoResultFound:
             mp = balanced.Marketplace().save()
-        payload = MARKETPLACE_BANK_ACCOUNT.copy()
+        payload = ACCOUNT_BANK_ACCOUNT.copy()
         payload['account_number'] = '1212121-110-019'
         bank_account = mp.create_bank_account(**payload)
         self.assertEqual(bank_account.last_four, '0019')
