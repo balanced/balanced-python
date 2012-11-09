@@ -701,8 +701,8 @@ class Marketplace(Resource):
                             bank_code,
                             ):
         """
-        Tokenizes an `accounts.BankAccount` which can then be associated with an
-        Account.
+        Tokenizes an `accounts.BankAccount` which can then be associated with
+        an Account.
 
         :rtype: `accounts.BankAccount`
         """
@@ -940,7 +940,7 @@ class BankAccount(Resource):
 
     def credit(self, amount, description=None):
         if not amount or amount <= 0:
-            raise ResourceError('Must have an amount')
+            raise ResourceError('Must have an amount >= 0')
 
         return Credit(
             uri=self.credits_uri,
