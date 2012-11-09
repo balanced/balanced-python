@@ -473,14 +473,12 @@ class BasicUseCases(unittest.TestCase):
         self.assertEqual(len(bas), count)
         self.assertGreater(count, 0)
 
-    @unittest.skip("Not supported yet")
     def test_26_toplevel_bank_account_credit(self):
         payload = BANK_ACCOUNT.copy()
         bank_account = balanced.BankAccount(**payload).save()
         cr = bank_account.credit(50)
         self.assertEqual(cr.amount, 50)
 
-    @unittest.skip("Not supported yet")
     def test_27_toplevel_credit(self):
         payload = CREDIT.copy()
         payload['bank_account'] = BANK_ACCOUNT.copy()
