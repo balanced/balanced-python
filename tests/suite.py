@@ -43,7 +43,7 @@ PERSON_MERCHANT = {
     'dob': '1842-01-01',
     'phone_number': '+16505551234',
     'country_code': 'USA',
-    }
+}
 
 BUSINESS_PRINCIPAL = {
     'name': 'William James',
@@ -53,7 +53,7 @@ BUSINESS_PRINCIPAL = {
     'dob': '1842-01-01',
     'phone_number': '+16505551234',
     'country_code': 'USA',
-    }
+}
 
 BUSINESS_MERCHANT = {
     'type': 'business',
@@ -64,7 +64,7 @@ BUSINESS_MERCHANT = {
     'phone_number': '+16505551234',
     'country_code': 'USA',
     'person': BUSINESS_PRINCIPAL,
-    }
+}
 
 CARD = {
     'street_address': '123 Fake Street',
@@ -75,7 +75,7 @@ CARD = {
     'card_number': '4444424444444440',
     'expiration_month': 12,
     'expiration_year': 2013,
-    }
+}
 
 INTERNATIONAL_CARD = {
     'street_address': '田原３ー８ー１',
@@ -87,13 +87,13 @@ INTERNATIONAL_CARD = {
     'card_number': '4444424444444440',
     'expiration_month': 12,
     'expiration_year': 2014,
-    }
+}
 
-BANK_ACCOUNT = {
+MARKETPLACE_BANK_ACCOUNT = {
     'name': 'Homer Jay',
     'account_number': '112233a',
     'bank_code': '121042882',
-    }
+}
 
 PERSON_FAILING_KYC = {
     'type': 'person',
@@ -104,9 +104,20 @@ PERSON_FAILING_KYC = {
     'postal_code': '99999',
     'region': 'EX',
     'country_code': 'USA',
-    }
+}
 
+# ACH api
+BANK_ACCOUNT = {
+    'name': 'Homer Jay',
+    'account_number': '112233a',
+    'routing_number': '121042882',
+    'type': 'checking'
+}
 
+CREDIT = {
+    'amount': 9876,
+    'description': 'I love money',
+}
 # tests
 
 class BasicUseCases(unittest.TestCase):
@@ -161,15 +172,15 @@ class BasicUseCases(unittest.TestCase):
             'card_number': card_number,
             'expiration_month': 12,
             'expiration_year': 2013,
-            }
+        }
         card = balanced.Card(**card_payload).save()
         card_uri = card.uri
         mp = self._find_marketplace()
 
         buyer = mp.create_buyer(email_address='m@poundpay.com',
-            card_uri=card_uri,
-            meta={'test#': 'test_d'}
-        )
+                                card_uri=card_uri,
+                                meta={'test#': 'test_d'}
+                                )
         self.assertTrue(buyer.id.startswith('AC'), buyer.id)
         self.assertEqual(buyer.name, 'khalkhalash onastick')
         self.assertEqual(buyer.roles, ['buyer'])
@@ -253,7 +264,7 @@ class BasicUseCases(unittest.TestCase):
     def test_09_create_a_person_merchant(self):
         mp = self._find_marketplace()
         merchant = mp.create_merchant('mahmoud@poundpay.com',
-            merchant=PERSON_MERCHANT)
+                                      merchant=PERSON_MERCHANT)
         self.assertEqual(merchant.roles, ['merchant'])
 
     def test_10_create_a_business_merchant(self):
@@ -262,8 +273,8 @@ class BasicUseCases(unittest.TestCase):
             "name": "Levain Bakery LLC",
             "account_number": "28304871049",
             "bank_code": "121042882",
-            }
-        bank_account = balanced.BankAccount(**payload).save()
+        }
+        bank_account = balanced.MarketplaceBankAccount(**payload).save()
         merchant = mp.create_merchant(
             'mahmoud+khalkhalash@poundpay.com',
             merchant=BUSINESS_MERCHANT,
@@ -275,7 +286,7 @@ class BasicUseCases(unittest.TestCase):
         mp = self._find_marketplace()
         with self.assertRaises(requests.HTTPError) as exc:
             mp.create_merchant('mahmoud@poundpay.com',
-                merchant=PERSON_MERCHANT)
+                               merchant=PERSON_MERCHANT)
         the_exception = exc.exception
         self.assertEqual(the_exception.status_code, 409)
         self.assertIn(
@@ -290,7 +301,7 @@ class BasicUseCases(unittest.TestCase):
         original_balance = marketplace.in_escrow
         merchants = list(marketplace.accounts.filter(
             email_address='mahmoud+khalkhalash@poundpay.com'
-            ))
+        ))
         merchant = merchants[0]
         credit = merchant.credit(amount=1000)
         self.assertTrue(credit.id.startswith('CR'))
@@ -341,7 +352,7 @@ class BasicUseCases(unittest.TestCase):
             'account_number': '112233a',
             'name': 'hald',
             'bank_code': '121042882',
-            }
+        }
         self.assertTrue(hasattr(self.merchant.me, 'bank_account'))
         a_merchant.save()
         self.assertFalse(hasattr(a_merchant, 'bank_account'))
@@ -354,7 +365,7 @@ class BasicUseCases(unittest.TestCase):
         card = mp.create_card(**CARD)
         self.assertTrue(card.id.startswith('CC'))
         account = mp.create_merchant('randy@pandy.com',
-            merchant=PERSON_MERCHANT)
+                                     merchant=PERSON_MERCHANT)
         account.add_card(card.uri)
 
     def test_19_create_and_associate_bank_account(self):
@@ -362,10 +373,13 @@ class BasicUseCases(unittest.TestCase):
             mp = balanced.Marketplace.query.one()
         except NoResultFound:
             mp = balanced.Marketplace().save()
-        bank_account = mp.create_bank_account(**BANK_ACCOUNT)
+        bank_account = mp.create_bank_account(**MARKETPLACE_BANK_ACCOUNT)
         self.assertTrue(bank_account.id.startswith('BA'))
+        self.assertTrue(hasattr(bank_account, 'last_four'))
+        self.assertTrue(hasattr(bank_account, 'bank_code'))
+        self.assertTrue(hasattr(bank_account, 'routing_number'))
         account = mp.create_merchant('free@example.com',
-            merchant=PERSON_MERCHANT)
+                                     merchant=PERSON_MERCHANT)
         account.add_bank_account(bank_account.uri)
 
     def test_20_test_filter_and_sort(self):
@@ -380,26 +394,26 @@ class BasicUseCases(unittest.TestCase):
         deb3 = buyer.debit(amount=2211, meta={'tag': '2'})
 
         debs = (balanced.Debit.query
-            .filter(balanced.Debit.f.meta.tag == '1')
-            .all())
+                .filter(balanced.Debit.f.meta.tag == '1')
+                .all())
         self.assertItemsEqual([deb.id for deb in debs], [deb1.id, deb2.id])
 
         debs = (balanced.Debit.query
-            .filter(balanced.Debit.f.meta.tag == '2')
-            .all())
+                .filter(balanced.Debit.f.meta.tag == '2')
+                .all())
         self.assertItemsEqual([deb.id for deb in debs], [deb3.id])
 
         debs = (balanced.Debit.query
-            .filter(balanced.Debit.f.meta.contains('tag'))
-            .sort(balanced.Debit.f.amount.asc())
-            .all())
+                .filter(balanced.Debit.f.meta.contains('tag'))
+                .sort(balanced.Debit.f.amount.asc())
+                .all())
         self.assertEqual(len(debs), 3)
         self.assertEqual([deb.id for deb in debs], [deb1.id, deb3.id, deb2.id])
 
         debs = (balanced.Debit.query
-            .filter(balanced.Debit.f.meta.contains('tag'))
-            .sort(balanced.Debit.f.amount.desc())
-            .all())
+                .filter(balanced.Debit.f.meta.contains('tag'))
+                .sort(balanced.Debit.f.amount.desc())
+                .all())
         self.assertEqual(len(debs), 3)
         self.assertEqual([deb.id for deb in debs], [deb2.id, deb3.id, deb1.id])
 
@@ -408,7 +422,7 @@ class BasicUseCases(unittest.TestCase):
             mp = balanced.Marketplace.query.one()
         except NoResultFound:
             mp = balanced.Marketplace().save()
-        payload = BANK_ACCOUNT.copy()
+        payload = MARKETPLACE_BANK_ACCOUNT.copy()
         payload['account_number'] = '1212121-110-019'
         bank_account = mp.create_bank_account(**payload)
         self.assertEqual(bank_account.last_four, '0019')
@@ -421,7 +435,7 @@ class BasicUseCases(unittest.TestCase):
         card = mp.create_card(**INTERNATIONAL_CARD)
         self.assertTrue(card.id.startswith('CC'))
         self.assertEqual(card.street_address,
-            INTERNATIONAL_CARD['street_address'])
+                         INTERNATIONAL_CARD['street_address'])
 
     def test_23_kyc_redirect(self):
         try:
@@ -430,7 +444,7 @@ class BasicUseCases(unittest.TestCase):
             mp = balanced.Marketplace().save()
 
         redirect_pattern = ('https://www.balancedpayments.com'
-            '/marketplaces/(.*)/kyc')
+                            '/marketplaces/(.*)/kyc')
 
         with self.assertRaises(MoreInformationRequiredError) as ex:
             mp.create_merchant('marshall@poundpay.com', PERSON_FAILING_KYC)
@@ -438,3 +452,37 @@ class BasicUseCases(unittest.TestCase):
         redirect_uri = ex.exception.redirect_uri
         result = re.search(redirect_pattern, redirect_uri)
         self.assertTrue(result)
+
+    def test_24_toplevel_bank_account(self):
+        count = balanced.BankAccount.query.count()
+        payload = BANK_ACCOUNT.copy()
+        bank_account = balanced.BankAccount(**payload).save()
+        self.assertFalse(hasattr(bank_account, 'last_four'))
+        self.assertFalse(hasattr(bank_account, 'bank_code'))
+        self.assertTrue(hasattr(bank_account, 'routing_number'))
+        self.assertEqual(bank_account.routing_number,
+                         payload['routing_number'])
+        self.assertEqual(payload['account_number'][-4:],
+                         bank_account.account_number)
+        self.assertIsNotNone(bank_account.credits_uri)
+        self.assertEqual(balanced.BankAccount.query.count(), count + 1)
+
+    def test_25_index_toplevel_bank_accounts(self):
+        count = balanced.BankAccount.query.count()
+        bas = balanced.BankAccount.query.all()
+        self.assertEqual(len(bas), count)
+        self.assertGreater(count, 0)
+
+    @unittest.skip("Not supported yet")
+    def test_26_toplevel_bank_account_credit(self):
+        payload = BANK_ACCOUNT.copy()
+        bank_account = balanced.BankAccount(**payload).save()
+        cr = bank_account.credit(50)
+        self.assertEqual(cr.amount, 50)
+
+    @unittest.skip("Not supported yet")
+    def test_27_toplevel_credit(self):
+        payload = CREDIT.copy()
+        payload['bank_account'] = BANK_ACCOUNT.copy()
+        credit = balanced.Credit(**payload).save()
+        self.assertEqual(credit.amount, payload['amount'])

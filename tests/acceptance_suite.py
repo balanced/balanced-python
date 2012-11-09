@@ -123,7 +123,7 @@ class AcceptanceUseCases(TestCases):
     def test_create_simple_credit(self):
         mp = balanced.Marketplace.query.one()
         payload = dict(self.bank_account_payload)
-        bank_account = balanced.BankAccount(**payload).save()
+        bank_account = balanced.MarketplaceBankAccount(**payload).save()
         merchant = mp.create_merchant(
             'cvraman@spectroscopy.com',
             merchant=merchants.BUSINESS_MERCHANT,
@@ -324,7 +324,7 @@ class AcceptanceUseCases(TestCases):
         # credit her later
         buyer.debit(2 * 700)
         bank_account_payload = dict(self.bank_account_payload)
-        bank_account = balanced.BankAccount(**bank_account_payload).save()
+        bank_account = balanced.MarketplaceBankAccount(**bank_account_payload).save()
         bank_account_uri = bank_account.uri
         buyer.add_bank_account(bank_account_uri=bank_account_uri)
 
@@ -347,7 +347,7 @@ class AcceptanceUseCases(TestCases):
         )
         # Add a bank account to test crediting
         bank_account_payload = dict(self.bank_account_payload)
-        bank_account = balanced.BankAccount(**bank_account_payload).save()
+        bank_account = balanced.MarketplaceBankAccount(**bank_account_payload).save()
         bank_account_uri = bank_account.uri
         buyer.add_bank_account(bank_account_uri=bank_account_uri)
 
@@ -559,9 +559,9 @@ class AICases(TestCases):
         buyer = self.mp.create_buyer(self._email_address(), card.uri)
         buyer.debit(555)
 
-        ba1 = balanced.BankAccount(
+        ba1 = balanced.MarketplaceBankAccount(
             **bank_accounts.BANK_ACCOUNT).save()
-        ba2 = balanced.BankAccount(
+        ba2 = balanced.MarketplaceBankAccount(
             **bank_accounts.BANK_ACCOUNT).save()
         merchant = self.mp.create_merchant(
             self._email_address(),
@@ -573,12 +573,12 @@ class AICases(TestCases):
         cases = [
             (merchant.credit,
              dict(amount=51),
-             balanced.Credit,
+             balanced.AccountCredit,
              dict(destination=ba2, amount=51),
              ),
             (merchant.credit,
              dict(amount=52, destination_uri=ba1.uri),
-             balanced.Credit,
+             balanced.AccountCredit,
              dict(destination=ba1, amount=52),
              ),
             ]
@@ -588,9 +588,9 @@ class AICases(TestCases):
         card = self.mp.create_card(**cards.CARD)
         buyer = self.mp.create_buyer(self._email_address(), card.uri)
 
-        ba1 = balanced.BankAccount(
+        ba1 = balanced.MarketplaceBankAccount(
             **bank_accounts.BANK_ACCOUNT).save()
-        ba2 = balanced.BankAccount(
+        ba2 = balanced.MarketplaceBankAccount(
             **bank_accounts.BANK_ACCOUNT).save()
         merchant = self.mp.create_merchant(
             self._email_address(),
@@ -644,7 +644,7 @@ class AICases(TestCases):
         buyer_card = self.mp.create_card(**cards.CARD)
         buyer = self.mp.create_buyer(self._email_address(), buyer_card.uri)
 
-        ba = balanced.BankAccount(
+        ba = balanced.MarketplaceBankAccount(
             **bank_accounts.BANK_ACCOUNT).save()
         merchant = self.mp.create_merchant(
             self._email_address(),
@@ -678,7 +678,7 @@ class AICases(TestCases):
         buyer_card = self.mp.create_card(**cards.CARD)
         buyer = self.mp.create_buyer(self._email_address(), buyer_card.uri)
 
-        ba = balanced.BankAccount(
+        ba = balanced.MarketplaceBankAccount(
             **bank_accounts.BANK_ACCOUNT).save()
         merchant = self.mp.create_merchant(
             self._email_address(),
@@ -718,7 +718,7 @@ class AICases(TestCases):
         self.assertItemsEqual(buyer.roles, ['buyer', 'merchant'])
 
     def test_debit_uses_newly_added_funding_src(self):
-        bank_account = balanced.BankAccount(
+        bank_account = balanced.MarketplaceBankAccount(
             **bank_accounts.BANK_ACCOUNT).save()
         merchant_account = self.mp.create_merchant(
             self._email_address(),
@@ -743,7 +743,7 @@ class AICases(TestCases):
         self.assertEqual(debit.source.id, bank_account.id)
 
     def test_maximum_credit_amount(self):
-        bank_account = balanced.BankAccount(
+        bank_account = balanced.MarketplaceBankAccount(
             **bank_accounts.BANK_ACCOUNT).save()
         merchant_account = self.mp.create_merchant(
             self._email_address(),
@@ -780,7 +780,7 @@ class AICases(TestCases):
         self.assertIn('must be <= 1000000000', str(ex))
 
     def test_maximum_refund_amount(self):
-        bank_account = balanced.BankAccount(
+        bank_account = balanced.MarketplaceBankAccount(
             **bank_accounts.BANK_ACCOUNT).save()
         merchant = self.mp.create_merchant(
             self._email_address(),
@@ -794,7 +794,7 @@ class AICases(TestCases):
         card = self.mp.create_card(**cards.CARD)
         buyer = self.mp.create_buyer(self._email_address(), card.uri)
         debit = buyer.debit(200)
-        bank_account = balanced.BankAccount(
+        bank_account = balanced.MarketplaceBankAccount(
             **bank_accounts.BANK_ACCOUNT).save()
         merchant.credit(100)
         with self.assertRaises(balanced.exc.HTTPError) as ex_ctx:
@@ -806,7 +806,7 @@ class AICases(TestCases):
         debit.refund()
 
     def test_view_credits_once_bank_account_has_been_invalidated(self):
-        bank_account = balanced.BankAccount(
+        bank_account = balanced.MarketplaceBankAccount(
             **bank_accounts.BANK_ACCOUNT).save()
         merchant = self.mp.create_merchant(
             self._email_address(),
