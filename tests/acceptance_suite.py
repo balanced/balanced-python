@@ -129,7 +129,7 @@ class AcceptanceUseCases(TestCases):
             merchant=merchants.BUSINESS_MERCHANT,
             bank_account_uri=bank_account.uri,
         )
-        self.assertItemsEqual(merchant.roles, ['buyer', 'merchant'])
+        self.assertItemsEqual(merchant.roles, ['merchant'])
 
         amount = 10000
         buyer_account = self._find_buyer_account()
@@ -259,7 +259,7 @@ class AcceptanceUseCases(TestCases):
         the_exception = exc.exception
         self.assertEqual(the_exception.status_code, 409)
         self.assertEqual(the_exception.category_code,
-            'bad-funding-info')
+            'no-funding-source')
 
         with self.assertRaises(requests.HTTPError) as exc:
             # ... and explicitly
@@ -267,14 +267,14 @@ class AcceptanceUseCases(TestCases):
         the_exception = exc.exception
         self.assertEqual(the_exception.status_code, 409)
         self.assertEqual(the_exception.category_code,
-            'bad-funding-info')
+            'card-not-valid')
 
         with self.assertRaises(requests.HTTPError) as exc:
             buyer.credit(8000)
         the_exception = exc.exception
         self.assertEqual(the_exception.status_code, 409)
         self.assertEqual(the_exception.category_code,
-            'illegal-credit')
+            'no-funding-destination')
 
     def test_merchant_no_bank_account(self):
         mp = balanced.Marketplace.query.one()
@@ -382,14 +382,14 @@ class AcceptanceUseCases(TestCases):
             owner.debit(600)
         the_exception = exc.exception
         self.assertEqual(the_exception.status_code, 409)
-        self.assertEqual('bad-funding-info',
+        self.assertEqual('no-funding-source',
             the_exception.category_code)
 
         with self.assertRaises(requests.HTTPError) as exc:
             owner.credit(900)
         the_exception = exc.exception
         self.assertEqual(the_exception.status_code, 409)
-        self.assertEqual('bad-funding-info',
+        self.assertEqual('no-funding-destination',
             the_exception.category_code)
 
     def test_redirect_on_merchant_failure(self):
@@ -491,12 +491,12 @@ class AICases(TestCases):
             (buyer1.hold,
              dict(amount=-100),
              balanced.exc.HTTPError,
-             'Invalid field "amount" - "-100"',
+             'Invalid field [amount] - "-100" must be >= ',
              ),
             (buyer1.hold,
              dict(amount=100, source_uri=card2.uri),
              balanced.exc.HTTPError,
-             'Funding source is not associated with account',
+             ' is not associated with account',
              ),
             ]
         self._test_transaction_failures(cases)
@@ -549,7 +549,7 @@ class AICases(TestCases):
             (debit2.refund,
              dict(amount=1000002),
              balanced.exc.HTTPError,
-             'Refund amount must be less than the debit amount',
+             'Invalid field [amount] - "1000002" must be <= 102',
              ),
             ]
         self._test_transaction_failures(cases)
@@ -623,13 +623,12 @@ class AICases(TestCases):
             (merchant.credit,
              dict(amount=52, destination_uri=ba2.uri),
              balanced.exc.HTTPError,
-             'Funding destination is not associated with account',
+             'is not associated with account',
              ),
             ]
         self._test_transaction_failures(cases)
 
-        ba1.is_invalid = True
-        ba1.save()
+        ba1.delete()
 
         cases = [
             (merchant.credit,
@@ -703,7 +702,8 @@ class AICases(TestCases):
         ex = ex_ctx.exception
         self.assertEqual(ex.status_code, 400)
         self.assertIn(
-            'Invalid field "merchant_uri" - v1/no/a/merchant not found',
+            'Invalid field [merchant_uri] - "v1/no/a/merchant" does not '
+            'resolve to merchant',
             str(ex))
 
     def test_upgrade_account_to_merchant_success(self):
@@ -726,21 +726,11 @@ class AICases(TestCases):
             bank_account_uri=bank_account.uri,
             )
 
-        # debit bank account
-        debit = merchant_account.debit(amount=100)
-        self.assertEqual(debit.source.id, bank_account.id)
-
         # debit card
         card = balanced.Card(**cards.CARD).save()
         merchant_account.add_card(card.uri)
         debit = merchant_account.debit(amount=100)
         self.assertEqual(debit.source.id, card.id)
-
-        # debit bank account
-        card.is_valid = False
-        card.save()
-        debit = merchant_account.debit(amount=100)
-        self.assertEqual(debit.source.id, bank_account.id)
 
     def test_maximum_credit_amount(self):
         bank_account = balanced.BankAccount(
@@ -842,3 +832,8 @@ class AICases(TestCases):
 
     def test_tokenize_card_without_address(self):
         card = balanced.Card(**cards.CARD_NO_ADDRESS).save()
+
+    def test_delete_bank_account(self):
+        bank_account = balanced.BankAccount(
+                           **bank_accounts.BANK_ACCOUNT).save()
+        bank_account.delete()
