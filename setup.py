@@ -1,7 +1,7 @@
 """
 Balanced Python client library.
 
-See ``README.rst`` for usage advice.
+See ``README.mkd`` for usage advice.
 """
 import os
 import pickle
