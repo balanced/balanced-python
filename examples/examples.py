@@ -113,10 +113,6 @@ if card.is_valid:
     raise Exception("This card is INCORRECTLY VALID")
 
 print "invalidating a bank account"
-bank_account.is_valid = False
-bank_account.save()
-
-if bank_account.is_valid:
-    raise Exception("This card is INCORRECTLY VALID")
+bank_account.delete()
 
 print "and there you have it :)"
