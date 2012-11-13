@@ -50,7 +50,7 @@ class Page(object):
             # fail fast.
             if (isinstance(stop, int) and
                 isinstance(start, int) and
-                stop - start <= 0):
+                    stop - start <= 0):
                 return []
 
             elif any((isinstance(start, int) and start < 0,
@@ -284,7 +284,7 @@ def uri_discovery(resource):
         uri = '{}/{}'.format(
             Marketplace.my_marketplace.uri,
             resource.RESOURCE['collection']
-            )
+        )
     return uri
 
 
@@ -310,7 +310,7 @@ def is_date(value):
         value and
         isinstance(value, basestring) and
         'Z' in value
-        )
+    )
 
 
 def is_uri(key):
@@ -471,7 +471,7 @@ def resource_base(singular=None,
                 '__new__': the_new,
                 'fields': fields,
                 'f': fields,
-                })
+            })
 
             the_class = type.__new__(mcs, classname, bases, clsdict)
             _RESOURCES.add(the_class)
@@ -552,7 +552,7 @@ class Account(Resource):
             description=description,
             source_uri=source_uri,
             appears_on_statement_as=appears_on_statement_as,
-            ).save()
+        ).save()
 
     def credit(self,
                amount,
@@ -586,7 +586,7 @@ class Account(Resource):
             appears_on_statement_as=appears_on_statement_as,
             destination_uri=destination_uri,
             debit_uri=debit_uri,
-            ).save()
+        ).save()
 
     def add_card(self, card_uri):
         """
@@ -657,18 +657,18 @@ class Marketplace(Resource):
         resides_under_marketplace=False)
 
     def create_card(self,
-            name,
-            card_number,
-            expiration_month,
-            expiration_year,
-            security_code=None,
-            street_address=None,
-            city=None,
-            region=None,
-            postal_code=None,
-            country_code=None,
-            phone_number=None,
-            ):
+                    name,
+                    card_number,
+                    expiration_month,
+                    expiration_year,
+                    security_code=None,
+                    street_address=None,
+                    city=None,
+                    region=None,
+                    postal_code=None,
+                    country_code=None,
+                    phone_number=None,
+                    ):
         """
         Tokenizes a `Card` which can then be associated with an Account.
 
@@ -695,10 +695,10 @@ class Marketplace(Resource):
         ).save()
 
     def create_bank_account(self,
-            name,
-            account_number,
-            bank_code,
-            ):
+                            name,
+                            account_number,
+                            bank_code,
+                            ):
         """
         Tokenizes a `BankAccount` which can then be associated with an Account.
 
@@ -709,7 +709,7 @@ class Marketplace(Resource):
             name=name,
             account_number=account_number,
             bank_code=bank_code,
-            ).save()
+        ).save()
 
     def create_buyer(self, email_address, card_uri, name=None, meta=None):
         """
