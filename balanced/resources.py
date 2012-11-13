@@ -992,8 +992,9 @@ class BankAccount(Resource):
         return credit
 
     def save(self):
+        # default type to 'checking' on create since it was not always required
         if not getattr(self, 'id', None) and not hasattr(self, 'type'):
-            self.type =  'checking'
+            self.type = 'checking'
         return super(BankAccount, self).save()
 
 
