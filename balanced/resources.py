@@ -89,8 +89,13 @@ class Page(object):
         return self.total
 
     def __iter__(self):
-        for resource in itertools.chain(self.items, self.next_page):
-            yield resource
+        if self.next_page:
+            for resource in itertools.chain(self.items, self.next_page):
+                yield resource
+        else:
+            # New-style, no pagination
+            for resource in self.items:
+                yield resource
 
     @classmethod
     def from_uri_and_params(cls, uri, params):
@@ -159,8 +164,10 @@ class Page(object):
 
     @property
     def next_page(self):
-        uri = self._lazy_loaded['next_uri']
-        return self._fetch(uri)
+        if 'next_uri' in self._lazy_loaded:
+            uri = self._lazy_loaded['next_uri']
+            return self._fetch(uri)
+        return None
 
     @property
     def last_page(self):
@@ -698,6 +705,7 @@ class Marketplace(Resource):
         :rtype: `BankAccount`
         """
         return BankAccount(
+            uri=self.bank_accounts_uri,
             name=name,
             account_number=account_number,
             bank_code=bank_code,
@@ -818,7 +826,8 @@ class Credit(Resource):
     destination associated with an Account. You may specify a specific
     funding source.
     """
-    __metaclass__ = resource_base(collection='credits')
+    __metaclass__ = resource_base(collection='credits',
+                                  resides_under_marketplace=False)
 
 
 class Refund(Resource):
@@ -931,7 +940,8 @@ class BankAccount(Resource):
 
     *NOTE:* The BankAccount resource does not support creating a Hold.
     """
-    __metaclass__ = resource_base(collection='bank_accounts')
+    __metaclass__ = resource_base(collection='bank_accounts',
+                                  resides_under_marketplace=False)
 
     def debit(self, amount, appears_on_statement_as=None,
               meta=None, description=None):
@@ -958,7 +968,7 @@ class BankAccount(Resource):
     def credit(self, amount, description=None, meta=None):
         """
         Creates a Credit of funds from your Marketplace's escrow account to
-        the Account associated with this BankAccount.
+        this BankAccount.
 
         :rtype: Credit
         """
@@ -966,12 +976,25 @@ class BankAccount(Resource):
             raise ResourceError('Must have an amount')
 
         meta = meta or {}
-        return Credit(
-            uri=self.account.credits_uri,
+
+        if getattr(self, 'account', None):
+            uri = self.account.credits_uri
+        else:
+            uri = self.credits_uri
+
+        credit = Credit(
+            uri=uri,
             amount=amount,
-            meta=meta,
             description=description,
-        ).save()
+            meta=meta,
+        )
+        credit.save()
+        return credit
+
+    def save(self):
+        if not getattr(self, 'id', None) and not hasattr(self, 'type'):
+            self.type =  'checking'
+        return super(BankAccount, self).save()
 
 
 class FilterExpression(object):

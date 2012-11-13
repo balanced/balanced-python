@@ -106,6 +106,18 @@ PERSON_FAILING_KYC = {
     'country_code': 'USA',
     }
 
+BANK_ACCOUNT_W_TYPE = {
+    'name': 'Homer Jay',
+    'account_number': '112233a',
+    'routing_number': '121042882',
+    'type': 'checking'
+}
+
+CREDIT = {
+    'amount': 9876,
+    'description': 'I love money',
+}
+
 
 # tests
 
@@ -143,6 +155,12 @@ class BasicUseCases(unittest.TestCase):
         self.assertIsNotNone(balanced.config.api_key_secret)
         mps = balanced.Marketplace.query.all()
         self.assertEqual(len(mps), 1)
+
+    def _create_marketplace(self):
+        try:
+            return balanced.Marketplace.query.one()
+        except NoResultFound:
+            return balanced.Marketplace().save()
 
     def _find_marketplace(self):
         return balanced.Marketplace.query.one()
@@ -257,7 +275,7 @@ class BasicUseCases(unittest.TestCase):
         self.assertEqual(merchant.roles, ['merchant'])
 
     def test_10_create_a_business_merchant(self):
-        mp = self._find_marketplace()
+        mp = self._create_marketplace()
         payload = {
             "name": "Levain Bakery LLC",
             "account_number": "28304871049",
@@ -404,30 +422,21 @@ class BasicUseCases(unittest.TestCase):
         self.assertEqual([deb.id for deb in debs], [deb2.id, deb3.id, deb1.id])
 
     def test_21_mask_bank_account(self):
-        try:
-            mp = balanced.Marketplace.query.one()
-        except NoResultFound:
-            mp = balanced.Marketplace().save()
+        mp = self._create_marketplace()
         payload = BANK_ACCOUNT.copy()
         payload['account_number'] = '1212121-110-019'
         bank_account = mp.create_bank_account(**payload)
         self.assertEqual(bank_account.last_four, '0019')
 
     def test_22_create_international_card(self):
-        try:
-            mp = balanced.Marketplace.query.one()
-        except NoResultFound:
-            mp = balanced.Marketplace().save()
+        mp = self._create_marketplace()
         card = mp.create_card(**INTERNATIONAL_CARD)
         self.assertTrue(card.id.startswith('CC'))
         self.assertEqual(card.street_address,
             INTERNATIONAL_CARD['street_address'])
 
     def test_23_kyc_redirect(self):
-        try:
-            mp = balanced.Marketplace.query.one()
-        except NoResultFound:
-            mp = balanced.Marketplace().save()
+        mp = self._create_marketplace()
 
         redirect_pattern = ('https://www.balancedpayments.com'
             '/marketplaces/(.*)/kyc')
@@ -438,3 +447,53 @@ class BasicUseCases(unittest.TestCase):
         redirect_uri = ex.exception.redirect_uri
         result = re.search(redirect_pattern, redirect_uri)
         self.assertTrue(result)
+
+    def test_24_toplevel_bank_account(self):
+        self._create_marketplace()
+        count = balanced.BankAccount.query.count()
+        payload = BANK_ACCOUNT_W_TYPE.copy()
+        bank_account = balanced.BankAccount(**payload).save()
+        self.assertFalse(hasattr(bank_account, 'last_four'))
+        self.assertFalse(hasattr(bank_account, 'bank_code'))
+        self.assertTrue(hasattr(bank_account, 'routing_number'))
+        self.assertEqual(bank_account.routing_number,
+                         payload['routing_number'])
+        self.assertEqual(payload['account_number'][-4:],
+                         bank_account.account_number[-4:])
+        self.assertIsNotNone(bank_account.credits_uri)
+        self.assertEqual(balanced.BankAccount.query.count(), count + 1)
+
+    def test_25_index_toplevel_bank_accounts(self):
+        self._create_marketplace()
+        count = balanced.BankAccount.query.count()
+        bas = balanced.BankAccount.query.all()
+        self.assertEqual(len(bas), count)
+        self.assertGreater(count, 0)
+
+    def test_26_toplevel_bank_account_credit(self):
+        self._create_marketplace()
+        buyer = self._find_account('buyer')
+        card = balanced.Marketplace.my_marketplace.create_card(**CARD)
+        buyer.add_card(card.uri)
+        buyer.debit(1212121)
+
+        payload = BANK_ACCOUNT_W_TYPE.copy()
+        bank_account = balanced.BankAccount(**payload).save()
+        cr = bank_account.credit(50)
+        self.assertEqual(cr.amount, 50)
+
+    def test_27_toplevel_credit(self):
+        self._create_marketplace()
+        buyer = self._find_account('buyer')
+        card = balanced.Marketplace.my_marketplace.create_card(**CARD)
+        buyer.add_card(card.uri)
+        buyer.debit(1212121)
+
+        payload = CREDIT.copy()
+        payload['bank_account'] = BANK_ACCOUNT_W_TYPE.copy()
+        credit = balanced.Credit(**payload).save()
+        self.assertEqual(credit.amount, payload['amount'])
+        self.assertEqual(credit.description, payload['description'])
+        self.assertNotIn('id', credit.bank_account)
+        self.assertNotIn('uri', credit.bank_account)
+        self.assertNotIn('created_at', credit.bank_account)
