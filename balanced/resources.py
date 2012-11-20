@@ -89,7 +89,7 @@ class Page(object):
         return self.total
 
     def __iter__(self):
-        if self.next_page:
+        if self.next_page is not None:
             for resource in itertools.chain(self.items, self.next_page):
                 yield resource
         else:
