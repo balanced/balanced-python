@@ -103,5 +103,5 @@ class TestPage(unittest.TestCase):
     def test_from_uri_and_dict(self):
         expected = resources.INVOICES.copy()
         expected.pop('uri')
-        page = balanced.resources.Page.from_uri_and_dict(**resources.INVOICES)
+        page = balanced.resources.Page.from_response(**resources.INVOICES)
         self.assertDictEqual(page._lazy_loaded, expected)

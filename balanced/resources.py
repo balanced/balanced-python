@@ -109,7 +109,7 @@ class Page(object):
         return cls(uri)
 
     @classmethod
-    def from_uri_and_dict(cls, uri, **kwargs):
+    def from_response(cls, uri, **kwargs):
         instance = cls(uri)
         setattr(instance, '_lazy_loaded', kwargs)
         return instance
@@ -376,7 +376,7 @@ def make_constructors():
                         "based access", key)
                 else:
                     if is_collection(uri):
-                        value = Page.from_uri_and_dict(**value)
+                        value = Page.from_response(**value)
                     else:
                         value = resource(**value)
             elif key.endswith('_at') and is_date(value):
