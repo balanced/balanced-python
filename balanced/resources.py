@@ -219,11 +219,9 @@ class Page(object):
                 values = [values]
             v = ','.join(str(v) for v in values)
             query_arguments[f] = v
-        if query_arguments:
-            qs = self.qs.copy()
-            qs.update(query_arguments)
-            return Page.from_uri_and_params(self.uri, qs)
-        return self
+        qs = self.qs.copy()
+        qs.update(query_arguments)
+        return Page.from_uri_and_params(self.uri, qs)
 
     def sort(self, *args):
         sorts = []
