@@ -6,6 +6,7 @@ import mock
 import balanced
 from .application import app
 from .utils import WSGIServerTest
+from .fixtures import resources
 
 
 class TestResourceConstruction(WSGIServerTest):
@@ -95,3 +96,12 @@ class TestMarketplace(unittest.TestCase):
             ('The region parameter will be deprecated in the '
              'next minor version of balanced-python'))
         self.assertEqual(call_args[1], PendingDeprecationWarning)
+
+
+class TestPage(unittest.TestCase):
+
+    def test_from_uri_and_dict(self):
+        expected = resources.INVOICES.copy()
+        expected.pop('uri')
+        page = balanced.resources.Page.from_uri_and_dict(**resources.INVOICES)
+        self.assertDictEqual(page._lazy_loaded, expected)

@@ -108,6 +108,12 @@ class Page(object):
             uri = uri + '?' + url_encode(parsed_qs)
         return cls(uri)
 
+    @classmethod
+    def from_uri_and_dict(cls, uri, **kwargs):
+        instance = cls(uri)
+        setattr(instance, '_lazy_loaded', kwargs)
+        return instance
+
     def __repr__(self):
         _resource = _RESOURCES.from_uri(self.uri)
         return '<Page{}{}>'.format(_resource, self.qs)
@@ -289,6 +295,7 @@ def uri_discovery(resource):
 
 
 def is_collection(uri):
+    uri = urlparse.urlparse(uri).path
     _, _, end_identifier = uri.rstrip('/').rpartition('/')
     return end_identifier in _RESOURCES
 
@@ -368,7 +375,10 @@ def make_constructors():
                         "added in resources.py. Defaulting to dictionary "
                         "based access", key)
                 else:
-                    value = resource(**value)
+                    if is_collection(uri):
+                        value = Page.from_uri_and_dict(**value)
+                    else:
+                        value = resource(**value)
             elif key.endswith('_at') and is_date(value):
                 value = iso8601.parse_date(value)
             setattr(self, key, value)
