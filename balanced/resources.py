@@ -110,7 +110,7 @@ class Page(object):
 
     @classmethod
     def from_response(cls, uri, **kwargs):
-        instance = cls(uri)
+        instance = cls.from_uri_and_params(uri, None)
         setattr(instance, '_lazy_loaded', kwargs)
         return instance
 
@@ -219,8 +219,9 @@ class Page(object):
                 values = [values]
             v = ','.join(str(v) for v in values)
             query_arguments[f] = v
-        self.qs.update(query_arguments)
-        return self
+        qs = self.qs.copy()
+        qs.update(query_arguments)
+        return Page.from_uri_and_params(self.uri, qs)
 
     def sort(self, *args):
         sorts = []
