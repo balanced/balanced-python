@@ -927,6 +927,7 @@ class Card(Resource):
             hold_uri=hold_uri,
             meta=meta,
             description=description,
+            source_uri=self.uri,
         ).save()
 
     def hold(self, amount, meta=None, description=None):
@@ -940,7 +941,8 @@ class Card(Resource):
             uri=self.account.holds_uri,
             amount=amount,
             meta=meta,
-            description=description
+            description=description,
+            source_uri=self.uri,
         ).save()
 
 
@@ -974,6 +976,7 @@ class BankAccount(Resource):
             appears_on_statement_as=appears_on_statement_as,
             meta=meta,
             description=description,
+            source_uri=self.uri,
         ).save()
 
     def credit(self, amount, description=None, meta=None):
@@ -992,12 +995,14 @@ class BankAccount(Resource):
             uri = self.account.credits_uri
         else:
             uri = self.credits_uri
+        destination_uri = self.uri
 
         credit = Credit(
             uri=uri,
             amount=amount,
             description=description,
             meta=meta,
+            destination_uri=destination_uri,
         )
         credit.save()
         return credit

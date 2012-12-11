@@ -1,4 +1,4 @@
-__version__ = '0.9.2'
+__version__ = '0.9.3'
 from collections import defaultdict
 import contextlib
 
@@ -25,7 +25,7 @@ __all__ = [
     Card.__name__,
     BankAccount.__name__,
     exc.__name__.partition('.')[-1],
-    ]
+]
 
 http_client = HTTPClient()
 config = http_client.config

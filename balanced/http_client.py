@@ -10,12 +10,12 @@ from balanced.exc import HTTPError, BalancedError, MoreInformationRequiredError
 
 serializers = {
     'application/json': to_json
-    }
+}
 
 
 deserializers = {
     'application/json': json.loads
-    }
+}
 
 
 REDIRECT_STATI = list(REDIRECT_STATI)
@@ -40,17 +40,17 @@ def wrap_raise_for_status(http_client):
                     raise redirection
                 deserialized = http_client.deserialize(
                     response_instance
-                    )
+                )
                 response_instance.deserialized = deserialized
                 extra = deserialized.get('additional') or ''
                 if extra:
                     extra = ' -- {}.'.format(extra)
                 error_msg = '{name}: {code}: {msg} {extra}'.format(
-                        name=deserialized['status'],
-                        code=deserialized['status_code'],
-                        msg=deserialized['description'].encode('utf8'),
-                        extra=extra.encode('utf8'),
-                    )
+                    name=deserialized['status'],
+                    code=deserialized['status_code'],
+                    msg=deserialized['description'].encode('utf8'),
+                    extra=extra.encode('utf8'),
+                )
                 http_error = HTTPError(error_msg)
                 for error, value in response_instance.deserialized.iteritems():
                     setattr(http_error, error, value)
@@ -94,7 +94,7 @@ def munge_request(http_op):
         kwargs['allow_redirects'] = False
         kwargs['hooks'] = {
             'response': wrap_raise_for_status(client)
-            }
+        }
 
         if client.config.api_key_secret:
             kwargs['auth'] = (client.config.api_key_secret, None)

@@ -236,11 +236,11 @@ class BalancedJSONSerializer(object):
         for serializer in self.serialization_chain:
             result = serializer(serializable)
             if ((not self.explicit_none_check and result) or
-                (self.explicit_none_check and result is not None)):
+                    (self.explicit_none_check and result is not None)):
                 return result
 
         error_msg = _JSON_ERROR_MSG.format(type(serializable),
-            repr(serializable))
+                                           repr(serializable))
         raise TypeError(error_msg)
 
 
@@ -258,8 +258,8 @@ json_serializer.add(handle_datetime)
 
 def to_json(*args, **kwargs):
     return json.dumps(dict(*args, **kwargs),
-        use_decimal=True,
-        default=json_serializer)
+                      use_decimal=True,
+                      default=json_serializer)
 
 
 def urljoin(*args):

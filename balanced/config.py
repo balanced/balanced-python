@@ -24,9 +24,9 @@ class Config(threading.local, object):
                 'Accept': 'application/json',
                 'Content-Type': 'application/json',
                 'User-agent': _make_user_agent(),
-                },
-                'danger_mode': True,
-            }
+            },
+            'danger_mode': True,
+        }
 
     @property
     def uri(self):
