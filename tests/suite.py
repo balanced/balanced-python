@@ -234,13 +234,13 @@ class BasicUseCases(unittest.TestCase):
         self.assertIsInstance(debit.account, balanced.Account)
         self.assertIsInstance(debit.hold, balanced.Hold)
         self.assertEqual(debit.description, 'Descripty')
-        self.assertEqual(debit.fee, (1000 * 0.029))
+        self.assertIsNone(debit.fee)
         self.assertEqual(debit.appears_on_statement_as, 'atest')
 
         refund = debit.refund(amount=100)
         self.assertTrue(refund.id.startswith('RF'))
         self.assertEqual(refund.debit.uri, debit.uri)
-        self.assertEqual(refund.fee, 0)
+        self.assertIsNone(refund.fee)
 
         another_debit = account.debit(
             amount=1000,
@@ -252,20 +252,20 @@ class BasicUseCases(unittest.TestCase):
     def test_07_create_hold_and_void_it(self):
         account = self._find_account('buyer')
         hold = account.hold(amount=1500, description='Hold me')
-        self.assertEqual(hold.fee, 30)
+        self.assertIsNone(hold.fee)
         self.assertEqual(hold.account.uri, account.uri)
         self.assertFalse(hold.is_void)
         self.assertEqual(hold.description, 'Hold me')
         hold.void()
         self.assertTrue(hold.is_void)
-        self.assertEqual(hold.fee, 30)  # fee still the same
+        self.assertIsNone(hold.fee)
 
     def test_08_create_hold_and_debit_it(self):
         account = self._find_account('buyer')
         hold = account.hold(amount=1500)
         self.assertTrue(hold.id.startswith('HL'))
         debit = hold.capture()
-        self.assertEqual(debit.fee, int((1500 * 0.029)))
+        self.assertIsNone(debit.fee)
 
     def test_09_create_a_person_merchant(self):
         mp = self._find_marketplace()
