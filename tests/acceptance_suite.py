@@ -696,9 +696,8 @@ class AICases(TestCases):
     def test_upgrade_account_to_merchant_invalid_uri(self):
         card = self.mp.create_card(**cards.CARD)
         buyer = self.mp.create_buyer('a@b.com', card.uri)
-        buyer.merchant_uri = '/no/a/merchant'
         with self.assertRaises(balanced.exc.HTTPError) as ex_ctx:
-            buyer.save()
+            buyer.promote_to_merchant('/no/a/merchant')
         ex = ex_ctx.exception
         self.assertEqual(ex.status_code, 400)
         self.assertIn(
@@ -713,8 +712,7 @@ class AICases(TestCases):
         merchant = api_key.merchant
         buyer = self.mp.create_buyer(self._email_address(), card.uri)
         self.assertItemsEqual(buyer.roles, ['buyer'])
-        buyer.merchant_uri = merchant.uri
-        buyer.save()
+        buyer.promote_to_merchant(merchant.uri)
         self.assertItemsEqual(buyer.roles, ['buyer', 'merchant'])
 
     def test_debit_uses_newly_added_funding_src(self):
