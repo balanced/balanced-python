@@ -625,7 +625,15 @@ class Account(Resource):
             self.merchant = merchant
         self.save()
 
-    add_merchant = promote_to_merchant
+    def add_merchant(self, merchant):
+        """
+        Deprecated alias of `promote_to_merchant` method.
+        """
+        warnings.warn('The add_merchant method will be deprecated in the '
+                      'next minor version of balanced-python, use the '
+                      'promote_to_merchant method instead',
+                      PendingDeprecationWarning)
+        self.promote_to_merchant(merchant)
 
 
 def cached_per_api_key(bust_cache=False):
