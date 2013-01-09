@@ -544,7 +544,7 @@ class AICases(TestCases):
             (debit1.refund,
              dict(),
              balanced.exc.HTTPError,
-             'Refund amount must be less than the debit amount',
+             'Amount must be less than the remaining debit amount',
              ),
             (debit2.refund,
              dict(amount=1000002),
