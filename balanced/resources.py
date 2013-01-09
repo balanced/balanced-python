@@ -614,12 +614,26 @@ class Account(Resource):
         self.bank_account_uri = bank_account_uri
         self.save()
 
-    def add_merchant(self, merchant_data):
+    def promote_to_merchant(self, merchant):
         """
-        Adds the `merchant` role to this Account.
+        Underwrites this account as a merchant. The `merchant` parameter can
+        be either a dictionary of merchant data, or a URI.
         """
-        self.merchant = merchant_data
+        if isinstance(merchant, basestring):
+            self.merchant_uri = merchant
+        else:
+            self.merchant = merchant
         self.save()
+
+    def add_merchant(self, merchant):
+        """
+        Deprecated alias of `promote_to_merchant` method.
+        """
+        warnings.warn('The add_merchant method will be deprecated in the '
+                      'next minor version of balanced-python, use the '
+                      'promote_to_merchant method instead',
+                      PendingDeprecationWarning)
+        self.promote_to_merchant(merchant)
 
 
 def cached_per_api_key(bust_cache=False):
