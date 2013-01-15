@@ -1,5 +1,3 @@
-import threading
-
 from balanced import __version__
 from balanced.utils import urljoin
 
@@ -8,7 +6,7 @@ def _make_user_agent():
     return 'balanced-python/' + __version__
 
 
-class Config(threading.local, object):
+class Config(object):
 
     def __init__(self):
         super(Config, self).__init__()
