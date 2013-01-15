@@ -59,7 +59,7 @@ class TestHTTPClient(unittest.TestCase):
         resp = mock.Mock()
         resp.headers = {
             'Content-Type': 'text/html',
-            }
+        }
         resp.content = 'Unhandled Exception'
         client = balanced.HTTPClient()
         with self.assertRaises(balanced.exc.BalancedError):
@@ -73,7 +73,7 @@ class TestHTTPClient(unittest.TestCase):
         resp = mock.Mock()
         resp.headers = {
             'Content-Type': 'text/html',
-            }
+        }
         resp.content = 'Unhandled Exception'
         client = balanced.HTTPClient()
         with self.assertRaises(balanced.exc.BalancedError):
@@ -112,35 +112,37 @@ class TestHTTPClient(unittest.TestCase):
             response.raise_for_status()
         self.assertEqual(ex.exception.description, api_response['description'])
 
-class MultiThreadedUserCases( unittest.TestCase ):
-		def setUp( self ):
-			balanced.configure( "test" )
 
-		def tearDown( self ):
-			balanced.configure( None )
+class TestConfigThread(threading.Thread):
+    def __init__( self ):
+        threading.Thread.__init__(self)
+        self.key = False
 
-		def test_multithreading_does_not_break_the_client_and_cause_the_api_key_to_change( self ):
-			class TestThread( threading.Thread ):
-				def __init__( self ):
-					threading.Thread.__init__( self )
-					self.key = False
+    def run(self):
+        print balanced.config.api_key_secret, balanced.config
+        self.key = balanced.config.api_key_secret == 'test'
 
-				def run( self ):
-					config = balanced.config
 
-					print config.api_key_secret
-					self.key = balanced.config.api_key_secret == "test" 
-					 
-			threads = []
+class MultiThreadedUserCases(unittest.TestCase):
+    def setUp(self):
+        balanced.configure('not-test')
 
-			for _ in xrange( 2 ):
-				t = TestThread()
-				threads.append( t )
+    def tearDown(self):
+        balanced.configure(None)
 
-			for t in threads:
-				t.start()
+    def test_config_does_not_change_across_threads(self):
+        threads = []
 
-			for t in threads:
-				t.join( len( threads ) )
+        for _ in xrange(2):
+            t = TestConfigThread()
+            threads.append(t)
 
-				self.assertTrue( t.key )
+        # change configuration once the threads are created
+        balanced.configure('test')
+
+        for t in threads:
+            t.start()
+
+        for t in threads:
+            t.join(len(threads))
+            self.assertTrue(t.key)

@@ -126,8 +126,8 @@ setup(
         'License :: OSI Approved :: BSD License',
         'Programming Language :: Python',
         'Topic :: Software Development :: Libraries :: Python Modules',
-        ],
+    ],
     cmdclass={
         'docs': DocumentationCommand,
-        }
+    }
 )

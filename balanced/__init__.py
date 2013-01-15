@@ -1,7 +1,6 @@
-__version__ = '0.9.3'
+__version__ = '0.9.4'
 from collections import defaultdict
 import contextlib
-
 
 from balanced.http_client import HTTPClient
 from balanced.resources import (
