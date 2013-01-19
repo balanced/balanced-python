@@ -502,7 +502,7 @@ class BasicUseCases(unittest.TestCase):
     def test_28_on_behalf_of(self):
         mp = self._create_marketplace()
         buyer = self._find_account('buyer')
-        merchant = mp.create_merchant('mahmoud@poundpay.com',
+        merchant = mp.create_merchant('mahmoud2@poundpay.com',
                                       merchant=PERSON_MERCHANT)
 
         card = balanced.Marketplace.my_marketplace.create_card(**CARD)
