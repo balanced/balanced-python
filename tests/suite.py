@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from __future__ import unicode_literals
+import warnings
 import re
 import unittest
 
@@ -496,3 +497,19 @@ class BasicUseCases(unittest.TestCase):
         self.assertNotIn('id', credit.bank_account)
         self.assertNotIn('uri', credit.bank_account)
         self.assertNotIn('created_at', credit.bank_account)
+
+    def test_28_on_behalf_of(self):
+        self._create_marketplace()
+        buyer = self._find_account('buyer')
+        merchant = self._find_account('merchant')
+
+        card = balanced.Marketplace.my_marketplace.create_card(**CARD)
+        buyer.add_card(card.uri)
+        self.assertIsNotNone(buyer.debit(2222, on_behalf_of=merchant))
+
+        with warnings.catch_warnings(record=True) as w:
+            self.assertIsNotNone(buyer.debit(1111, merchant_uri=merchant))
+            self.assertEqual(len(w), 1)
+
+
+
