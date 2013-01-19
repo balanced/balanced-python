@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from __future__ import unicode_literals
+import mock
 import warnings
 import re
 import unittest
@@ -499,17 +500,41 @@ class BasicUseCases(unittest.TestCase):
         self.assertNotIn('created_at', credit.bank_account)
 
     def test_28_on_behalf_of(self):
-        self._create_marketplace()
+        mp = self._create_marketplace()
         buyer = self._find_account('buyer')
-        merchant = self._find_account('merchant')
+        merchant = mp.create_merchant('mahmoud@poundpay.com',
+                                      merchant=PERSON_MERCHANT)
 
         card = balanced.Marketplace.my_marketplace.create_card(**CARD)
         buyer.add_card(card.uri)
-        self.assertIsNotNone(buyer.debit(2222, on_behalf_of=merchant))
+
+        self.assertIsNotNone(buyer.debit(2222, on_behalf_of=merchant.uri))
 
         with warnings.catch_warnings(record=True) as w:
-            self.assertIsNotNone(buyer.debit(1111, merchant_uri=merchant))
+            self.assertIsNotNone(buyer.debit(1111, merchant_uri=merchant.uri))
             self.assertEqual(len(w), 1)
 
+        # test that we extract the uri if you pass the object
+        with mock.patch('balanced.resources.Debit') as debit:
+            buyer.debit(2222, on_behalf_of=merchant)
+            self.assertEqual(
+                debit.call_args[1]['on_behalf_of_uri'],
+            merchant.uri)
 
+        # test that we throw an exception if the uri of the merchant is the
+        # same as the account uri
+        with self.assertRaises(ValueError) as exc:
+            buyer.debit(2222, on_behalf_of=buyer)
+            self.assertEqual(
+                exc.exception.args[0],
+                'The on_behalf_of parameter MAY NOT be the same account as '
+                'the account you are debiting!'
+            )
 
+        # test that you can't pass in a bunch of shit
+        with self.assertRaises(ValueError) as exc:
+            buyer.debit(2222, on_behalf_of=15)
+            self.assertEqual(
+                exc.exception.args[0],
+                'The on_behalf_of parameter needs to be an account uri'
+            )

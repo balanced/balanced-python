@@ -532,11 +532,28 @@ class Account(Resource):
 
         if merchant_uri and not on_behalf_of:
             warnings.warn(
-                'merchant_uri is deprecated - please use on_behalf_of '
+                'merchant_uri is DEPRECATED - use the on_behalf_of '
                 'parameter',
                 UserWarning,
                 stacklevel=2
             )
+            on_behalf_of = merchant_uri
+
+        if on_behalf_of:
+
+            if hasattr(on_behalf_of, 'uri'):
+                on_behalf_of = on_behalf_of.uri
+
+            if not isinstance(on_behalf_of, basestring):
+                raise ValueError(
+                    'The on_behalf_of parameter needs to be an account uri'
+                )
+
+            if on_behalf_of == self.uri:
+                raise ValueError(
+                    'The on_behalf_of parameter MAY NOT be the same account'
+                    ' as the account you are debiting!'
+                )
 
         meta = meta or {}
         return Debit(
