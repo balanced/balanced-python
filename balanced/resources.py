@@ -537,6 +537,7 @@ class Account(Resource):
                 UserWarning,
                 stacklevel=2
             )
+            merchant_uri = None
             on_behalf_of = merchant_uri
 
         if on_behalf_of:
