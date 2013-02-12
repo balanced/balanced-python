@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 import datetime
 import unittest
+import urlparse
 import mock
 
 import balanced
@@ -44,8 +45,6 @@ class TestResourceConstruction(WSGIServerTest):
 
 class TestPage(unittest.TestCase):
 
-    @unittest.skip('What is the correct behavior here? This will not update '
-                   'the qs param, everything is in the resource URI itself')
     def test_filter2(self):
         query = balanced.Marketplace.query
         query = query.filter(balanced.Marketplace.f.a == 'b')
@@ -62,8 +61,11 @@ class TestPage(unittest.TestCase):
         query = query.filter(balanced.Marketplace.f.f.endswith('lo'))
         query = query.filter(g=12)
 
+        parsed_uri = urlparse.urlparse(query.uri)
+        parsed_qs = urlparse.parse_qsl(parsed_uri.query)
+
         self.assertDictEqual(
-            query.qs,
+            dict(parsed_qs),
             {'a': 'b',
              'a[!=]': '101',
              'b[<=]': '5',
@@ -77,7 +79,7 @@ class TestPage(unittest.TestCase):
              'f[endswith]': 'lo',
              'f[startswith]': 'la',
              'g': '12',
-             })
+         })
 
     def test_sort(self):
         q = balanced.Marketplace.query

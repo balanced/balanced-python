@@ -20,6 +20,9 @@ class _ResourceRegistry(dict):
         self[resource_class.RESOURCE['singular']] = resource_class
         self[resource_class.RESOURCE['collection']] = resource_class
         if resource_class.RESOURCE['nested_under']:
+            # nested_as = ['marketplaces', 'events']
+            # collection = 'logs'
+            # store nested_under as |marketplaces/events/logs
             nested_under = self._as_nested(
                 resource_class.RESOURCE['nested_under'] + [
                     resource_class.RESOURCE['collection']
@@ -32,20 +35,39 @@ class _ResourceRegistry(dict):
             return None
 
         split_uri = urlparse.urlsplit(uri.rstrip('/'))
+        # split_uri.path == '/v1/marketplaces/M123/events/E123'
+        # url == ['', 'v1', 'marketplaces', 'M123', 'events', 'E123']
         url = split_uri.path.split('/')  # pylint: disable-msg=E1103
-        parts = url[2::2]
+
+        resource = self._from_nested(url) or self._from_url(url)
+
+        return resource
+
+    def _from_url(self, url_parts):
+        if url_parts[-1] in self:
+            resource = self[url_parts[-1]]
+        else:
+            resource = self[url_parts[-2]]
+        return resource
+
+    def _from_nested(self, url_parts):
+        # ['marketplaces', 'events']
+        parts = url_parts[2::2]
+        # we have a possible nested resource, check if it's specifically nested
         if len(parts) > 1:
             nested = self._as_nested(parts)
             if nested in self:
                 resource = self[nested]
                 return resource
-        if url[-1] in self:
-            resource = self[url[-1]]
-        else:
-            resource = self[url[-2]]
-        return resource
+        return None
 
     def _as_nested(self, parts):
+        """
+        >>> _ResourceRegistry()._as_nested(['marketplaces', 'events'])
+        '|marketplaces/events'
+        :param parts: list of parts to turn into a nested resource
+        :return: munged fungible
+        """
         return '|' + '/'.join(parts)
 
 
