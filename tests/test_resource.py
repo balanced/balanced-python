@@ -4,6 +4,7 @@ import unittest
 import mock
 
 import balanced
+from balanced.resources import _RESOURCES as resource_registry
 from .application import app
 from .utils import WSGIServerTest
 from .fixtures import resources
@@ -43,23 +44,26 @@ class TestResourceConstruction(WSGIServerTest):
 
 class TestPage(unittest.TestCase):
 
+    @unittest.skip('What is the correct behavior here? This will not update '
+                   'the qs param, everything is in the resource URI itself')
     def test_filter2(self):
-        q = balanced.Marketplace.query
-        q.filter(balanced.Marketplace.f.a == 'b')
-        q.filter(balanced.Marketplace.f.a != '101')
-        q.filter(balanced.Marketplace.f.b < 4)
-        q.filter(balanced.Marketplace.f.b <= 5)
-        q.filter(balanced.Marketplace.f.c > 123)
-        q.filter(balanced.Marketplace.f.c >= 44)
-        q.filter(balanced.Marketplace.f.d.in_(1, 2, 3))
-        q.filter(~balanced.Marketplace.f.d.in_(6, 33, 55))
-        q.filter(balanced.Marketplace.f.e.contains('it'))
-        q.filter(~balanced.Marketplace.f.e.contains('soda'))
-        q.filter(balanced.Marketplace.f.f.startswith('la'))
-        q.filter(balanced.Marketplace.f.f.endswith('lo'))
-        q.filter(g=12)
-        self.assertEqual(
-            q.qs,
+        query = balanced.Marketplace.query
+        query = query.filter(balanced.Marketplace.f.a == 'b')
+        query = query.filter(balanced.Marketplace.f.a != '101')
+        query = query.filter(balanced.Marketplace.f.b < 4)
+        query = query.filter(balanced.Marketplace.f.b <= 5)
+        query = query.filter(balanced.Marketplace.f.c > 123)
+        query = query.filter(balanced.Marketplace.f.c >= 44)
+        query = query.filter(balanced.Marketplace.f.d.in_(1, 2, 3))
+        query = query.filter(~balanced.Marketplace.f.d.in_(6, 33, 55))
+        query = query.filter(balanced.Marketplace.f.e.contains('it'))
+        query = query.filter(~balanced.Marketplace.f.e.contains('soda'))
+        query = query.filter(balanced.Marketplace.f.f.startswith('la'))
+        query = query.filter(balanced.Marketplace.f.f.endswith('lo'))
+        query = query.filter(g=12)
+
+        self.assertDictEqual(
+            query.qs,
             {'a': 'b',
              'a[!=]': '101',
              'b[<=]': '5',
@@ -82,6 +86,12 @@ class TestPage(unittest.TestCase):
         q.sort(balanced.Marketplace.f.u.desc())
         self.assertEqual(q.qs, {'sort': ['me,asc', 'u,desc']})
 
+    def test_from_uri_and_dict(self):
+        expected = resources.INVOICES.copy()
+        expected.pop('uri')
+        page = balanced.resources.Page.from_response(**resources.INVOICES)
+        self.assertDictEqual(page._lazy_loaded, expected)
+
 
 class TestMarketplace(unittest.TestCase):
 
@@ -98,10 +108,26 @@ class TestMarketplace(unittest.TestCase):
         self.assertEqual(call_args[1], PendingDeprecationWarning)
 
 
-class TestPage(unittest.TestCase):
+class TestResourceIdentification(unittest.TestCase):
 
-    def test_from_uri_and_dict(self):
-        expected = resources.INVOICES.copy()
-        expected.pop('uri')
-        page = balanced.resources.Page.from_response(**resources.INVOICES)
-        self.assertDictEqual(page._lazy_loaded, expected)
+    def test_resource(self):
+        uris = [
+            # marketplace
+            (balanced.Marketplace, '/v1/marketplaces/MP123'),
+            (balanced.Marketplace, '/v1/marketplaces'),
+            # nested under marketplace
+            (balanced.Credit, '/v1/marketplaces/credits'),
+            (balanced.Credit, '/v1/marketplaces/credits/C1'),
+            # root
+            (balanced.Event, '/v1/events'),
+            (balanced.Event, '/v1/events/E1'),
+            # nested under events
+            (balanced.EventCallback, '/v1/events/E1/callbacks'),
+            (balanced.EventCallback, '/v1/events/E1/callbacks/C1'),
+            # nested under events and callbacks
+            (balanced.EventCallbackLog, '/v1/events/E1/callbacks/C1/logs'),
+            (balanced.EventCallbackLog, '/v1/events/E1/callbacks/C1/logs/L1'),
+        ]
+        for expected_type, uri in uris:
+            derived_type = resource_registry.from_uri(uri)
+            self.assertEqual(expected_type, derived_type)
