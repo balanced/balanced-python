@@ -2,6 +2,7 @@ from __future__ import unicode_literals
 import datetime
 import unittest
 import urlparse
+import warnings
 import mock
 
 import balanced
@@ -98,16 +99,21 @@ class TestPage(unittest.TestCase):
 class TestMarketplace(unittest.TestCase):
 
     @mock.patch('balanced.resources.Card')
-    @mock.patch('balanced.resources.warnings')
-    def test_region_deprecation(self, warnings, _):
+    def test_region_deprecation(self, _card):
         mkt = balanced.Marketplace()
-        mkt.create_card('John Name', '341111111111111', '12', '2020',
-                        region='CA')
-        call_args, _ = warnings.warn.call_args
-        self.assertEqual(call_args[0],
+        with warnings.catch_warnings(record=True) as w:
+            mkt.create_card(
+                'John Name', '341111111111111', '12', '2020',
+                region='CA'
+            )
+            self.assertEqual(len(w), 1)
+            warning_ = w[0]
+        self.assertEqual(
+            warning_.message.message,
             ('The region parameter will be deprecated in the '
-             'next minor version of balanced-python'))
-        self.assertEqual(call_args[1], PendingDeprecationWarning)
+             'next minor version of balanced-python')
+        )
+        self.assertTrue(isinstance(warning_.message, UserWarning))
 
 
 class TestResourceIdentification(unittest.TestCase):

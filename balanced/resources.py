@@ -547,7 +547,8 @@ class Account(Resource):
               meta=None,
               description=None,
               source_uri=None,
-              merchant_uri=None):
+              merchant_uri=None,
+              on_behalf_of=None):
         """
         :rtype: A `Debit` representing a flow of money from this Account to
             your Marketplace's escrow account.
@@ -560,11 +561,40 @@ class Account(Resource):
             associated with this account. If not specified the `Card` most
             recently added to this `Account` is used.
         :param merchant_uri: merchant providing service or delivering product.
+               (deprecated - use on_behalf_of instead)
+        :param on_behalf_of: the account uri of whomever is providing the
+               service or delivering the product.
         """
         if not any((amount, hold_uri)):
             raise ResourceError('Must have an amount or hold uri')
         if all([hold_uri, source_uri]):
             raise ResourceError('Must specify either hold_uri OR source_uri')
+
+        if merchant_uri and not on_behalf_of:
+            warnings.warn(
+                'merchant_uri is DEPRECATED - use the on_behalf_of '
+                'parameter',
+                UserWarning,
+                stacklevel=2
+            )
+            merchant_uri = None
+            on_behalf_of = merchant_uri
+
+        if on_behalf_of:
+
+            if hasattr(on_behalf_of, 'uri'):
+                on_behalf_of = on_behalf_of.uri
+
+            if not isinstance(on_behalf_of, basestring):
+                raise ValueError(
+                    'The on_behalf_of parameter needs to be an account uri'
+                )
+
+            if on_behalf_of == self.uri:
+                raise ValueError(
+                    'The on_behalf_of parameter MAY NOT be the same account'
+                    ' as the account you are debiting!'
+                )
 
         meta = meta or {}
         return Debit(
@@ -576,6 +606,7 @@ class Account(Resource):
             description=description,
             source_uri=source_uri,
             merchant_uri=merchant_uri,
+            on_behalf_of_uri=on_behalf_of,
         ).save()
 
     def hold(self, amount, description=None, meta=None, source_uri=None,
@@ -672,7 +703,7 @@ class Account(Resource):
         warnings.warn('The add_merchant method will be deprecated in the '
                       'next minor version of balanced-python, use the '
                       'promote_to_merchant method instead',
-                      PendingDeprecationWarning)
+                      UserWarning)
         self.promote_to_merchant(merchant)
 
 
@@ -743,7 +774,7 @@ class Marketplace(Resource):
         if region:
             warnings.warn('The region parameter will be deprecated in the '
                           'next minor version of balanced-python',
-                          PendingDeprecationWarning)
+                          UserWarning)
 
         return Card(
             card_number=card_number,
@@ -834,6 +865,8 @@ class Marketplace(Resource):
         current API key used for this request.
         """
         return cls.query.one()
+
+    mine = my_marketplace
 
     @cached_per_api_key(bust_cache=True)
     def save(self):
