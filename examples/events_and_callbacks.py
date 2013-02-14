@@ -48,8 +48,8 @@ def main():
 
     print 'Woop, we got some events, let us see what there is to look at'
     for event in balanced.Event.query:
-        print 'this was a {} event, is occurred at {}, the callback has a ' \
-              'status of {}'.format(
+        print 'this was a {0} event, it occurred at {1}, the callback has a ' \
+              'status of {2}'.format(
             event.type,
             event.occurred_at,
             event.callback_statuses
@@ -58,15 +58,17 @@ def main():
     print 'you can inspect each event to see the logs'
     event = balanced.Event.query[0]
     for callback in event.callbacks:
-        print 'inspecting callback to {} for event {}'.format(
+        print 'inspecting callback to {0} for event {1}'.format(
             callback.url,
             event.type,
         )
         for log in callback.logs:
-            print 'this attempt to the callback {}'.format(log.status)
+            print 'this attempt to the callback has a status "{0}"'.format(
+                log.status
+            )
 
     print 'ok, let\'s check with requestb.in to see if our callbacks fired'
-    print 'we received {} callbacks, you can view them at {}'.format(
+    print 'we received {0} callbacks, you can view them at {1}'.format(
         len(request_bin.get_requests()),
         request_bin.view_url,
     )
