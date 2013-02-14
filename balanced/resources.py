@@ -19,18 +19,56 @@ class _ResourceRegistry(dict):
         self[resource_class.__name__] = resource_class
         self[resource_class.RESOURCE['singular']] = resource_class
         self[resource_class.RESOURCE['collection']] = resource_class
+        if resource_class.RESOURCE['nested_under']:
+            # nested_as = ['marketplaces', 'events']
+            # collection = 'logs'
+            # store nested_under as |marketplaces/events/logs
+            nested_under = self._as_nested(
+                resource_class.RESOURCE['nested_under'] + [
+                    resource_class.RESOURCE['collection']
+                ]
+            )
+            self[nested_under] = resource_class
 
     def from_uri(self, uri):
         if not uri:
             return None
 
         split_uri = urlparse.urlsplit(uri.rstrip('/'))
+        # split_uri.path == '/v1/marketplaces/M123/events/E123'
+        # url == ['', 'v1', 'marketplaces', 'M123', 'events', 'E123']
         url = split_uri.path.split('/')  # pylint: disable-msg=E1103
-        if url[-1] in self:
-            resource = self[url[-1]]
-        else:
-            resource = self[url[-2]]
+
+        resource = self._from_nested(url) or self._from_url(url)
+
         return resource
+
+    def _from_url(self, url_parts):
+        if url_parts[-1] in self:
+            resource = self[url_parts[-1]]
+        else:
+            resource = self[url_parts[-2]]
+        return resource
+
+    def _from_nested(self, url_parts):
+        # ['marketplaces', 'events']
+        parts = url_parts[2::2]
+        # we have a possible nested resource, check if it's specifically nested
+        if len(parts) > 1:
+            nested = self._as_nested(parts)
+            if nested in self:
+                resource = self[nested]
+                return resource
+        return None
+
+    def _as_nested(self, parts):
+        """
+        >>> _ResourceRegistry()._as_nested(['marketplaces', 'events'])
+        '|marketplaces/events'
+        :param parts: list of parts to turn into a nested resource
+        :return: munged fungible
+        """
+        return '|' + '/'.join(parts)
 
 
 _RESOURCES = _ResourceRegistry()
@@ -464,7 +502,8 @@ class _ResourceFields(object):
 def resource_base(singular=None,
                   collection=None,
                   metadata=None,
-                  resides_under_marketplace=True):
+                  resides_under_marketplace=True,
+                  nested_under=None):
 
     class Base(type):
 
@@ -477,6 +516,7 @@ def resource_base(singular=None,
                     'singular': singular or classname.lower(),
                     'collection': collection,
                     'resides_under_marketplace': resides_under_marketplace,
+                    'nested_under': nested_under,
                 },
                 '__init__': the_init,
                 '__new__': the_new,
@@ -1059,6 +1099,45 @@ class BankAccount(Resource):
         if not getattr(self, 'id', None) and not hasattr(self, 'type'):
             self.type = 'checking'
         return super(BankAccount, self).save()
+
+
+class Event(Resource):
+    """
+    An Event is a snapshot of another resource at a point in time when
+    something significant occurred. Events are created when resources are
+    created, updated, deleted or otherwise change state such as a Credit being
+    marked as failed.
+    """
+    __metaclass__ = resource_base(collection='events',
+                                  resides_under_marketplace=False)
+
+
+class EventCallback(Resource):
+    """
+    Represents a single event being sent to a callback.
+    """
+    __metaclass__ = resource_base(collection='callbacks',
+                                  nested_under=['events'],
+                                  resides_under_marketplace=False)
+
+
+class EventCallbackLog(Resource):
+    """
+    Represents a request and response from single attempt to notify a callback
+    of an event.
+    """
+    __metaclass__ = resource_base(collection='logs',
+                                  nested_under=['events', 'callbacks'],
+                                  resides_under_marketplace=False)
+
+
+class Callback(Resource):
+    """
+    A Callback is a publicly accessible location that can receive POSTed JSON
+    data whenever an Event is generated.
+    """
+    __metaclass__ = resource_base(collection='callbacks',
+                                  resides_under_marketplace=True)
 
 
 class FilterExpression(object):
