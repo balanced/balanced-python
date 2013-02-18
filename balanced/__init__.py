@@ -1,4 +1,4 @@
-__version__ = '0.9.9'
+__version__ = '0.9.10'
 from collections import defaultdict
 import contextlib
 
@@ -8,6 +8,7 @@ from balanced.resources import (
     Hold, Credit, Debit, Refund,
     Merchant, Transaction, BankAccount, Card,
     Callback, Event, EventCallback, EventCallbackLog,
+    BankAccountAuthentication,
 )
 from balanced import exc
 
@@ -29,6 +30,7 @@ __all__ = [
     Event.__name__,
     EventCallback.__name__,
     EventCallbackLog.__name__,
+    BankAccountAuthentication.__name__,
     exc.__name__.partition('.')[-1],
 ]
 

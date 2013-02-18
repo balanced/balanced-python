@@ -1100,6 +1100,25 @@ class BankAccount(Resource):
             self.type = 'checking'
         return super(BankAccount, self).save()
 
+    def authenticate(self):
+        return BankAccountAuthentication(
+            uri=self.authentications_uri,
+            bank_account_uri=self.uri,
+        ).save()
+
+
+class BankAccountAuthentication(Resource):
+    """
+    Represents an attempt to verify a bank account so that it can be debited.
+    """
+    __metaclass__ = resource_base(collection='authentications',
+                                  nested_under=['bank_accounts'],
+                                  resides_under_marketplace=False)
+
+    def confirm(self, amount_1, amount_2):
+        self.amounts = [amount_1, amount_2]
+        return self.save()
+
 
 class Event(Resource):
     """
