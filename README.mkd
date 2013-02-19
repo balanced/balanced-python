@@ -10,7 +10,7 @@ Online Marketplace Payments
 
 ## Usage
 
-View Balanced's online tutorial and documentation at https://www.balancedpayments.com/docs/python
+View Balanced's online tutorial and documentation at https://www.balancedpayments.com/docs/overview?language=python
 
 ## Contributing
 
