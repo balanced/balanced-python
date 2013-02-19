@@ -26,3 +26,17 @@ class HTTPError(BalancedError, requests.HTTPError):
 
 class MoreInformationRequiredError(HTTPError):
     redirect_uri = None
+
+
+class FundingInstrumentAuthenticationFailure(HTTPError):
+    pass
+
+
+category_code_map = {
+    'bank-account-authentication-not-pending':
+        FundingInstrumentAuthenticationFailure,
+    'bank-account-authentication-failed':
+        FundingInstrumentAuthenticationFailure,
+    'bank-account-authentication-already-exists':
+        FundingInstrumentAuthenticationFailure,
+}

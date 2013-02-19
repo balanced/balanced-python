@@ -840,16 +840,18 @@ class AICases(TestCases):
         bank_account = balanced.BankAccount(
             **bank_accounts.BANK_ACCOUNT).save()
         authentication = bank_account.authenticate()
-        authentication.confirm(1, 1)
-        with self.assertRaises(balanced.exc.HTTPError):
-            authentication.confirm(1, 1)
+        authentication.verify(1, 1)
+        ex = balanced.exc.FundingInstrumentAuthenticationFailure
+        with self.assertRaises(ex):
+            authentication.verify(1, 1)
 
     def test_authenticate_test_bank_account_failure(self):
         bank_account = balanced.BankAccount(
             **bank_accounts.BANK_ACCOUNT).save()
         authentication = bank_account.authenticate()
+        ex = balanced.exc.FundingInstrumentAuthenticationFailure
         for _ in xrange(authentication.remaining_attempts):
-            with self.assertRaises(balanced.exc.HTTPError):
-                authentication.confirm(1, 2)
-        with self.assertRaises(balanced.exc.HTTPError):
-            authentication.confirm(1, 1)
+            with self.assertRaises(ex):
+                authentication.verify(1, 2)
+        with self.assertRaises(ex):
+            authentication.verify(1, 1)

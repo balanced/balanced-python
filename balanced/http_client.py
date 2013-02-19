@@ -4,9 +4,9 @@ import threading
 import requests
 from requests.models import REDIRECT_STATI
 
+from balanced import exc
 from balanced.config import Config
 from balanced.utils import to_json, urljoin
-from balanced.exc import HTTPError, BalancedError, MoreInformationRequiredError
 
 serializers = {
     'application/json': to_json
@@ -31,12 +31,12 @@ def wrap_raise_for_status(http_client):
         def wrapped():
             try:
                 raise_for_status(allow_redirects=False)
-            except requests.HTTPError, exc:
-                if exc.response.status_code in REDIRECT_STATI:
-                    redirection = MoreInformationRequiredError('%s' % exc)
-                    redirection.status_code = exc.response.status_code
-                    redirection.response = exc.response
-                    redirection.redirect_uri = exc.response.headers['Location']
+            except requests.HTTPError, ex:
+                if ex.response.status_code in REDIRECT_STATI:
+                    redirection = exc.MoreInformationRequiredError('%s' % ex)
+                    redirection.status_code = ex.response.status_code
+                    redirection.response = ex.response
+                    redirection.redirect_uri = ex.response.headers['Location']
                     raise redirection
                 deserialized = http_client.deserialize(
                     response_instance
@@ -51,8 +51,11 @@ def wrap_raise_for_status(http_client):
                     msg=deserialized['description'].encode('utf8'),
                     extra=extra.encode('utf8'),
                 )
-                http_error = HTTPError(error_msg)
-                for error, value in response_instance.deserialized.iteritems():
+                category_code = deserialized.get('category_code', None)
+                error_cls = exc.category_code_map.get(
+                    category_code, exc.HTTPError)
+                http_error = error_cls(error_msg)
+                for error, value in deserialized.iteritems():
                     setattr(http_error, error, value)
                 raise http_error
 
