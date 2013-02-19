@@ -1058,7 +1058,7 @@ class BankAccount(Resource):
 
         meta = meta or {}
         return Debit(
-            uri=self.account.debits_uri,
+            uri=self.debits_uri,
             amount=amount,
             appears_on_statement_as=appears_on_statement_as,
             meta=meta,

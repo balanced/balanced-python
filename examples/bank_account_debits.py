@@ -1,0 +1,51 @@
+'''
+Learn how to authenticate a bank account so you can debit with it.
+'''
+from __future__ import unicode_literals
+
+import balanced
+
+
+def init():
+    key = balanced.APIKey().save()
+    balanced.configure(key.secret)
+    balanced.Marketplace().save()
+
+
+def main():
+    init()
+
+    # create a bank account
+    bank_account = balanced.BankAccount(
+        account_number='1234567890',
+        bank_code='321174851',
+        name='Jack Q Merchant',
+    ).save()
+
+    print 'you can\'t debit until you authenticate'
+    try:
+        bank_account.debit(100)
+    except balanced.exc.HTTPError as ex:
+        print 'Debit failed, %s' % ex.message
+
+    # authenticate
+    authentication = bank_account.authenticate()
+
+    print 'PROTIP: for TEST bank accounts the valid amount is always 1 and 1'
+    try:
+        authentication.verify(1, 2)
+    except balanced.exc.BankAccountAuthenticationFailure as ex:
+        print 'Authentication error , %s' % ex.message
+
+    if authentication.verify(1, 1).state != 'verified':
+        raise Exception('unpossible')
+    debit = bank_account.debit(100)
+    print 'debited the bank account %s for %d cents' % (
+        debit.source.uri,
+        debit.amount
+    )
+    print 'and there you have it'
+
+
+if __name__ == '__main__':
+    main()
