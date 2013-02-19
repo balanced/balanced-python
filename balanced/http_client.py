@@ -156,7 +156,7 @@ class HTTPClient(threading.local, object):
         try:
             return deserializers[resp.headers['Content-Type']](resp.content)
         except KeyError:
-            raise BalancedError('Invalid content type "{}": {}'.format(
+            raise exc.BalancedError('Invalid content type "{}": {}'.format(
                 resp.headers['Content-Type'], resp.content,
             ))
 
