@@ -1103,22 +1103,22 @@ class BankAccount(Resource):
             self.type = 'checking'
         return super(BankAccount, self).save()
 
-    def authenticate(self):
-        return BankAccountAuthentication(
-            uri=self.authentications_uri,
+    def verify(self):
+        return BankAccountVerification(
+            uri=self.verifications_uri,
         ).save()
 
 
-class BankAccountAuthentication(Resource):
+class BankAccountVerification(Resource):
     """
     Represents an attempt to authenticate a funding instrument so it can
     perform verified operations.
     """
-    __metaclass__ = resource_base(collection='authentications',
+    __metaclass__ = resource_base(collection='verifications',
                                   nested_under=['bank_accounts'],
                                   resides_under_marketplace=False)
 
-    def verify(self, amount_1, amount_2):
+    def confirm(self, amount_1, amount_2):
         self.amount_1 = amount_1
         self.amount_2 = amount_2
         return self.save()

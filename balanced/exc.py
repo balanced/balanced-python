@@ -28,19 +28,19 @@ class MoreInformationRequiredError(HTTPError):
     redirect_uri = None
 
 
-class FundingInstrumentAuthenticationFailure(HTTPError):
+class FundingInstrumentVerificationFailure(HTTPError):
     pass
 
 
-class BankAccountAuthenticationFailure(FundingInstrumentAuthenticationFailure):
+class BankAccountVerificationFailure(FundingInstrumentVerificationFailure):
     pass
 
 
 category_code_map = {
     'bank-account-authentication-not-pending':
-        BankAccountAuthenticationFailure,
+        BankAccountVerificationFailure,
     'bank-account-authentication-failed':
-        BankAccountAuthenticationFailure,
+        BankAccountVerificationFailure,
     'bank-account-authentication-already-exists':
-        BankAccountAuthenticationFailure,
+        BankAccountVerificationFailure,
 }

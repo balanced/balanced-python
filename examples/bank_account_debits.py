@@ -1,5 +1,5 @@
 '''
-Learn how to authenticate a bank account so you can debit with it.
+Learn how to verify a bank account so you can debit with it.
 '''
 from __future__ import unicode_literals
 
@@ -31,16 +31,16 @@ def main():
     except balanced.exc.HTTPError as ex:
         print 'Debit failed, %s' % ex.message
 
-    # authenticate
-    authentication = bank_account.authenticate()
+    # verify
+    verification = bank_account.verify()
 
     print 'PROTIP: for TEST bank accounts the valid amount is always 1 and 1'
     try:
-        authentication.verify(1, 2)
-    except balanced.exc.BankAccountAuthenticationFailure as ex:
+        verification.confirm(1, 2)
+    except balanced.exc.BankAccountVerificationFailure as ex:
         print 'Authentication error , %s' % ex.message
 
-    if authentication.verify(1, 1).state != 'verified':
+    if verification.confirm(1, 1).state != 'verified':
         raise Exception('unpossible')
     debit = bank_account.debit(100)
     print 'debited the bank account %s for %d cents' % (

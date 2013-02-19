@@ -8,7 +8,7 @@ from balanced.resources import (
     Hold, Credit, Debit, Refund,
     Merchant, Transaction, BankAccount, Card,
     Callback, Event, EventCallback, EventCallbackLog,
-    BankAccountAuthentication,
+    BankAccountVerification,
 )
 from balanced import exc
 
@@ -30,7 +30,7 @@ __all__ = [
     Event.__name__,
     EventCallback.__name__,
     EventCallbackLog.__name__,
-    BankAccountAuthentication.__name__,
+    BankAccountVerification.__name__,
     exc.__name__.partition('.')[-1],
 ]
 

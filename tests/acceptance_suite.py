@@ -836,22 +836,22 @@ class AICases(TestCases):
             **bank_accounts.BANK_ACCOUNT).save()
         bank_account.delete()
 
-    def test_authenticate_test_bank_account(self):
+    def test_verify_test_bank_account(self):
         bank_account = balanced.BankAccount(
             **bank_accounts.BANK_ACCOUNT).save()
-        authentication = bank_account.authenticate()
-        authentication.verify(1, 1)
-        ex = balanced.exc.FundingInstrumentAuthenticationFailure
+        verification = bank_account.verify()
+        verification.confirm(1, 1)
+        ex = balanced.exc.FundingInstrumentVerificationFailure
         with self.assertRaises(ex):
-            authentication.verify(1, 1)
+            verification.confirm(1, 1)
 
-    def test_authenticate_test_bank_account_failure(self):
+    def test_verify_test_bank_account_failure(self):
         bank_account = balanced.BankAccount(
             **bank_accounts.BANK_ACCOUNT).save()
-        authentication = bank_account.authenticate()
-        ex = balanced.exc.FundingInstrumentAuthenticationFailure
-        for _ in xrange(authentication.remaining_attempts):
+        verification = bank_account.verify()
+        ex = balanced.exc.FundingInstrumentVerificationFailure
+        for _ in xrange(verification.remaining_attempts):
             with self.assertRaises(ex):
-                authentication.verify(1, 2)
+                verification.confirm(1, 2)
         with self.assertRaises(ex):
-            authentication.verify(1, 1)
+            verification.confirm(1, 1)
