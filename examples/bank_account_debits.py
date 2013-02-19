@@ -21,6 +21,9 @@ def main():
         bank_code='321174851',
         name='Jack Q Merchant',
     ).save()
+    account = balanced.Account().save()
+    account.add_bank_account(bank_account.uri)
+    bank_account = account.bank_accounts[0]
 
     print 'you can\'t debit until you authenticate'
     try:

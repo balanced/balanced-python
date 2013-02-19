@@ -1055,10 +1055,13 @@ class BankAccount(Resource):
         """
         if not amount or amount <= 0:
             raise ResourceError('Must have an amount')
-
+        if not hasattr(self, 'account'):
+            raise ResourceError(
+                '{} must be associated with an account'.format(self)
+            )
         meta = meta or {}
         return Debit(
-            uri=self.debits_uri,
+            uri=self.account.debits_uri,
             amount=amount,
             appears_on_statement_as=appears_on_statement_as,
             meta=meta,
