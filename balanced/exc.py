@@ -32,11 +32,15 @@ class FundingInstrumentAuthenticationFailure(HTTPError):
     pass
 
 
+class BankAccountAuthenticationFailure(FundingInstrumentAuthenticationFailure):
+    pass
+
+
 category_code_map = {
     'bank-account-authentication-not-pending':
-        FundingInstrumentAuthenticationFailure,
+        BankAccountAuthenticationFailure,
     'bank-account-authentication-failed':
-        FundingInstrumentAuthenticationFailure,
+        BankAccountAuthenticationFailure,
     'bank-account-authentication-already-exists':
-        FundingInstrumentAuthenticationFailure,
+        BankAccountAuthenticationFailure,
 }
