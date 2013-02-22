@@ -1055,7 +1055,10 @@ class BankAccount(Resource):
         """
         if not amount or amount <= 0:
             raise ResourceError('Must have an amount')
-
+        if not hasattr(self, 'account'):
+            raise ResourceError(
+                '{} must be associated with an account'.format(self)
+            )
         meta = meta or {}
         return Debit(
             uri=self.account.debits_uri,
@@ -1099,6 +1102,26 @@ class BankAccount(Resource):
         if not getattr(self, 'id', None) and not hasattr(self, 'type'):
             self.type = 'checking'
         return super(BankAccount, self).save()
+
+    def verify(self):
+        return BankAccountVerification(
+            uri=self.verifications_uri,
+        ).save()
+
+
+class BankAccountVerification(Resource):
+    """
+    Represents an attempt to authenticate a funding instrument so it can
+    perform verified operations.
+    """
+    __metaclass__ = resource_base(collection='verifications',
+                                  nested_under=['bank_accounts'],
+                                  resides_under_marketplace=False)
+
+    def confirm(self, amount_1, amount_2):
+        self.amount_1 = amount_1
+        self.amount_2 = amount_2
+        return self.save()
 
 
 class Event(Resource):
