@@ -29,13 +29,12 @@ class TestClient(unittest.TestCase):
     def test_http_operations(self):
         ops = ['get', 'post', 'put', 'delete']
         for op in ops:
-            request = getattr(balanced.http_client, op)(
+            response = getattr(balanced.http_client, op)(
                 'hithere',
-                return_response=False
             )
-            self.assertEqual(request.method, op.upper())
+            self.assertEqual(response.request.method, op.upper())
             self.assertEqual(
-                request.url, 'https://api.balancedpayments.com/v1/hithere'
+                response.url, 'https://api.balancedpayments.com/v1/hithere'
             )
 
     def test_client_reference_config(self):

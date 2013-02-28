@@ -23,7 +23,6 @@ class Config(object):
                 'Content-Type': 'application/json',
                 'User-agent': _make_user_agent(),
             },
-            'danger_mode': True,
         }
 
     @property

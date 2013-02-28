@@ -93,7 +93,9 @@ def munge_request(http_op):
         request_body.update(fixed_up_body)
         kwargs['data'] = request_body
         # TODO: merge config dictionaries if it exists.
-        kwargs['config'] = client.config.requests.copy()
+        headers = kwargs.pop('headers', {})
+        headers.update(client.config.requests['base_headers'])
+        kwargs['headers'] = headers
         kwargs['allow_redirects'] = False
         kwargs['hooks'] = {
             'response': wrap_raise_for_status(client)
@@ -124,31 +126,28 @@ class HTTPClient(threading.local, object):
     def get(self, uri, **kwargs):
         kwargs = self.serialize(kwargs.copy())
         resp = self.interface.get(uri, **kwargs)
-        if kwargs.get('return_response', True):
-            resp.deserialized = self.deserialize(resp)
+        resp.deserialized = self.deserialize(resp)
         return resp
 
     @munge_request
     def post(self, uri, data=None, **kwargs):
         data = self.serialize({'data': data}).pop('data')
         resp = self.interface.post(uri, data=data, **kwargs)
-        if kwargs.get('return_response', True):
-            resp.deserialized = self.deserialize(resp)
+        resp.deserialized = self.deserialize(resp)
         return resp
 
     @munge_request
     def put(self, uri, data=None, **kwargs):
         data = self.serialize({'data': data}).pop('data')
         resp = self.interface.put(uri, data=data, **kwargs)
-        if kwargs.get('return_response', True):
-            resp.deserialized = self.deserialize(resp)
+        resp.deserialized = self.deserialize(resp)
         return resp
 
     @munge_request
     def delete(self, uri, **kwargs):
         kwargs = self.serialize(kwargs.copy())
         resp = self.interface.delete(uri, **kwargs)
-        if kwargs.get('return_response', True) and resp.status_code != 204:
+        if resp.status_code != 204:
             resp.deserialized = self.deserialize(resp)
         return resp
 
