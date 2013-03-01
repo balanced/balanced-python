@@ -22,6 +22,9 @@ REDIRECT_STATI = list(REDIRECT_STATI)
 REDIRECT_STATI.append(300)
 
 
+before_request_hooks = []
+
+
 def wrap_raise_for_status(http_client):
 
     def wrapper(response_instance):
@@ -64,6 +67,13 @@ def wrap_raise_for_status(http_client):
     return wrapper
 
 
+# requests does define a 'pre_request' hook but we want to get in there before
+# it does the encoding of authorization headers etc.
+def _before_request(*args):
+    for hook in before_request_hooks:
+        hook(*args)
+
+
 def munge_request(http_op):
 
     # follows the spec for requests.<http operation>
@@ -102,6 +112,8 @@ def munge_request(http_op):
         if client.config.api_key_secret:
             kwargs['auth'] = (client.config.api_key_secret, None)
 
+        _before_request(client, http_op, url, kwargs)
+
         return http_op(client, url, **kwargs)
 
     return make_absolute_url
@@ -110,6 +122,7 @@ def munge_request(http_op):
 class HTTPClient(threading.local, object):
 
     config = Config()
+    _before_request_hooks = before_request_hooks
 
     def __init__(self, keep_alive=True, *args, **kwargs):
         super(HTTPClient, self).__init__(*args, **kwargs)
