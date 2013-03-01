@@ -2,7 +2,7 @@
 import unittest
 
 import balanced
-from balanced.http_client import wrap_raise_for_status
+from balanced.http_client import wrap_raise_for_status, before_request_hooks
 import mock
 
 import threading
@@ -52,6 +52,19 @@ class TestClient(unittest.TestCase):
         with balanced.key_switcher('new_key'):
             self.assertEqual(the_config.api_key_secret, 'new_key')
         self.assertEqual(the_config.api_key_secret, current_key)
+
+    def test_before_request_hook(self):
+        momo = mock.Mock()
+        before_request_hooks.append(momo)
+
+        balanced.http_client.get(
+            'hithere',
+            return_response=False
+        )
+        self.assertEqual(momo.call_count, 1)
+        args, _ = momo.call_args
+        self.assertEqual(args[0], balanced.http_client)
+        self.assertIn('hithere', args[2])
 
 
 class TestHTTPClient(unittest.TestCase):
