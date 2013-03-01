@@ -67,6 +67,8 @@ def wrap_raise_for_status(http_client):
     return wrapper
 
 
+# requests does define a 'pre_request' hook but we want to get in there before
+# it does the encoding of authorization headers etc.
 def _before_request(*args):
     for hook in before_request_hooks:
         hook(*args)
@@ -120,6 +122,7 @@ def munge_request(http_op):
 class HTTPClient(threading.local, object):
 
     config = Config()
+    _before_request_hooks = before_request_hooks
 
     def __init__(self, keep_alive=True, *args, **kwargs):
         super(HTTPClient, self).__init__(*args, **kwargs)
