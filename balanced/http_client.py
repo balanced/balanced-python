@@ -27,42 +27,48 @@ before_request_hooks = []
 
 def wrap_raise_for_status(http_client):
 
-    def wrapper(response_instance):
+    def handle_exception(response):
+        deserialized = http_client.deserialize(
+            response
+        )
+        response.deserialized = deserialized
+        extra = deserialized.get('additional') or ''
+        if extra:
+            extra = ' -- {}.'.format(extra)
+        error_msg = '{name}: {code}: {msg} {extra}'.format(
+            name=deserialized['status'],
+            code=deserialized['status_code'],
+            msg=deserialized['description'].encode('utf8'),
+            extra=extra.encode('utf8'),
+            )
+        category_code = deserialized.get('category_code', None)
+        error_cls = exc.category_code_map.get(
+            category_code, exc.HTTPError)
+        http_error = error_cls(error_msg)
+        for error, value in deserialized.iteritems():
+            setattr(http_error, error, value)
+        raise http_error
 
-        raise_for_status = response_instance.raise_for_status
+    def handle_redirect(response):
+        reason = '%s Client Error: %s' % (
+            response.status_code,
+            response.reason,
+            )
+        redirection = exc.MoreInformationRequiredError(reason)
+        redirection.status_code = response.status_code
+        redirection.response = response
+        redirection.redirect_uri = response.headers['Location']
+        raise redirection
 
-        def wrapped():
-            try:
-                raise_for_status(allow_redirects=False)
-            except requests.HTTPError, ex:
-                if ex.response.status_code in REDIRECT_STATI:
-                    redirection = exc.MoreInformationRequiredError('%s' % ex)
-                    redirection.status_code = ex.response.status_code
-                    redirection.response = ex.response
-                    redirection.redirect_uri = ex.response.headers['Location']
-                    raise redirection
-                deserialized = http_client.deserialize(
-                    response_instance
-                )
-                response_instance.deserialized = deserialized
-                extra = deserialized.get('additional') or ''
-                if extra:
-                    extra = ' -- {}.'.format(extra)
-                error_msg = '{name}: {code}: {msg} {extra}'.format(
-                    name=deserialized['status'],
-                    code=deserialized['status_code'],
-                    msg=deserialized['description'].encode('utf8'),
-                    extra=extra.encode('utf8'),
-                )
-                category_code = deserialized.get('category_code', None)
-                error_cls = exc.category_code_map.get(
-                    category_code, exc.HTTPError)
-                http_error = error_cls(error_msg)
-                for error, value in deserialized.iteritems():
-                    setattr(http_error, error, value)
-                raise http_error
+    def wrapper(response):
 
-        response_instance.raise_for_status = wrapped
+        try:
+            response.raise_for_status()
+        except requests.HTTPError:
+            handle_exception(response)
+        else:
+            if response.status_code in REDIRECT_STATI:
+                handle_redirect(response)
 
     return wrapper
 
@@ -107,6 +113,7 @@ def munge_request(http_op):
         headers.update(client.config.requests['base_headers'])
         kwargs['headers'] = headers
         kwargs['allow_redirects'] = False
+
         kwargs['hooks'] = {
             'response': wrap_raise_for_status(client)
         }

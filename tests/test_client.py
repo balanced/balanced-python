@@ -25,8 +25,21 @@ class TestConfig(unittest.TestCase):
         self.assertEqual(config.version, 'v1')
 
 
+def no_hook(client, http_op, url, kwargs):
+    kwargs.pop('hooks', None)
+
+
 class TestClient(unittest.TestCase):
+
+    def setUp(self):
+        before_request_hooks.append(no_hook)
+
+    def tearDown(self):
+        while before_request_hooks:
+            before_request_hooks.pop()
+
     def test_http_operations(self):
+
         ops = ['get', 'post', 'put', 'delete']
         for op in ops:
             response = getattr(balanced.http_client, op)(
@@ -54,11 +67,12 @@ class TestClient(unittest.TestCase):
 
     def test_before_request_hook(self):
         momo = mock.Mock()
+
+        before_request_hooks.append(no_hook)
         before_request_hooks.append(momo)
 
         balanced.http_client.get(
             'hithere',
-            return_response=False
         )
         self.assertEqual(momo.call_count, 1)
         args, _ = momo.call_args
@@ -118,10 +132,9 @@ class TestHTTPClient(unittest.TestCase):
         response.raise_for_status.side_effect = ex
 
         wrapped = wrap_raise_for_status(client)
-        wrapped(response)
 
         with self.assertRaises(balanced.exc.HTTPError) as ex:
-            response.raise_for_status()
+            wrapped(response)
         self.assertEqual(ex.exception.description, api_response['description'])
 
 
