@@ -1,13 +1,15 @@
 # -*- coding: utf-8 -*-
 
 from __future__ import unicode_literals
-
+import mock
+import warnings
+import re
 import unittest
 
 import requests
 
 import balanced
-from balanced.exc import NoResultFound
+from balanced.exc import NoResultFound, MoreInformationRequiredError
 
 
 # fixtures
@@ -72,7 +74,7 @@ CARD = {
     'region': 'CA',
     'postal_code': '90210',
     'name': 'Johnny Fresh',
-    'card_number': '4' + '1' * 15,
+    'card_number': '4444424444444440',
     'expiration_month': 12,
     'expiration_year': 2013,
     }
@@ -84,7 +86,7 @@ INTERNATIONAL_CARD = {
     'postal_code': '4020054',
     'country_code': 'JPN',
     'name': 'Johnny Fresh',
-    'card_number': '4' + '1' * 15,
+    'card_number': '4444424444444440',
     'expiration_month': 12,
     'expiration_year': 2014,
     }
@@ -94,6 +96,29 @@ BANK_ACCOUNT = {
     'account_number': '112233a',
     'bank_code': '121042882',
     }
+
+PERSON_FAILING_KYC = {
+    'type': 'person',
+    'name': 'William James',
+    'dob': '1842-01-01',
+    'phone_number': '+16505551234',
+    'street_address': '801 High St',
+    'postal_code': '99999',
+    'region': 'EX',
+    'country_code': 'USA',
+    }
+
+BANK_ACCOUNT_W_TYPE = {
+    'name': 'Homer Jay',
+    'account_number': '112233a',
+    'routing_number': '121042882',
+    'type': 'checking'
+}
+
+CREDIT = {
+    'amount': 9876,
+    'description': 'I love money',
+}
 
 
 # tests
@@ -132,6 +157,12 @@ class BasicUseCases(unittest.TestCase):
         self.assertIsNotNone(balanced.config.api_key_secret)
         mps = balanced.Marketplace.query.all()
         self.assertEqual(len(mps), 1)
+
+    def _create_marketplace(self):
+        try:
+            return balanced.Marketplace.query.one()
+        except NoResultFound:
+            return balanced.Marketplace().save()
 
     def _find_marketplace(self):
         return balanced.Marketplace.query.one()
@@ -205,39 +236,38 @@ class BasicUseCases(unittest.TestCase):
         self.assertIsInstance(debit.account, balanced.Account)
         self.assertIsInstance(debit.hold, balanced.Hold)
         self.assertEqual(debit.description, 'Descripty')
-        self.assertEqual(debit.fee, (1000 * 0.029))
+        self.assertIsNone(debit.fee)
         self.assertEqual(debit.appears_on_statement_as, 'atest')
 
         refund = debit.refund(amount=100)
-        #self.assertTrue(refund.id.startswith('RF'))
+        self.assertTrue(refund.id.startswith('RF'))
         self.assertEqual(refund.debit.uri, debit.uri)
-        self.assertEqual(refund.fee, -1 * int((100 * 0.029)))
+        self.assertIsNone(refund.fee)
 
         another_debit = account.debit(
             amount=1000,
             meta={'fraud': 'yes'})
         self.assertEqual(another_debit.appears_on_statement_as, 'example.com')
 
-        another_refund = another_debit.refund()
-        self.assertEqual(another_refund.fee + another_debit.fee, 0)
+        another_debit.refund()
 
     def test_07_create_hold_and_void_it(self):
         account = self._find_account('buyer')
         hold = account.hold(amount=1500, description='Hold me')
-        self.assertEqual(hold.fee, 30)
+        self.assertIsNone(hold.fee)
         self.assertEqual(hold.account.uri, account.uri)
         self.assertFalse(hold.is_void)
         self.assertEqual(hold.description, 'Hold me')
         hold.void()
         self.assertTrue(hold.is_void)
-        self.assertEqual(hold.fee, 30)  # fee still the same
+        self.assertIsNone(hold.fee)
 
     def test_08_create_hold_and_debit_it(self):
         account = self._find_account('buyer')
         hold = account.hold(amount=1500)
         self.assertTrue(hold.id.startswith('HL'))
         debit = hold.capture()
-        self.assertEqual(debit.fee, int((1500 * 0.029)))
+        self.assertIsNone(debit.fee)
 
     def test_09_create_a_person_merchant(self):
         mp = self._find_marketplace()
@@ -246,7 +276,7 @@ class BasicUseCases(unittest.TestCase):
         self.assertEqual(merchant.roles, ['merchant'])
 
     def test_10_create_a_business_merchant(self):
-        mp = self._find_marketplace()
+        mp = self._create_marketplace()
         payload = {
             "name": "Levain Bakery LLC",
             "account_number": "28304871049",
@@ -258,7 +288,7 @@ class BasicUseCases(unittest.TestCase):
             merchant=BUSINESS_MERCHANT,
             bank_account_uri=bank_account.uri,
         )
-        self.assertItemsEqual(merchant.roles, ['buyer', 'merchant'])
+        self.assertItemsEqual(merchant.roles, ['merchant'])
 
     def test_11_create_a_business_merchant_with_existing_email_addr(self):
         mp = self._find_marketplace()
@@ -302,13 +332,6 @@ class BasicUseCases(unittest.TestCase):
         self.assertEqual(the_exception.status_code, 409)
         print the_exception
 
-    def test_14_appends_marketplace_for_creating_account(self):
-        with self.assertRaises(requests.HTTPError) as exc:
-            balanced.Account().save()
-        the_exception = exc.exception
-        self.assertEqual(the_exception.status_code, 400)
-        print the_exception
-
     def test_15_debits_without_an_account(self):
         with self.assertRaises(requests.HTTPError) as exc:
             balanced.Debit().save()
@@ -319,10 +342,16 @@ class BasicUseCases(unittest.TestCase):
     def test_16_slice_syntax(self):
         total_debit = balanced.Debit.query.count()
         self.assertNotEqual(total_debit, 2)
+        self.assertEqual(len(balanced.Debit.query), total_debit)
         sliced_debits = balanced.Debit.query[:2]
         self.assertEqual(len(sliced_debits), 2)
         for debit in sliced_debits:
             self.assertIsInstance(debit, balanced.Debit)
+        all_debits = balanced.Debit.query.all()
+        last = total_debit * - 1
+        for index, debit in enumerate(all_debits):
+            self.assertEqual(debit.uri,
+                             balanced.Debit.query[last + index].uri)
 
     def test_17_test_merchant_cache_busting(self):
         # cache it.
@@ -394,21 +423,118 @@ class BasicUseCases(unittest.TestCase):
         self.assertEqual([deb.id for deb in debs], [deb2.id, deb3.id, deb1.id])
 
     def test_21_mask_bank_account(self):
-        try:
-            mp = balanced.Marketplace.query.one()
-        except NoResultFound:
-            mp = balanced.Marketplace().save()
+        mp = self._create_marketplace()
         payload = BANK_ACCOUNT.copy()
         payload['account_number'] = '1212121-110-019'
         bank_account = mp.create_bank_account(**payload)
         self.assertEqual(bank_account.last_four, '0019')
 
     def test_22_create_international_card(self):
-        try:
-            mp = balanced.Marketplace.query.one()
-        except NoResultFound:
-            mp = balanced.Marketplace().save()
+        mp = self._create_marketplace()
         card = mp.create_card(**INTERNATIONAL_CARD)
         self.assertTrue(card.id.startswith('CC'))
         self.assertEqual(card.street_address,
             INTERNATIONAL_CARD['street_address'])
+
+    def test_23_kyc_redirect(self):
+        mp = self._create_marketplace()
+
+        redirect_pattern = ('https://www.balancedpayments.com'
+            '/marketplaces/(.*)/kyc')
+
+        with self.assertRaises(MoreInformationRequiredError) as ex:
+            mp.create_merchant('marshall@poundpay.com', PERSON_FAILING_KYC)
+
+        redirect_uri = ex.exception.redirect_uri
+        result = re.search(redirect_pattern, redirect_uri)
+        self.assertTrue(result)
+
+    def test_24_toplevel_bank_account(self):
+        self._create_marketplace()
+        count = balanced.BankAccount.query.count()
+        payload = BANK_ACCOUNT_W_TYPE.copy()
+        bank_account = balanced.BankAccount(**payload).save()
+        self.assertFalse(hasattr(bank_account, 'last_four'))
+        self.assertFalse(hasattr(bank_account, 'bank_code'))
+        self.assertTrue(hasattr(bank_account, 'routing_number'))
+        self.assertEqual(bank_account.routing_number,
+                         payload['routing_number'])
+        self.assertEqual(payload['account_number'][-4:],
+                         bank_account.account_number[-4:])
+        self.assertIsNotNone(bank_account.credits_uri)
+        self.assertEqual(balanced.BankAccount.query.count(), count + 1)
+
+    def test_25_index_toplevel_bank_accounts(self):
+        self._create_marketplace()
+        count = balanced.BankAccount.query.count()
+        bas = balanced.BankAccount.query.all()
+        self.assertEqual(len(bas), count)
+        self.assertGreater(count, 0)
+
+    def test_26_toplevel_bank_account_credit(self):
+        self._create_marketplace()
+        buyer = self._find_account('buyer')
+        card = balanced.Marketplace.my_marketplace.create_card(**CARD)
+        buyer.add_card(card.uri)
+        buyer.debit(1212121)
+
+        payload = BANK_ACCOUNT_W_TYPE.copy()
+        bank_account = balanced.BankAccount(**payload).save()
+        cr = bank_account.credit(50)
+        self.assertEqual(cr.amount, 50)
+
+    def test_27_toplevel_credit(self):
+        self._create_marketplace()
+        buyer = self._find_account('buyer')
+        card = balanced.Marketplace.my_marketplace.create_card(**CARD)
+        buyer.add_card(card.uri)
+        buyer.debit(1212121)
+
+        payload = CREDIT.copy()
+        payload['bank_account'] = BANK_ACCOUNT_W_TYPE.copy()
+        credit = balanced.Credit(**payload).save()
+        self.assertEqual(credit.amount, payload['amount'])
+        self.assertEqual(credit.description, payload['description'])
+        self.assertNotIn('id', credit.bank_account)
+        self.assertNotIn('uri', credit.bank_account)
+        self.assertNotIn('created_at', credit.bank_account)
+
+    def test_28_on_behalf_of(self):
+        mp = self._create_marketplace()
+        buyer = self._find_account('buyer')
+        merchant = mp.create_merchant('mahmoud2@poundpay.com',
+                                      merchant=PERSON_MERCHANT)
+
+        card = balanced.Marketplace.my_marketplace.create_card(**CARD)
+        buyer.add_card(card.uri)
+
+        self.assertIsNotNone(buyer.debit(2222, on_behalf_of=merchant.uri))
+
+        with warnings.catch_warnings(record=True) as w:
+            self.assertIsNotNone(buyer.debit(1111, merchant_uri=merchant.uri))
+            self.assertEqual(len(w), 1)
+
+        # test that we extract the uri if you pass the object
+        with mock.patch('balanced.resources.Debit') as debit:
+            buyer.debit(2222, on_behalf_of=merchant)
+            self.assertEqual(
+                debit.call_args[1]['on_behalf_of_uri'],
+            merchant.uri)
+
+        # test that we throw an exception if the uri of the merchant is the
+        # same as the account uri
+        with self.assertRaises(ValueError) as exc:
+            buyer.debit(2222, on_behalf_of=buyer)
+            self.assertEqual(
+                exc.exception.args[0],
+                'The on_behalf_of parameter MAY NOT be the same account as '
+                'the account you are debiting!'
+            )
+
+        # test that you can't pass in a bunch of shit
+        with self.assertRaises(ValueError) as exc:
+            buyer.debit(2222, on_behalf_of=15)
+            self.assertEqual(
+                exc.exception.args[0],
+                'The on_behalf_of parameter needs to be an account uri'
+            )

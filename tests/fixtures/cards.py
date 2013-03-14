@@ -64,7 +64,7 @@ CARD = {
     'region': 'CA',
     'postal_code': '94301',
     'name': 'Johnny Fresh',
-    'card_number': '4' + '1' * 15,
+    'card_number': '4444424444444440',
     'expiration_month': 12,
     'expiration_year': 2013,
     }
@@ -72,7 +72,7 @@ CARD = {
 
 CARD_NO_ADDRESS = {
     'name': 'Johnny Fresh',
-    'card_number': '4' + '1' * 15,
+    'card_number': '4444424444444440',
     'expiration_month': 12,
     'expiration_year': 2013,
     }

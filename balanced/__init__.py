@@ -1,13 +1,15 @@
-__version__ = '0.8.16'
+__version__ = '0.9.12'
 from collections import defaultdict
 import contextlib
-
 
 from balanced.http_client import HTTPClient
 from balanced.resources import (
     Resource, Marketplace, Account, APIKey,
     Hold, Credit, Debit, Refund,
-    Merchant, Transaction, BankAccount, Card)
+    Merchant, Transaction, BankAccount, Card,
+    Callback, Event, EventCallback, EventCallbackLog,
+    BankAccountVerification,
+)
 from balanced import exc
 
 
@@ -24,8 +26,13 @@ __all__ = [
     Transaction.__name__,
     Card.__name__,
     BankAccount.__name__,
+    Callback.__name__,
+    Event.__name__,
+    EventCallback.__name__,
+    EventCallbackLog.__name__,
+    BankAccountVerification.__name__,
     exc.__name__.partition('.')[-1],
-    ]
+]
 
 http_client = HTTPClient()
 config = http_client.config

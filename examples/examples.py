@@ -57,8 +57,6 @@ print "our buyer account: " + buyer.uri
 print "hold some amount of funds on the buyer, lets say 15$"
 the_hold = buyer.hold(1500)
 
-print "the hold has a fee of {0} cents".format(the_hold.fee)
-
 print "ok, no more holds! lets just capture it (for the full amount)"
 debit = the_hold.capture()
 
@@ -72,19 +70,14 @@ print "i have {0} in escrow!".format(marketplace.in_escrow)
 print "cool. now let me refund the full amount"
 refund = debit.refund()  # the full amount!
 
-print "notice how Balanced refunds you your fees? refund fees: {0}".format(
-    refund.fee)
-if refund.fee + debit.fee:
-    raise Exception("Woah, fees are incorrect")
-
 print ("ok, we have a merchant that's signing up, let's create an account for "
        "them first, lets create their bank account.")
 
 bank_account = balanced.BankAccount(
     account_number="1234567890",
-    bank_code="12",
+    bank_code="321174851",
     name="Jack Q Merchant",
-    ).save()
+).save()
 
 merchant = marketplace.create_merchant(
     "merchant@example.org",
@@ -120,11 +113,7 @@ if card.is_valid:
     raise Exception("This card is INCORRECTLY VALID")
 
 print "invalidating a bank account"
-bank_account.is_valid = False
-bank_account.save()
-
-if bank_account.is_valid:
-    raise Exception("This card is INCORRECTLY VALID")
+bank_account.delete()
 
 # a little filtering
 merchants = balanced.Account.query.filter(roles='merchant')

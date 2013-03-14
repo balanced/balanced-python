@@ -2,6 +2,7 @@ import functools
 import itertools
 import logging
 import urlparse
+import warnings
 
 import iso8601
 
@@ -18,18 +19,56 @@ class _ResourceRegistry(dict):
         self[resource_class.__name__] = resource_class
         self[resource_class.RESOURCE['singular']] = resource_class
         self[resource_class.RESOURCE['collection']] = resource_class
+        if resource_class.RESOURCE['nested_under']:
+            # nested_as = ['marketplaces', 'events']
+            # collection = 'logs'
+            # store nested_under as |marketplaces/events/logs
+            nested_under = self._as_nested(
+                resource_class.RESOURCE['nested_under'] + [
+                    resource_class.RESOURCE['collection']
+                ]
+            )
+            self[nested_under] = resource_class
 
     def from_uri(self, uri):
         if not uri:
             return None
 
         split_uri = urlparse.urlsplit(uri.rstrip('/'))
+        # split_uri.path == '/v1/marketplaces/M123/events/E123'
+        # url == ['', 'v1', 'marketplaces', 'M123', 'events', 'E123']
         url = split_uri.path.split('/')  # pylint: disable-msg=E1103
-        if url[-1] in self:
-            resource = self[url[-1]]
-        else:
-            resource = self[url[-2]]
+
+        resource = self._from_nested(url) or self._from_url(url)
+
         return resource
+
+    def _from_url(self, url_parts):
+        if url_parts[-1] in self:
+            resource = self[url_parts[-1]]
+        else:
+            resource = self[url_parts[-2]]
+        return resource
+
+    def _from_nested(self, url_parts):
+        # ['marketplaces', 'events']
+        parts = url_parts[2::2]
+        # we have a possible nested resource, check if it's specifically nested
+        if len(parts) > 1:
+            nested = self._as_nested(parts)
+            if nested in self:
+                resource = self[nested]
+                return resource
+        return None
+
+    def _as_nested(self, parts):
+        """
+        >>> _ResourceRegistry()._as_nested(['marketplaces', 'events'])
+        '|marketplaces/events'
+        :param parts: list of parts to turn into a nested resource
+        :return: munged fungible
+        """
+        return '|' + '/'.join(parts)
 
 
 _RESOURCES = _ResourceRegistry()
@@ -49,7 +88,7 @@ class Page(object):
             # fail fast.
             if (isinstance(stop, int) and
                 isinstance(start, int) and
-                stop - start <= 0):
+                    stop - start <= 0):
                 return []
 
             elif any((isinstance(start, int) and start < 0,
@@ -62,6 +101,16 @@ class Page(object):
             else:
                 return list(res)
         else:
+            # negative index
+            if item < 0:
+                # e.g. let len(self) = 3 and item = -1
+                # self[length of collection - item : length of collection]
+                # self[3 - 1: 3]
+                length = len(self)
+                return list(self[length + item:length])[0]
+            # positive index
+            # let item = 2
+            # self[2:3][0]
             return list(self[item:item + 1])[0]
 
     def _slice(self, start, stop):
@@ -74,9 +123,17 @@ class Page(object):
             self.qs['offset'] = (self.offset or 0) + start
         return itertools.islice(self, start, stop)
 
+    def __len__(self):
+        return self.total
+
     def __iter__(self):
-        for resource in itertools.chain(self.items, self.next_page):
-            yield resource
+        if self.next_page is not None:
+            for resource in itertools.chain(self.items, self.next_page):
+                yield resource
+        else:
+            # New-style, no pagination
+            for resource in self.items:
+                yield resource
 
     @classmethod
     def from_uri_and_params(cls, uri, params):
@@ -88,6 +145,12 @@ class Page(object):
         if parsed_qs:
             uri = uri + '?' + url_encode(parsed_qs)
         return cls(uri)
+
+    @classmethod
+    def from_response(cls, uri, **kwargs):
+        instance = cls.from_uri_and_params(uri, None)
+        setattr(instance, '_lazy_loaded', kwargs)
+        return instance
 
     def __repr__(self):
         _resource = _RESOURCES.from_uri(self.uri)
@@ -145,8 +208,10 @@ class Page(object):
 
     @property
     def next_page(self):
-        uri = self._lazy_loaded['next_uri']
-        return self._fetch(uri)
+        if 'next_uri' in self._lazy_loaded:
+            uri = self._lazy_loaded['next_uri']
+            return self._fetch(uri)
+        return None
 
     @property
     def last_page(self):
@@ -192,8 +257,9 @@ class Page(object):
                 values = [values]
             v = ','.join(str(v) for v in values)
             query_arguments[f] = v
-        self.qs.update(query_arguments)
-        return self
+        qs = self.qs.copy()
+        qs.update(query_arguments)
+        return Page.from_uri_and_params(self.uri, qs)
 
     def sort(self, *args):
         sorts = []
@@ -263,11 +329,12 @@ def uri_discovery(resource):
         uri = '{0}/{1}'.format(
             Marketplace.my_marketplace.uri,
             resource.RESOURCE['collection']
-            )
+        )
     return uri
 
 
 def is_collection(uri):
+    uri = urlparse.urlparse(uri).path
     _, _, end_identifier = uri.rstrip('/').rpartition('/')
     return end_identifier in _RESOURCES
 
@@ -289,7 +356,7 @@ def is_date(value):
         value and
         isinstance(value, basestring) and
         'Z' in value
-        )
+    )
 
 
 def is_uri(key):
@@ -347,7 +414,10 @@ def make_constructors():
                         "added in resources.py. Defaulting to dictionary "
                         "based access", key)
                 else:
-                    value = resource(**value)
+                    if is_collection(uri):
+                        value = Page.from_response(**value)
+                    else:
+                        value = resource(**value)
             elif key.endswith('_at') and is_date(value):
                 value = iso8601.parse_date(value)
             setattr(self, key, value)
@@ -432,7 +502,8 @@ class _ResourceFields(object):
 def resource_base(singular=None,
                   collection=None,
                   metadata=None,
-                  resides_under_marketplace=True):
+                  resides_under_marketplace=True,
+                  nested_under=None):
 
     class Base(type):
 
@@ -445,12 +516,13 @@ def resource_base(singular=None,
                     'singular': singular or classname.lower(),
                     'collection': collection,
                     'resides_under_marketplace': resides_under_marketplace,
+                    'nested_under': nested_under,
                 },
                 '__init__': the_init,
                 '__new__': the_new,
                 'fields': fields,
                 'f': fields,
-                })
+            })
 
             the_class = type.__new__(mcs, classname, bases, clsdict)
             _RESOURCES.add(the_class)
@@ -468,17 +540,61 @@ class Account(Resource):
     """
     __metaclass__ = resource_base(collection='accounts')
 
-    def debit(self, amount=None, appears_on_statement_as=None,
-              hold_uri=None, meta=None, description=None, source_uri=None):
+    def debit(self,
+              amount=None,
+              appears_on_statement_as=None,
+              hold_uri=None,
+              meta=None,
+              description=None,
+              source_uri=None,
+              merchant_uri=None,
+              on_behalf_of=None):
         """
         :rtype: A `Debit` representing a flow of money from this Account to
             your Marketplace's escrow account.
-
+        :param amount: Amount to hold in cents, must be >= 50
+        :param appears_on_statement_as: description of the payment as it needs
+        to appear on customers card statement
+        :param meta: Key/value collection
+        :param description: Human readable description
+        :param source_uri: A specific funding source such as a `Card`
+            associated with this account. If not specified the `Card` most
+            recently added to this `Account` is used.
+        :param merchant_uri: merchant providing service or delivering product.
+               (deprecated - use on_behalf_of instead)
+        :param on_behalf_of: the account uri of whomever is providing the
+               service or delivering the product.
         """
         if not any((amount, hold_uri)):
             raise ResourceError('Must have an amount or hold uri')
         if all([hold_uri, source_uri]):
             raise ResourceError('Must specify either hold_uri OR source_uri')
+
+        if merchant_uri and not on_behalf_of:
+            warnings.warn(
+                'merchant_uri is DEPRECATED - use the on_behalf_of '
+                'parameter',
+                UserWarning,
+                stacklevel=2
+            )
+            merchant_uri = None
+            on_behalf_of = merchant_uri
+
+        if on_behalf_of:
+
+            if hasattr(on_behalf_of, 'uri'):
+                on_behalf_of = on_behalf_of.uri
+
+            if not isinstance(on_behalf_of, basestring):
+                raise ValueError(
+                    'The on_behalf_of parameter needs to be an account uri'
+                )
+
+            if on_behalf_of == self.uri:
+                raise ValueError(
+                    'The on_behalf_of parameter MAY NOT be the same account'
+                    ' as the account you are debiting!'
+                )
 
         meta = meta or {}
         return Debit(
@@ -489,6 +605,8 @@ class Account(Resource):
             meta=meta,
             description=description,
             source_uri=source_uri,
+            merchant_uri=merchant_uri,
+            on_behalf_of_uri=on_behalf_of,
         ).save()
 
     def hold(self, amount, description=None, meta=None, source_uri=None,
@@ -516,17 +634,26 @@ class Account(Resource):
             description=description,
             source_uri=source_uri,
             appears_on_statement_as=appears_on_statement_as,
-            ).save()
+        ).save()
 
-    def credit(self, amount, description=None, meta=None,
-               destination_uri=None, appears_on_statement_as=None):
+    def credit(self,
+               amount,
+               description=None,
+               meta=None,
+               destination_uri=None,
+               appears_on_statement_as=None,
+               debit_uri=None):
         """
         Returns a new Credit representing a transfer of funds from your
         Marketplace's escrow account to this Account.
 
-        Args:
-            destination_uri: A specific funding destination such as a
+        :param amount: Amount to hold in cents
+        :param description: Human readable description
+        :param meta: Key/value collection
+        :param destination_uri: A specific funding destination such as a
                 `BankAccount` associated with this account.
+        :param appears_on_statement_as: description of the payment as it needs
+        :param debit_uri: the debit corresponding to this particular credit
 
         Returns:
             A `Credit` representing the transfer of funds from your
@@ -540,7 +667,8 @@ class Account(Resource):
             description=description,
             appears_on_statement_as=appears_on_statement_as,
             destination_uri=destination_uri,
-            ).save()
+            debit_uri=debit_uri,
+        ).save()
 
     def add_card(self, card_uri):
         """
@@ -557,12 +685,26 @@ class Account(Resource):
         self.bank_account_uri = bank_account_uri
         self.save()
 
-    def add_merchant(self, merchant_data):
+    def promote_to_merchant(self, merchant):
         """
-        Adds the `merchant` role to this Account.
+        Underwrites this account as a merchant. The `merchant` parameter can
+        be either a dictionary of merchant data, or a URI.
         """
-        self.merchant = merchant_data
+        if isinstance(merchant, basestring):
+            self.merchant_uri = merchant
+        else:
+            self.merchant = merchant
         self.save()
+
+    def add_merchant(self, merchant):
+        """
+        Deprecated alias of `promote_to_merchant` method.
+        """
+        warnings.warn('The add_merchant method will be deprecated in the '
+                      'next minor version of balanced-python, use the '
+                      'promote_to_merchant method instead',
+                      UserWarning)
+        self.promote_to_merchant(merchant)
 
 
 def cached_per_api_key(bust_cache=False):
@@ -611,23 +753,29 @@ class Marketplace(Resource):
         resides_under_marketplace=False)
 
     def create_card(self,
-            name,
-            card_number,
-            expiration_month,
-            expiration_year,
-            security_code=None,
-            street_address=None,
-            city=None,
-            region=None,
-            postal_code=None,
-            country_code=None,
-            phone_number=None,
-            ):
+                    name,
+                    card_number,
+                    expiration_month,
+                    expiration_year,
+                    security_code=None,
+                    street_address=None,
+                    city=None,
+                    region=None,
+                    postal_code=None,
+                    country_code=None,
+                    phone_number=None,
+                    ):
         """
         Tokenizes a `Card` which can then be associated with an Account.
 
         :rtype: `Card`
         """
+
+        if region:
+            warnings.warn('The region parameter will be deprecated in the '
+                          'next minor version of balanced-python',
+                          UserWarning)
+
         return Card(
             card_number=card_number,
             expiration_month=expiration_month,
@@ -640,23 +788,24 @@ class Marketplace(Resource):
             region=region,
             country_code=country_code,
             phone_number=phone_number,
-            ).save()
+        ).save()
 
     def create_bank_account(self,
-            name,
-            account_number,
-            bank_code,
-            ):
+                            name,
+                            account_number,
+                            bank_code,
+                            ):
         """
         Tokenizes a `BankAccount` which can then be associated with an Account.
 
         :rtype: `BankAccount`
         """
         return BankAccount(
+            uri=self.bank_accounts_uri,
             name=name,
             account_number=account_number,
             bank_code=bank_code,
-            ).save()
+        ).save()
 
     def create_buyer(self, email_address, card_uri, name=None, meta=None):
         """
@@ -717,6 +866,8 @@ class Marketplace(Resource):
         """
         return cls.query.one()
 
+    mine = my_marketplace
+
     @cached_per_api_key(bust_cache=True)
     def save(self):
         return super(Marketplace, self).save()
@@ -773,7 +924,8 @@ class Credit(Resource):
     destination associated with an Account. You may specify a specific
     funding source.
     """
-    __metaclass__ = resource_base(collection='credits')
+    __metaclass__ = resource_base(collection='credits',
+                                  resides_under_marketplace=False)
 
 
 class Refund(Resource):
@@ -862,6 +1014,7 @@ class Card(Resource):
             hold_uri=hold_uri,
             meta=meta,
             description=description,
+            source_uri=self.uri,
         ).save()
 
     def hold(self, amount, meta=None, description=None):
@@ -875,7 +1028,8 @@ class Card(Resource):
             uri=self.account.holds_uri,
             amount=amount,
             meta=meta,
-            description=description
+            description=description,
+            source_uri=self.uri,
         ).save()
 
 
@@ -886,7 +1040,8 @@ class BankAccount(Resource):
 
     *NOTE:* The BankAccount resource does not support creating a Hold.
     """
-    __metaclass__ = resource_base(collection='bank_accounts')
+    __metaclass__ = resource_base(collection='bank_accounts',
+                                  resides_under_marketplace=False)
 
     def debit(self, amount, appears_on_statement_as=None,
               meta=None, description=None):
@@ -900,7 +1055,10 @@ class BankAccount(Resource):
         """
         if not amount or amount <= 0:
             raise ResourceError('Must have an amount')
-
+        if not hasattr(self, 'account'):
+            raise ResourceError(
+                '{} must be associated with an account'.format(self)
+            )
         meta = meta or {}
         return Debit(
             uri=self.account.debits_uri,
@@ -908,12 +1066,13 @@ class BankAccount(Resource):
             appears_on_statement_as=appears_on_statement_as,
             meta=meta,
             description=description,
+            source_uri=self.uri,
         ).save()
 
     def credit(self, amount, description=None, meta=None):
         """
         Creates a Credit of funds from your Marketplace's escrow account to
-        the Account associated with this BankAccount.
+        this BankAccount.
 
         :rtype: Credit
         """
@@ -921,12 +1080,87 @@ class BankAccount(Resource):
             raise ResourceError('Must have an amount')
 
         meta = meta or {}
-        return Credit(
-            uri=self.account.credits_uri,
+
+        if getattr(self, 'account', None):
+            uri = self.account.credits_uri
+        else:
+            uri = self.credits_uri
+        destination_uri = self.uri
+
+        credit = Credit(
+            uri=uri,
             amount=amount,
-            meta=meta,
             description=description,
+            meta=meta,
+            destination_uri=destination_uri,
+        )
+        credit.save()
+        return credit
+
+    def save(self):
+        # default type to 'checking' on create since it was not always required
+        if not getattr(self, 'id', None) and not hasattr(self, 'type'):
+            self.type = 'checking'
+        return super(BankAccount, self).save()
+
+    def verify(self):
+        return BankAccountVerification(
+            uri=self.verifications_uri,
         ).save()
+
+
+class BankAccountVerification(Resource):
+    """
+    Represents an attempt to authenticate a funding instrument so it can
+    perform verified operations.
+    """
+    __metaclass__ = resource_base(collection='verifications',
+                                  nested_under=['bank_accounts'],
+                                  resides_under_marketplace=False)
+
+    def confirm(self, amount_1, amount_2):
+        self.amount_1 = amount_1
+        self.amount_2 = amount_2
+        return self.save()
+
+
+class Event(Resource):
+    """
+    An Event is a snapshot of another resource at a point in time when
+    something significant occurred. Events are created when resources are
+    created, updated, deleted or otherwise change state such as a Credit being
+    marked as failed.
+    """
+    __metaclass__ = resource_base(collection='events',
+                                  resides_under_marketplace=False)
+
+
+class EventCallback(Resource):
+    """
+    Represents a single event being sent to a callback.
+    """
+    __metaclass__ = resource_base(collection='callbacks',
+                                  nested_under=['events'],
+                                  resides_under_marketplace=False)
+
+
+class EventCallbackLog(Resource):
+    """
+    Represents a request and response from single attempt to notify a callback
+    of an event.
+    """
+    __metaclass__ = resource_base(collection='logs',
+                                  nested_under=['events', 'callbacks'],
+                                  resides_under_marketplace=False)
+
+
+class Callback(Resource):
+    """
+    A Callback is a publicly accessible location that can receive POSTed JSON
+    data whenever an Event is generated.
+    """
+    __metaclass__ = resource_base(collection='callbacks',
+                                  resides_under_marketplace=True)
 
 
 class FilterExpression(object):

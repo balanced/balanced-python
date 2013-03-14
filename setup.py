@@ -1,7 +1,7 @@
 """
 Balanced Python client library.
 
-See ``README.rst`` for usage advice.
+See ``README.mkd`` for usage advice.
 """
 import os
 import pickle
@@ -73,7 +73,7 @@ def _get_version():
 
 
 def _get_long_description():
-    path = os.path.join(PATH_TO_FILE, 'README.rst')
+    path = os.path.join(PATH_TO_FILE, 'README.mkd')
     fo = open(path)
     try:
         return fo.read()
@@ -114,7 +114,7 @@ setup(
     url='https://balancedpayments.com/',
     license='BSD',
     author='Mahmoud Abdelkader',
-    author_email='devsupport@poundpay.com',
+    author_email='support@balancedpayments.com',
     description='Payments platform for marketplaces',
     long_description=LONG_DESCRIPTION,
     packages=['balanced'],
@@ -126,8 +126,8 @@ setup(
         'License :: OSI Approved :: BSD License',
         'Programming Language :: Python',
         'Topic :: Software Development :: Libraries :: Python Modules',
-        ],
+    ],
     cmdclass={
         'docs': DocumentationCommand,
-        }
+    }
 )

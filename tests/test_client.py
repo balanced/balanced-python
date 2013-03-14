@@ -2,8 +2,10 @@
 import unittest
 
 import balanced
-from balanced.http_client import wrap_raise_for_status
+from balanced.http_client import wrap_raise_for_status, before_request_hooks
 import mock
+
+import threading
 
 
 class TestConfig(unittest.TestCase):
@@ -50,13 +52,26 @@ class TestClient(unittest.TestCase):
             self.assertEqual(the_config.api_key_secret, 'new_key')
         self.assertEqual(the_config.api_key_secret, current_key)
 
+    def test_before_request_hook(self):
+        momo = mock.Mock()
+        before_request_hooks.append(momo)
+
+        balanced.http_client.get(
+            'hithere',
+            return_response=False
+        )
+        self.assertEqual(momo.call_count, 1)
+        args, _ = momo.call_args
+        self.assertEqual(args[0], balanced.http_client)
+        self.assertTrue('hithere' in args[2])
+
 
 class TestHTTPClient(unittest.TestCase):
     def test_deserialization(self):
         resp = mock.Mock()
         resp.headers = {
             'Content-Type': 'text/html',
-            }
+        }
         resp.content = 'Unhandled Exception'
         client = balanced.HTTPClient()
         has_error = False
@@ -74,7 +89,7 @@ class TestHTTPClient(unittest.TestCase):
         resp = mock.Mock()
         resp.headers = {
             'Content-Type': 'text/html',
-            }
+        }
         resp.content = 'Unhandled Exception'
         client = balanced.HTTPClient()
         has_error = False
@@ -120,3 +135,38 @@ class TestHTTPClient(unittest.TestCase):
             has_error = True
         self.assertTrue(has_error)
         self.assertEqual(ex.description, api_response['description'])
+
+
+class TestConfigThread(threading.Thread):
+    def __init__( self ):
+        threading.Thread.__init__(self)
+        self.key = False
+
+    def run(self):
+        print balanced.config.api_key_secret, balanced.config
+        self.key = balanced.config.api_key_secret == 'test'
+
+
+class MultiThreadedUserCases(unittest.TestCase):
+    def setUp(self):
+        balanced.configure('not-test')
+
+    def tearDown(self):
+        balanced.configure(None)
+
+    def test_config_does_not_change_across_threads(self):
+        threads = []
+
+        for _ in xrange(2):
+            t = TestConfigThread()
+            threads.append(t)
+
+        # change configuration once the threads are created
+        balanced.configure('test')
+
+        for t in threads:
+            t.start()
+
+        for t in threads:
+            t.join(len(threads))
+            self.assertTrue(t.key)

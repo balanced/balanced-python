@@ -1,26 +1,28 @@
 import json
-import os
 import threading
 
 import requests
 from requests.models import REDIRECT_STATI
 
+from balanced import exc
 from balanced.config import Config
-from balanced.utils import to_json
-from balanced.exc import HTTPError, BalancedError
+from balanced.utils import to_json, urljoin
 
 serializers = {
     'application/json': to_json
-    }
+}
 
 
 deserializers = {
     'application/json': json.loads
-    }
+}
 
 
 REDIRECT_STATI = list(REDIRECT_STATI)
 REDIRECT_STATI.append(300)
+
+
+before_request_hooks = []
 
 
 def wrap_raise_for_status(http_client):
@@ -32,33 +34,44 @@ def wrap_raise_for_status(http_client):
         def wrapped():
             try:
                 raise_for_status(allow_redirects=False)
-            except requests.HTTPError, exc:
-                if exc.response.status_code in REDIRECT_STATI:
-                    redirection = HTTPError('%s' % exc)
-                    redirection.status_code = exc.response.status_code
-                    redirection.response = exc.response
+            except requests.HTTPError, ex:
+                if ex.response.status_code in REDIRECT_STATI:
+                    redirection = exc.MoreInformationRequiredError('%s' % ex)
+                    redirection.status_code = ex.response.status_code
+                    redirection.response = ex.response
+                    redirection.redirect_uri = ex.response.headers['Location']
                     raise redirection
                 deserialized = http_client.deserialize(
                     response_instance
-                    )
+                )
                 response_instance.deserialized = deserialized
                 extra = deserialized.get('additional') or ''
                 if extra:
                     extra = ' -- {0}.'.format(extra)
                 error_msg = '{name}: {code}: {msg} {extra}'.format(
-                        name=deserialized['status'],
-                        code=deserialized['status_code'],
-                        msg=deserialized['description'].encode('utf8'),
-                        extra=extra.encode('utf8'),
-                    )
-                http_error = HTTPError(error_msg)
-                for error, value in response_instance.deserialized.iteritems():
+                    name=deserialized['status'],
+                    code=deserialized['status_code'],
+                    msg=deserialized['description'].encode('utf8'),
+                    extra=extra.encode('utf8'),
+                )
+                category_code = deserialized.get('category_code', None)
+                error_cls = exc.category_code_map.get(
+                    category_code, exc.HTTPError)
+                http_error = error_cls(error_msg)
+                for error, value in deserialized.iteritems():
                     setattr(http_error, error, value)
                 raise http_error
 
         response_instance.raise_for_status = wrapped
 
     return wrapper
+
+
+# requests does define a 'pre_request' hook but we want to get in there before
+# it does the encoding of authorization headers etc.
+def _before_request(*args):
+    for hook in before_request_hooks:
+        hook(*args)
 
 
 def munge_request(http_op):
@@ -69,15 +82,15 @@ def munge_request(http_op):
             return url
         url = url.lstrip('/')
         if url.startswith(config.version):
-            url = os.path.join(config.root_uri, url)
+            url = urljoin(config.root_uri, url)
         else:
-            url = os.path.join(config.uri, url)
+            url = urljoin(config.uri, url)
         return url
 
     def prepend_version(config, url):
         url = url.lstrip('/')
         if not url.startswith(config.version):
-            url = os.path.join(config.version, url)
+            url = urljoin(config.version, url)
         return url
 
     def make_absolute_url(client, url, **kwargs):
@@ -94,10 +107,12 @@ def munge_request(http_op):
         kwargs['allow_redirects'] = False
         kwargs['hooks'] = {
             'response': wrap_raise_for_status(client)
-            }
+        }
 
         if client.config.api_key_secret:
             kwargs['auth'] = (client.config.api_key_secret, None)
+
+        _before_request(client, http_op, url, kwargs)
 
         return http_op(client, url, **kwargs)
 
@@ -107,6 +122,7 @@ def munge_request(http_op):
 class HTTPClient(threading.local, object):
 
     config = Config()
+    _before_request_hooks = before_request_hooks
 
     def __init__(self, keep_alive=True, *args, **kwargs):
         super(HTTPClient, self).__init__(*args, **kwargs)
@@ -145,7 +161,7 @@ class HTTPClient(threading.local, object):
     def delete(self, uri, **kwargs):
         kwargs = self.serialize(kwargs.copy())
         resp = self.interface.delete(uri, **kwargs)
-        if kwargs.get('return_response', True):
+        if kwargs.get('return_response', True) and resp.status_code != 204:
             resp.deserialized = self.deserialize(resp)
         return resp
 
@@ -153,7 +169,7 @@ class HTTPClient(threading.local, object):
         try:
             return deserializers[resp.headers['Content-Type']](resp.content)
         except KeyError:
-            raise BalancedError('Invalid content type "{0}": {1}'.format(
+            raise exc.BalancedError('Invalid content type "{0}": {1}'.format(
                 resp.headers['Content-Type'], resp.content,
             ))
 

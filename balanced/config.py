@@ -1,14 +1,12 @@
-import os
-import threading
-
 from balanced import __version__
+from balanced.utils import urljoin
 
 
 def _make_user_agent():
     return 'balanced-python/' + __version__
 
 
-class Config(threading.local, object):
+class Config(object):
 
     def __init__(self):
         super(Config, self).__init__()
@@ -24,13 +22,13 @@ class Config(threading.local, object):
                 'Accept': 'application/json',
                 'Content-Type': 'application/json',
                 'User-agent': _make_user_agent(),
-                },
-                'danger_mode': True,
-            }
+            },
+            'danger_mode': True,
+        }
 
     @property
     def uri(self):
-        return os.path.join(self.root_uri, self.version)
+        return urljoin(self.root_uri, self.version)
 
     @property
     def version(self):
