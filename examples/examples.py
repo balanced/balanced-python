@@ -47,7 +47,7 @@ card = balanced.Card(
     card_number="5105105105105100",
     expiration_month="12",
     expiration_year="2015",
-    ).save()
+).save()
 print "Our card uri: " + card.uri
 
 print "create our **buyer** account"
@@ -75,9 +75,9 @@ print ("ok, we have a merchant that's signing up, let's create an account for "
 
 bank_account = balanced.BankAccount(
     account_number="1234567890",
-    bank_code="12",
+    bank_code="321174851",
     name="Jack Q Merchant",
-    ).save()
+).save()
 
 merchant = marketplace.create_merchant(
     "merchant@example.org",
