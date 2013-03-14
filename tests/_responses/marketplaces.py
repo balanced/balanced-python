@@ -57,9 +57,9 @@ def index(limit=10, offset=0, num=1, pages=1):
     items = []
     for _ in xrange(num):
         rand = int(random.random() * 10000)
-        mp_uri = '/v1/marketplaces/TEST-MP-123-456-{}'.format(rand)
+        mp_uri = '/v1/marketplaces/TEST-MP-123-456-{0}'.format(rand)
         rand = int(random.random() * 10000)
-        ac_uri = mp_uri + '/accounts/AC123-456-{}'.format(rand)
+        ac_uri = mp_uri + '/accounts/AC123-456-{0}'.format(rand)
 
         items.append({
             'uri': mp_uri,

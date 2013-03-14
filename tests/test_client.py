@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-import unittest
+import unittest2 as unittest
 
 import balanced
 from balanced.http_client import wrap_raise_for_status, before_request_hooks
@@ -11,7 +11,7 @@ import threading
 class TestConfig(unittest.TestCase):
     def test_default_config(self):
         config = balanced.config.__class__()
-        # this is here because it tests taht if you add anything new
+        # this is here because it tests that if you add anything new
         # then you should test it here..it's not really all encompassing though
         # for example, it won't detect any @property methods..
         self.assertItemsEqual(
@@ -20,7 +20,7 @@ class TestConfig(unittest.TestCase):
         )
         self.assertEqual(config.root_uri, 'https://api.balancedpayments.com')
         self.assertEqual(config.api_version, '1')
-        self.assertEqual(config.api_key_secret, None)
+        self.assertIsNone(config.api_key_secret)
         self.assertEqual(config.uri, 'https://api.balancedpayments.com/v1')
         self.assertEqual(config.version, 'v1')
 
@@ -80,7 +80,7 @@ class TestHTTPClient(unittest.TestCase):
         resp.headers['Content-Type'] = 'application/json'
         resp.content = '{"hi": "world"}'
         deserialized = client.deserialize(resp)
-        self.assertItemsEqual(deserialized, {u'hi': u'world'})
+        self.assertDictEqual(deserialized, {u'hi': u'world'})
 
     def test_deserialization_unicode(self):
         resp = mock.Mock()
@@ -96,7 +96,7 @@ class TestHTTPClient(unittest.TestCase):
                         '"third": "\\u06a9\\u0647 \\u0686\\u0647 '
                         '\\u06a9\\u062b\\u0627\\u0641\\u062a\\u06cc"}')
         deserialized = client.deserialize(resp)
-        self.assertItemsEqual(deserialized, {
+        self.assertDictEqual(deserialized, {
             u'third': (u'\u06a9\u0647 \u0686\u0647 '
                        u'\u06a9\u062b\u0627\u0641\u062a\u06cc'),
             u'\uc800\uac74 \ub610 \ubb50\uc57c': u'second'})
