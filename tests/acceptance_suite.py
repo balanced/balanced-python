@@ -6,7 +6,7 @@ import time
 import balanced
 import copy
 import requests
-import unittest
+import unittest2 as unittest
 
 from fixtures import cards, merchants, bank_accounts
 

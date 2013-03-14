@@ -30,15 +30,15 @@ print "what's my merchant?, easy: Merchant.me: ", balanced.Merchant.me
 # what's my marketplace?
 if not balanced.Marketplace.my_marketplace:
     raise Exception("Marketplace.my_marketplace should not be nil")
-print "what's my marketplace?, easy: Marketplace.my_marketplace: {}".format(
+print "what's my marketplace?, easy: Marketplace.my_marketplace: {0}".format(
     balanced.Marketplace.my_marketplace
 )
 
-print "My marketplace's name is: {}".format(marketplace.name)
+print "My marketplace's name is: {0}".format(marketplace.name)
 print "Changing it to TestFooey"
 marketplace.name = "TestFooey"
 marketplace.save()
-print "My marketplace name is now: {}".format(marketplace.name)
+print "My marketplace name is now: {0}".format(marketplace.name)
 if marketplace.name != 'TestFooey':
     raise Exception("Marketplace name is NOT TestFooey!")
 
@@ -65,7 +65,7 @@ balanced.bust_cache()
 marketplace = balanced.Marketplace.my_marketplace
 if marketplace.in_escrow != 1500:
     raise Exception("1500 is not in escrow! this is wrong")
-print "i have {} in escrow!".format(marketplace.in_escrow)
+print "i have {0} in escrow!".format(marketplace.in_escrow)
 
 print "cool. now let me refund the full amount"
 refund = debit.refund()  # the full amount!
@@ -114,5 +114,20 @@ if card.is_valid:
 
 print "invalidating a bank account"
 bank_account.delete()
+
+# a little filtering
+merchants = balanced.Account.query.filter(roles='merchant')
+buyers = balanced.Account.query.filter(roles='buyer')
+print (
+    'we have {0} accounts, {1} with the role "buyer", '
+    'and {2} with the role "merchant"'.format(
+        balanced.Account.query.count(),
+        buyers.count(),
+        merchants.count(),
+    )
+)
+
+print 'here are our merchants: {0}'.format([a.name for a in merchants])
+print 'here are our buyers: {0}'.format([a.name for a in buyers])
 
 print "and there you have it :)"

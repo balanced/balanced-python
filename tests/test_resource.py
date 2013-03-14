@@ -1,6 +1,6 @@
 from __future__ import unicode_literals
 import datetime
-import unittest
+import unittest2 as unittest
 import urlparse
 import warnings
 import mock
@@ -85,9 +85,9 @@ class TestPage(unittest.TestCase):
     def test_sort(self):
         q = balanced.Marketplace.query
         q.sort(balanced.Marketplace.f.me.asc())
-        self.assertEqual(q.qs, {'sort': ['me,asc']})
+        self.assertDictEqual(q.qs, {'sort': ['me,asc']})
         q.sort(balanced.Marketplace.f.u.desc())
-        self.assertEqual(q.qs, {'sort': ['me,asc', 'u,desc']})
+        self.assertDictEqual(q.qs, {'sort': ['me,asc', 'u,desc']})
 
     def test_from_uri_and_dict(self):
         expected = resources.INVOICES.copy()
