@@ -4,8 +4,8 @@ from __future__ import unicode_literals
 import mock
 import warnings
 import re
-import unittest
 
+import unittest2 as unittest
 import requests
 
 import balanced

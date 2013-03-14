@@ -34,7 +34,7 @@ def wrap_raise_for_status(http_client):
         response.deserialized = deserialized
         extra = deserialized.get('additional') or ''
         if extra:
-            extra = ' -- {}.'.format(extra)
+            extra = ' -- {0}.'.format(extra)
         error_msg = '{name}: {code}: {msg} {extra}'.format(
             name=deserialized['status'],
             code=deserialized['status_code'],
@@ -175,7 +175,7 @@ class HTTPClient(threading.local, object):
         try:
             return deserializers[resp.headers['Content-Type']](resp.content)
         except KeyError:
-            raise exc.BalancedError('Invalid content type "{}": {}'.format(
+            raise exc.BalancedError('Invalid content type "{0}": {1}'.format(
                 resp.headers['Content-Type'], resp.content,
             ))
 
