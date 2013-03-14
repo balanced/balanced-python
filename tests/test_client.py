@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-import unittest
+import unittest2 as unittest
 
 import balanced
 from balanced.http_client import wrap_raise_for_status, before_request_hooks
@@ -14,12 +14,13 @@ class TestConfig(unittest.TestCase):
         # this is here because it tests that if you add anything new
         # then you should test it here..it's not really all encompassing though
         # for example, it won't detect any @property methods..
-        for key in config.__dict__.keys():
-            self.assertTrue(key in ['api_key_secret', 'api_version',
-                                    'root_uri', 'requests'])
+        self.assertItemsEqual(
+            config.__dict__.keys(),
+            ['api_key_secret', 'api_version', 'root_uri', 'requests']
+        )
         self.assertEqual(config.root_uri, 'https://api.balancedpayments.com')
         self.assertEqual(config.api_version, '1')
-        self.assertEqual(config.api_key_secret, None)
+        self.assertIsNone(config.api_key_secret)
         self.assertEqual(config.uri, 'https://api.balancedpayments.com/v1')
         self.assertEqual(config.version, 'v1')
 
@@ -39,7 +40,7 @@ class TestClient(unittest.TestCase):
 
     def test_client_reference_config(self):
         the_config = balanced.config
-        self.assertEqual(balanced.http_client.config.api_key_secret, None)
+        self.assertIsNone(balanced.http_client.config.api_key_secret)
         the_config.api_key_secret = 'khalkhalash'
         self.assertEqual(
             balanced.http_client.config.api_key_secret, 'khalkhalash'
@@ -63,7 +64,7 @@ class TestClient(unittest.TestCase):
         self.assertEqual(momo.call_count, 1)
         args, _ = momo.call_args
         self.assertEqual(args[0], balanced.http_client)
-        self.assertTrue('hithere' in args[2])
+        self.assertIn('hithere', args[2])
 
 
 class TestHTTPClient(unittest.TestCase):
@@ -74,16 +75,12 @@ class TestHTTPClient(unittest.TestCase):
         }
         resp.content = 'Unhandled Exception'
         client = balanced.HTTPClient()
-        has_error = False
-        try:
+        with self.assertRaises(balanced.exc.BalancedError):
             client.deserialize(resp)
-        except balanced.exc.BalancedError:
-            has_error = True
-        self.assertTrue(has_error)
         resp.headers['Content-Type'] = 'application/json'
         resp.content = '{"hi": "world"}'
         deserialized = client.deserialize(resp)
-        self.assertEqual(deserialized, {u'hi': u'world'})
+        self.assertDictEqual(deserialized, {u'hi': u'world'})
 
     def test_deserialization_unicode(self):
         resp = mock.Mock()
@@ -92,18 +89,14 @@ class TestHTTPClient(unittest.TestCase):
         }
         resp.content = 'Unhandled Exception'
         client = balanced.HTTPClient()
-        has_error = False
-        try:
+        with self.assertRaises(balanced.exc.BalancedError):
             client.deserialize(resp)
-        except balanced.exc.BalancedError:
-            has_error = True
-        self.assertTrue(has_error)
         resp.headers['Content-Type'] = 'application/json'
         resp.content = ('{"\\uc800\\uac74 \\ub610 \\ubb50\\uc57c": "second", '
                         '"third": "\\u06a9\\u0647 \\u0686\\u0647 '
                         '\\u06a9\\u062b\\u0627\\u0641\\u062a\\u06cc"}')
         deserialized = client.deserialize(resp)
-        self.assertEqual(deserialized, {
+        self.assertDictEqual(deserialized, {
             u'third': (u'\u06a9\u0647 \u0686\u0647 '
                        u'\u06a9\u062b\u0627\u0641\u062a\u06cc'),
             u'\uc800\uac74 \ub610 \ubb50\uc57c': u'second'})
@@ -128,13 +121,9 @@ class TestHTTPClient(unittest.TestCase):
         wrapped = wrap_raise_for_status(client)
         wrapped(response)
 
-        has_error = False
-        try:
+        with self.assertRaises(balanced.exc.HTTPError) as ex:
             response.raise_for_status()
-        except balanced.exc.HTTPError as ex:
-            has_error = True
-        self.assertTrue(has_error)
-        self.assertEqual(ex.description, api_response['description'])
+        self.assertEqual(ex.exception.description, api_response['description'])
 
 
 class TestConfigThread(threading.Thread):

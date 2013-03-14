@@ -1,6 +1,6 @@
 import contextlib
 import multiprocessing
-import unittest
+import unittest2 as unittest
 
 from wsgiref.simple_server import make_server
 

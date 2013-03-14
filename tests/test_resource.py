@@ -1,6 +1,6 @@
 from __future__ import unicode_literals
 import datetime
-import unittest
+import unittest2 as unittest
 import urlparse
 import warnings
 import mock
@@ -30,17 +30,13 @@ class TestResourceConstruction(WSGIServerTest):
             for txn in balanced.Transaction.query:
                 if isinstance(txn, balanced.Debit):
                     break
-            self.assertTrue(isinstance(txn.created_at, datetime.datetime))
+            self.assertIsInstance(txn.created_at, datetime.datetime)
 
     def test_redirects(self):
         with self.start_server(app):
-            has_error = False
-            try:
+            with self.assertRaises(balanced.exc.HTTPError) as exc:
                 balanced.APIKey().save()
-            except balanced.exc.HTTPError as exc:
-                has_error = True
-            self.assertTrue(has_error)
-            exception = exc
+            exception = exc.exception
             self.assertEqual(exception.response.status_code, 302)
             self.assertEqual(
                 exception.response.headers['location'],
@@ -69,7 +65,7 @@ class TestPage(unittest.TestCase):
         parsed_uri = urlparse.urlparse(query.uri)
         parsed_qs = urlparse.parse_qsl(parsed_uri.query)
 
-        self.assertEqual(
+        self.assertDictEqual(
             dict(parsed_qs),
             {'a': 'b',
              'a[!=]': '101',
@@ -89,15 +85,15 @@ class TestPage(unittest.TestCase):
     def test_sort(self):
         q = balanced.Marketplace.query
         q.sort(balanced.Marketplace.f.me.asc())
-        self.assertEqual(q.qs, {'sort': ['me,asc']})
+        self.assertDictEqual(q.qs, {'sort': ['me,asc']})
         q.sort(balanced.Marketplace.f.u.desc())
-        self.assertEqual(q.qs, {'sort': ['me,asc', 'u,desc']})
+        self.assertDictEqual(q.qs, {'sort': ['me,asc', 'u,desc']})
 
     def test_from_uri_and_dict(self):
         expected = resources.INVOICES.copy()
         expected.pop('uri')
         page = balanced.resources.Page.from_response(**resources.INVOICES)
-        self.assertEqual(page._lazy_loaded, expected)
+        self.assertDictEqual(page._lazy_loaded, expected)
 
 
 class TestMarketplace(unittest.TestCase):
