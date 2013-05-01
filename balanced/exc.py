@@ -19,7 +19,7 @@ class MultipleResultsFound(BalancedError):
 
 class HTTPError(BalancedError, requests.HTTPError):
     """
-    Baseclass for all HTTP exceptions.
+    Base class for all HTTP exceptions.
     """
     status_code = None
 

@@ -1,8 +1,7 @@
-'''
+"""
 Learn how to verify a bank account so you can debit with it.
-'''
+"""
 from __future__ import unicode_literals
-
 import balanced
 
 
@@ -25,29 +24,29 @@ def main():
     account.add_bank_account(bank_account.uri)
     bank_account = account.bank_accounts[0]
 
-    print 'you can\'t debit until you authenticate'
+    print('you can\'t debit until you authenticate')
     try:
         bank_account.debit(100)
     except balanced.exc.HTTPError as ex:
-        print 'Debit failed, %s' % ex.message
+        print('Debit failed, %s' % ex.message)
 
     # verify
     verification = bank_account.verify()
 
-    print 'PROTIP: for TEST bank accounts the valid amount is always 1 and 1'
+    print('PROTIP: for TEST bank accounts the valid amount is always 1 and 1')
     try:
         verification.confirm(1, 2)
     except balanced.exc.BankAccountVerificationFailure as ex:
-        print 'Authentication error , %s' % ex.message
+        print('Authentication error , %s' % ex.message)
 
     if verification.confirm(1, 1).state != 'verified':
-        raise Exception('unpossible')
+        raise Exception('impossible')
     debit = bank_account.debit(100)
-    print 'debited the bank account %s for %d cents' % (
+    print('debited the bank account %s for %d cents' % (
         debit.source.uri,
         debit.amount
-    )
-    print 'and there you have it'
+    ))
+    print('and there you have it')
 
 
 if __name__ == '__main__':
