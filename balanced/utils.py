@@ -102,8 +102,8 @@ def url_encode(obj, charset='utf-8', encode_keys=False, sort=False, key=None,
     if sort:
         iterable = sorted(iterable, key=key)
     tmp = []
-    print([x for x in iterable])
     for key, value in iterable:
+        print
         if value is None:
             continue
         if encode_keys and isinstance(key, str):
