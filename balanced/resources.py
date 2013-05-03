@@ -1,7 +1,7 @@
 import functools
 import itertools
 import logging
-import urlparse
+from urllib import parse as urlparse
 import warnings
 
 import iso8601
@@ -139,7 +139,7 @@ class Page(object):
     def from_uri_and_params(cls, uri, params):
         parsed_uri = urlparse.urlparse(uri)
         parsed_qs = urlparse.parse_qs(parsed_uri.query)
-        if params and isinstance(params, (dict, )):
+        if params and isinstance(params, dict):
             parsed_qs.update(params)
         uri = parsed_uri.path
         if parsed_qs:
@@ -251,7 +251,7 @@ class Page(object):
             if not isinstance(values, (list, tuple)):
                 values = [values]
             query_arguments[f] = ','.join(str(v) for v in values)
-        for k, values in kwargs.iteritems():
+        for k, values in list(kwargs.items()):
             f = '{0}'.format(k)
             if not isinstance(values, (list, tuple)):
                 values = [values]
@@ -286,7 +286,7 @@ class Resource(object):
 
     def __repr__(self):
         attrs = ', '.join(['%s=%s' % (k, repr(v)) for k, v in
-                           self.__dict__.iteritems()])
+                           list(self.__dict__.items())])
         return '%s(%s)' % (self.__class__.__name__, attrs)
 
     @classproperty
@@ -306,7 +306,7 @@ class Resource(object):
         if not uri:
             uri = self.RESOURCE['collection']
 
-        for key, value in instance_attributes.items():
+        for key, value in list(instance_attributes.items()):
             if isinstance(value, Resource):
                 instance_attributes.pop(key)
 
@@ -354,13 +354,13 @@ def is_subresource(value):
 def is_date(value):
     return (
         value and
-        isinstance(value, basestring) and
+        isinstance(value, str) and
         'Z' in value
     )
 
 
 def is_uri(key):
-    return isinstance(key, basestring) and key.endswith('_uri')
+    return isinstance(key, str) and key.endswith('_uri')
 
 
 class _LazyURIDescriptor(object):
@@ -384,7 +384,7 @@ def make_constructors():
     """
 
     def the_new(cls, **kwargs):
-        for key in kwargs.iterkeys():
+        for key in list(kwargs.keys()):
 
             if not is_uri(key):
                 continue
@@ -395,14 +395,13 @@ def make_constructors():
                 continue
 
             setattr(cls, new_key, _LazyURIDescriptor(key))
-
         return object.__new__(cls, **kwargs)
 
     def the_init(self, **kwargs):
         self.id = None
 
         # iterate through the schema that comes back
-        for key, value in kwargs.iteritems():
+        for key, value in list(kwargs.items()):
             if is_subresource(value):
                 # sub resources have a uri in them
                 uri = value['uri']
@@ -446,17 +445,17 @@ class _ResourceField(object):
         return FilterExpression(self, 'in', args, '!in')
 
     def startswith(self, prefix):
-        if not isinstance(prefix, basestring):
+        if not isinstance(prefix, str):
             raise ValueError('"startswith" prefix  must be a string')
         return FilterExpression(self, 'startswith', prefix, None)
 
     def endswith(self, suffix):
-        if not isinstance(suffix, basestring):
+        if not isinstance(suffix, str):
             raise ValueError('"endswith" suffix  must be a string')
         return FilterExpression(self, 'endswith', suffix, None)
 
     def contains(self, fragment):
-        if not isinstance(fragment, basestring):
+        if not isinstance(fragment, str):
             raise ValueError('"contains" fragment must be a string')
         return FilterExpression(self, 'contains', fragment, '!contains')
 
@@ -531,14 +530,13 @@ def resource_base(singular=None,
     return Base
 
 
-class Account(Resource):
+class Account(Resource, metaclass=resource_base(collection='accounts')):
     """
     An Account represents a user within your Marketplace. An Account can have
     two `roles`. If the Account has the `buyer` role then you may create
     Debits using this Account. If they have the `merchant` role then you may
     create Credits to transfer funds to this Account.
     """
-    __metaclass__ = resource_base(collection='accounts')
 
     def debit(self,
               amount=None,
@@ -585,7 +583,7 @@ class Account(Resource):
             if hasattr(on_behalf_of, 'uri'):
                 on_behalf_of = on_behalf_of.uri
 
-            if not isinstance(on_behalf_of, basestring):
+            if not isinstance(on_behalf_of, str):
                 raise ValueError(
                     'The on_behalf_of parameter needs to be an account uri'
                 )
@@ -690,7 +688,7 @@ class Account(Resource):
         Underwrites this account as a merchant. The `merchant` parameter can
         be either a dictionary of merchant data, or a URI.
         """
-        if isinstance(merchant, basestring):
+        if isinstance(merchant, str):
             self.merchant_uri = merchant
         else:
             self.merchant = merchant
@@ -722,13 +720,12 @@ def cached_per_api_key(bust_cache=False):
     return cacher
 
 
-class Merchant(Resource):
+class Merchant(Resource, metaclass=resource_base(
+        collection='merchants',
+        resides_under_marketplace=False)):
     """
 
     """
-    __metaclass__ = resource_base(
-        collection='merchants',
-        resides_under_marketplace=False)
 
     @classproperty
     @cached_per_api_key()
@@ -744,13 +741,12 @@ class Merchant(Resource):
         return super(Merchant, self).save()
 
 
-class Marketplace(Resource):
+class Marketplace(Resource, metaclass=resource_base(
+        collection='marketplaces',
+        resides_under_marketplace=False)):
     """
 
     """
-    __metaclass__ = resource_base(
-        collection='marketplaces',
-        resides_under_marketplace=False)
 
     def create_card(self,
                     name,
@@ -873,7 +869,7 @@ class Marketplace(Resource):
         return super(Marketplace, self).save()
 
 
-class Debit(Resource):
+class Debit(Resource, metaclass=resource_base(collection='debits')):
     """
     A Debit represents a transfer of funds from a buyer's Account to your
     Marketplace's escrow account.
@@ -887,7 +883,6 @@ class Debit(Resource):
     cannot change the funding source between creating a Hold and capturing
     it.
     """
-    __metaclass__ = resource_base(collection='debits')
 
     def refund(self, amount=None, description=None, meta=None):
         """
@@ -907,15 +902,15 @@ class Debit(Resource):
         ).save()
 
 
-class Transaction(Resource):
+class Transaction(Resource, metaclass=resource_base(collection='transactions')):
     """
     Any transfer, or potential transfer of, funds from or to, your Marketplace.
     E.g. a Credit, Debit, Refund, or Hold.
     """
-    __metaclass__ = resource_base(collection='transactions')
 
 
-class Credit(Resource):
+class Credit(Resource, metaclass=resource_base(collection='credits',
+                                  resides_under_marketplace=False)):
     """
     A Credit represents a transfer of funds from your Marketplace's
     escrow account to a Merchant's Account within your Marketplace.
@@ -924,21 +919,18 @@ class Credit(Resource):
     destination associated with an Account. You may specify a specific
     funding source.
     """
-    __metaclass__ = resource_base(collection='credits',
-                                  resides_under_marketplace=False)
 
 
-class Refund(Resource):
+class Refund(Resource, metaclass=resource_base(collection='refunds')):
     """
     A Refund represents a reversal of funds from a Debit. A Debit can have
     many Refunds associated with it up to the total amount of the original
     Debit. Funds are returned to your Marketplace's Merchant Account
     proportional to the amount of the Refund.
     """
-    __metaclass__ = resource_base(collection='refunds')
 
 
-class Hold(Resource):
+class Hold(Resource, metaclass=resource_base(collection='holds')):
     """
     A Hold is a reservation of funds on a funding source such as a Card. This
     reservation is guaranteed until the `expires_at` date. You may capture
@@ -952,7 +944,6 @@ class Hold(Resource):
     or `BankAccount`.
 
     """
-    __metaclass__ = resource_base(collection='holds')
 
     def void(self):
         """
@@ -971,7 +962,10 @@ class Hold(Resource):
         return self.account.debit(hold_uri=self.uri, **kwargs)
 
 
-class APIKey(Resource):
+class APIKey(Resource, metaclass=resource_base(
+        singular='api_key',
+        collection='api_keys',
+        resides_under_marketplace=False)):
     """
     Your ApiKey is used to authenticate when performing operations on the
     Balanced API.
@@ -979,18 +973,13 @@ class APIKey(Resource):
     **NOTE:** Never give out or expose your ApiKey. You may POST to this
     endpoint to create new ApiKeys and then DELETE any old keys.
     """
-    __metaclass__ = resource_base(
-        singular='api_key',
-        collection='api_keys',
-        resides_under_marketplace=False)
 
 
-class Card(Resource):
+class Card(Resource, metaclass=resource_base(collection='cards')):
     """
     A card represents a source of funds for an Account. You may Hold or Debit
     funds from the account associated with the Card.
     """
-    __metaclass__ = resource_base(collection='cards')
 
     def debit(self, amount=None, appears_on_statement_as=None,
               hold_uri=None, meta=None, description=None):
@@ -1033,15 +1022,14 @@ class Card(Resource):
         ).save()
 
 
-class BankAccount(Resource):
+class BankAccount(Resource, metaclass=resource_base(collection='bank_accounts',
+                                  resides_under_marketplace=False)):
     """
     A BankAccount is both a source, and a destination of, funds. You may
     create Debits and Credits to and from, this funding source.
 
     *NOTE:* The BankAccount resource does not support creating a Hold.
     """
-    __metaclass__ = resource_base(collection='bank_accounts',
-                                  resides_under_marketplace=False)
 
     def debit(self, amount, appears_on_statement_as=None,
               meta=None, description=None):
@@ -1109,14 +1097,13 @@ class BankAccount(Resource):
         ).save()
 
 
-class BankAccountVerification(Resource):
+class BankAccountVerification(Resource, metaclass=resource_base(collection='verifications',
+                                  nested_under=['bank_accounts'],
+                                  resides_under_marketplace=False)):
     """
     Represents an attempt to authenticate a funding instrument so it can
     perform verified operations.
     """
-    __metaclass__ = resource_base(collection='verifications',
-                                  nested_under=['bank_accounts'],
-                                  resides_under_marketplace=False)
 
     def confirm(self, amount_1, amount_2):
         self.amount_1 = amount_1
@@ -1124,43 +1111,39 @@ class BankAccountVerification(Resource):
         return self.save()
 
 
-class Event(Resource):
+class Event(Resource, metaclass=resource_base(collection='events',
+                                  resides_under_marketplace=False)):
     """
     An Event is a snapshot of another resource at a point in time when
     something significant occurred. Events are created when resources are
     created, updated, deleted or otherwise change state such as a Credit being
     marked as failed.
     """
-    __metaclass__ = resource_base(collection='events',
-                                  resides_under_marketplace=False)
 
 
-class EventCallback(Resource):
+class EventCallback(Resource, metaclass=resource_base(collection='callbacks',
+                                  nested_under=['events'],
+                                  resides_under_marketplace=False)):
     """
     Represents a single event being sent to a callback.
     """
-    __metaclass__ = resource_base(collection='callbacks',
-                                  nested_under=['events'],
-                                  resides_under_marketplace=False)
 
 
-class EventCallbackLog(Resource):
+class EventCallbackLog(Resource, metaclass=resource_base(collection='logs',
+                                  nested_under=['events', 'callbacks'],
+                                  resides_under_marketplace=False)):
     """
     Represents a request and response from single attempt to notify a callback
     of an event.
     """
-    __metaclass__ = resource_base(collection='logs',
-                                  nested_under=['events', 'callbacks'],
-                                  resides_under_marketplace=False)
 
 
-class Callback(Resource):
+class Callback(Resource, metaclass=resource_base(collection='callbacks',
+                                  resides_under_marketplace=True)):
     """
     A Callback is a publicly accessible location that can receive POSTed JSON
     data whenever an Event is generated.
     """
-    __metaclass__ = resource_base(collection='callbacks',
-                                  resides_under_marketplace=True)
 
 
 class FilterExpression(object):
