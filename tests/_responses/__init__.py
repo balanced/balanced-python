@@ -1,7 +1,7 @@
-import marketplaces
-import merchants
-import transactions
-import accounts
+from . import marketplaces
+from . import merchants
+from . import transactions
+from . import accounts
 
 
 __all__ = [

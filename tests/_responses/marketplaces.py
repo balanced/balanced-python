@@ -1,5 +1,5 @@
 import random
-import urllib
+import urllib.request, urllib.parse, urllib.error
 
 
 def anonymous_create():
@@ -33,7 +33,7 @@ def index(limit=10, offset=0, num=1, pages=1):
         }
 
     pages -= 1
-    qs = urllib.urlencode(params.copy())
+    qs = urllib.parse.urlencode(params.copy())
     params.update({
         'offset': params['limit'] + params['offset'],
         'pages': pages,
@@ -51,11 +51,11 @@ def index(limit=10, offset=0, num=1, pages=1):
     }
 
     if pages:
-        qs_next = urllib.urlencode(params)
+        qs_next = urllib.parse.urlencode(params)
         response['next_uri'] = '/v1/marketplaces?' + qs_next
 
     items = []
-    for _ in xrange(num):
+    for _ in range(num):
         rand = int(random.random() * 10000)
         mp_uri = '/v1/marketplaces/TEST-MP-123-456-{0}'.format(rand)
         rand = int(random.random() * 10000)

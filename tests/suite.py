@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 
-from __future__ import unicode_literals
+
 import mock
 import warnings
 import re
 
-import unittest2 as unittest
+import unittest
 import requests
 
 import balanced
@@ -330,14 +330,14 @@ class BasicUseCases(unittest.TestCase):
             merchant.credit(amount=original_balance + 1000)
         the_exception = exc.exception
         self.assertEqual(the_exception.status_code, 409)
-        print the_exception
+        print(the_exception)
 
     def test_15_debits_without_an_account(self):
         with self.assertRaises(requests.HTTPError) as exc:
             balanced.Debit().save()
         the_exception = exc.exception
         self.assertEqual(the_exception.status_code, 400)
-        print the_exception
+        print(the_exception)
 
     def test_16_slice_syntax(self):
         total_debit = balanced.Debit.query.count()

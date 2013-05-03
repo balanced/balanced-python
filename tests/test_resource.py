@@ -1,7 +1,7 @@
-from __future__ import unicode_literals
+
 import datetime
-import unittest2 as unittest
-import urlparse
+import unittest
+import urllib.parse
 import warnings
 import mock
 
@@ -62,8 +62,9 @@ class TestPage(unittest.TestCase):
         query = query.filter(balanced.Marketplace.f.f.endswith('lo'))
         query = query.filter(g=12)
 
-        parsed_uri = urlparse.urlparse(query.uri)
-        parsed_qs = urlparse.parse_qsl(parsed_uri.query)
+        parsed_uri = urllib.parse.urlparse(query.uri)
+        print(parsed_uri.query)
+        parsed_qs = urllib.parse.parse_qsl(parsed_uri.query)
 
         self.assertDictEqual(
             dict(parsed_qs),
@@ -80,7 +81,7 @@ class TestPage(unittest.TestCase):
              'f[endswith]': 'lo',
              'f[startswith]': 'la',
              'g': '12',
-         })
+             })
 
     def test_sort(self):
         q = balanced.Marketplace.query

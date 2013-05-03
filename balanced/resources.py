@@ -314,6 +314,7 @@ class Resource(object):
         method = getattr(self.http_client, http_method)
 
         resource = method(uri, data=instance_attributes)
+        print(resource.deserialized)
         new_klass = self.__class__(**resource.deserialized)
         self.__dict__.clear()
         self.__dict__.update(new_klass.__dict__)

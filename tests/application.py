@@ -2,7 +2,7 @@ import json
 
 import bottle
 
-import _responses
+from . import _responses
 
 
 SERIALIZERS = {
