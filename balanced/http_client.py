@@ -40,12 +40,12 @@ def wrap_raise_for_status(http_client):
             code=deserialized['status_code'],
             msg=deserialized['description'].encode('utf8'),
             extra=extra.encode('utf8'),
-            )
+        )
         category_code = deserialized.get('category_code', None)
         error_cls = exc.category_code_map.get(
             category_code, exc.HTTPError)
         http_error = error_cls(error_msg)
-        for error, value in deserialized.iteritems():
+        for error, value in deserialized.items():
             setattr(http_error, error, value)
         raise http_error
 
@@ -53,7 +53,7 @@ def wrap_raise_for_status(http_client):
         reason = '%s Client Error: %s' % (
             response.status_code,
             response.reason,
-            )
+        )
         redirection = exc.MoreInformationRequiredError(reason)
         redirection.status_code = response.status_code
         redirection.response = response
@@ -103,7 +103,7 @@ def munge_request(http_op):
         url = transform_into_absolute_url(client.config, url)
         request_body = kwargs.get('data', {})
         fixed_up_body = {}
-        for key, value in request_body.iteritems():
+        for key, value in request_body.items():
             if key.endswith('_uri') and value:
                 fixed_up_body[key] = prepend_version(client.config, value)
         request_body.update(fixed_up_body)
@@ -173,7 +173,10 @@ class HTTPClient(threading.local, object):
 
     def deserialize(self, resp):
         try:
-            return deserializers[resp.headers['Content-Type']](resp.content)
+            content = resp.content
+            if type(content) is not str:
+                content = content.decode('utf-8')
+            return deserializers[resp.headers['Content-Type']](content)
         except KeyError:
             raise exc.BalancedError('Invalid content type "{0}": {1}'.format(
                 resp.headers['Content-Type'], resp.content,

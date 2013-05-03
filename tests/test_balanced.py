@@ -1,4 +1,4 @@
-import unittest2 as unittest
+import unittest
 
 
 class TestBalancedImportStar(unittest.TestCase):
@@ -10,6 +10,6 @@ class TestBalancedImportStar(unittest.TestCase):
             # the __import__ doesn't do what I want here.
             # and doing a "from balanced import *" generates an
             # unsupressable SyntaxWarning.
-            exec "from balanced import *"  # pylint: disable-msg=W0122
-        except Exception, exc:
+            exec("from balanced import *")  # pylint: disable-msg=W0122
+        except Exception as exc:
             raise ImportError("%s" % exc)

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-import unittest2 as unittest
+import unittest
 
 import balanced
 from balanced.http_client import wrap_raise_for_status, before_request_hooks
@@ -15,7 +15,7 @@ class TestConfig(unittest.TestCase):
         # then you should test it here..it's not really all encompassing though
         # for example, it won't detect any @property methods..
         self.assertItemsEqual(
-            config.__dict__.keys(),
+            list(config.__dict__.keys()),
             ['api_key_secret', 'api_version', 'root_uri', 'requests']
         )
         self.assertEqual(config.root_uri, 'https://api.balancedpayments.com')
@@ -93,7 +93,7 @@ class TestHTTPClient(unittest.TestCase):
         resp.headers['Content-Type'] = 'application/json'
         resp.content = '{"hi": "world"}'
         deserialized = client.deserialize(resp)
-        self.assertDictEqual(deserialized, {u'hi': u'world'})
+        self.assertDictEqual(deserialized, {'hi': 'world'})
 
     def test_deserialization_unicode(self):
         resp = mock.Mock()
@@ -110,17 +110,17 @@ class TestHTTPClient(unittest.TestCase):
                         '\\u06a9\\u062b\\u0627\\u0641\\u062a\\u06cc"}')
         deserialized = client.deserialize(resp)
         self.assertDictEqual(deserialized, {
-            u'third': (u'\u06a9\u0647 \u0686\u0647 '
-                       u'\u06a9\u062b\u0627\u0641\u062a\u06cc'),
-            u'\uc800\uac74 \ub610 \ubb50\uc57c': u'second'})
+            'third': ('\u06a9\u0647 \u0686\u0647 '
+                       '\u06a9\u062b\u0627\u0641\u062a\u06cc'),
+            '\uc800\uac74 \ub610 \ubb50\uc57c': 'second'})
 
     def test_wrap_raise_for_status(self):
         api_response = {'additional': ('Valid email address formats may be '
                                        'found at http://tools.ietf.org/html'
                                        '/rfc2822#section-3.4'),
-                        'description': (u'"s\xf8ren.kierkegaard216@yahoo.web" '
-                                        u'must be a valid email address as '
-                                        u'specified by rfc2822 for email_add'),
+                        'description': ('"s\xf8ren.kierkegaard216@yahoo.web" '
+                                        'must be a valid email address as '
+                                        'specified by rfc2822 for email_add'),
                         'status': 'Bad Request',
                         'status_code': 400}
         client = mock.Mock()
@@ -144,7 +144,7 @@ class TestConfigThread(threading.Thread):
         self.key = False
 
     def run(self):
-        print balanced.config.api_key_secret, balanced.config
+        print(balanced.config.api_key_secret, balanced.config)
         self.key = balanced.config.api_key_secret == 'test'
 
 
@@ -158,7 +158,7 @@ class MultiThreadedUserCases(unittest.TestCase):
     def test_config_does_not_change_across_threads(self):
         threads = []
 
-        for _ in xrange(2):
+        for _ in range(2):
             t = TestConfigThread()
             threads.append(t)
 
