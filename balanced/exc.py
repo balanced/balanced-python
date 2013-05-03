@@ -35,12 +35,8 @@ class FundingInstrumentVerificationFailure(HTTPError):
 class BankAccountVerificationFailure(FundingInstrumentVerificationFailure):
     pass
 
-
-category_code_map = {
-    'bank-account-authentication-not-pending':
-        BankAccountVerificationFailure,
-    'bank-account-authentication-failed':
-        BankAccountVerificationFailure,
-    'bank-account-authentication-already-exists':
-        BankAccountVerificationFailure,
-}
+category_code_map = {err: BankAccountVerificationFailure for err in [
+    'bank-account-authentication-not-pending',
+    'bank-account-authentication-failed',
+    'bank-account-authentication-already-exists'
+]}

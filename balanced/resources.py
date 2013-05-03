@@ -314,7 +314,6 @@ class Resource(object):
         method = getattr(self.http_client, http_method)
 
         resource = method(uri, data=instance_attributes)
-        print(resource.deserialized)
         new_klass = self.__class__(**resource.deserialized)
         self.__dict__.clear()
         self.__dict__.update(new_klass.__dict__)
@@ -903,15 +902,17 @@ class Debit(Resource, metaclass=resource_base(collection='debits')):
         ).save()
 
 
-class Transaction(Resource, metaclass=resource_base(collection='transactions')):
+class Transaction(Resource,
+                  metaclass=resource_base(collection='transactions')):
     """
     Any transfer, or potential transfer of, funds from or to, your Marketplace.
     E.g. a Credit, Debit, Refund, or Hold.
     """
 
 
-class Credit(Resource, metaclass=resource_base(collection='credits',
-                                  resides_under_marketplace=False)):
+class Credit(Resource,
+             metaclass=resource_base(collection='credits',
+                                     resides_under_marketplace=False)):
     """
     A Credit represents a transfer of funds from your Marketplace's
     escrow account to a Merchant's Account within your Marketplace.
@@ -1023,8 +1024,9 @@ class Card(Resource, metaclass=resource_base(collection='cards')):
         ).save()
 
 
-class BankAccount(Resource, metaclass=resource_base(collection='bank_accounts',
-                                  resides_under_marketplace=False)):
+class BankAccount(Resource,
+                  metaclass=resource_base(collection='bank_accounts',
+                  resides_under_marketplace=False)):
     """
     A BankAccount is both a source, and a destination of, funds. You may
     create Debits and Credits to and from, this funding source.
@@ -1098,7 +1100,9 @@ class BankAccount(Resource, metaclass=resource_base(collection='bank_accounts',
         ).save()
 
 
-class BankAccountVerification(Resource, metaclass=resource_base(collection='verifications',
+class BankAccountVerification(Resource,
+                              metaclass=resource_base(
+                                  collection='verifications',
                                   nested_under=['bank_accounts'],
                                   resides_under_marketplace=False)):
     """
@@ -1112,8 +1116,9 @@ class BankAccountVerification(Resource, metaclass=resource_base(collection='veri
         return self.save()
 
 
-class Event(Resource, metaclass=resource_base(collection='events',
-                                  resides_under_marketplace=False)):
+class Event(Resource,
+            metaclass=resource_base(collection='events',
+                                    resides_under_marketplace=False)):
     """
     An Event is a snapshot of another resource at a point in time when
     something significant occurred. Events are created when resources are
@@ -1122,25 +1127,28 @@ class Event(Resource, metaclass=resource_base(collection='events',
     """
 
 
-class EventCallback(Resource, metaclass=resource_base(collection='callbacks',
-                                  nested_under=['events'],
-                                  resides_under_marketplace=False)):
+class EventCallback(Resource,
+                    metaclass=resource_base(collection='callbacks',
+                                            nested_under=['events'],
+                                            resides_under_marketplace=False)):
     """
     Represents a single event being sent to a callback.
     """
 
 
-class EventCallbackLog(Resource, metaclass=resource_base(collection='logs',
-                                  nested_under=['events', 'callbacks'],
-                                  resides_under_marketplace=False)):
+class EventCallbackLog(Resource,
+                       metaclass=resource_base(collection='logs',
+                       nested_under=['events', 'callbacks'],
+                       resides_under_marketplace=False)):
     """
     Represents a request and response from single attempt to notify a callback
     of an event.
     """
 
 
-class Callback(Resource, metaclass=resource_base(collection='callbacks',
-                                  resides_under_marketplace=True)):
+class Callback(Resource,
+               metaclass=resource_base(collection='callbacks',
+                                       resides_under_marketplace=True)):
     """
     A Callback is a publicly accessible location that can receive POSTed JSON
     data whenever an Event is generated.
