@@ -30,7 +30,7 @@ def iter_multi_items(mapping):
             argspec = inspect.getargspec(mapping.iteritems)
         except TypeError:
             if isinstance(mapping, dict):
-                for key, value in mapping.iteritems():
+                for key, value in mapping.__iter__():
                     if isinstance(value, (tuple, list)):
                         for value in value:
                             yield key, value
@@ -38,7 +38,7 @@ def iter_multi_items(mapping):
                         yield key, value
         else:
             if 'multi' in argspec.args:
-                for item in mapping.iteritems(multi=True):
+                for item in mapping.__iter___(multi=True):
                     yield item
     else:
         for item in mapping:
@@ -103,7 +103,6 @@ def url_encode(obj, charset='utf-8', encode_keys=False, sort=False, key=None,
         iterable = sorted(iterable, key=key)
     tmp = []
     for key, value in iterable:
-        print
         if value is None:
             continue
         if encode_keys and isinstance(key, str):

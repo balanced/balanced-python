@@ -173,7 +173,10 @@ class HTTPClient(threading.local, object):
 
     def deserialize(self, resp):
         try:
-            return deserializers[resp.headers['Content-Type']](resp.content.decode('utf-8'))
+            content = resp.content
+            if type(content) is not str:
+                content = content.decode('utf-8')
+            return deserializers[resp.headers['Content-Type']](content)
         except KeyError:
             raise exc.BalancedError('Invalid content type "{0}": {1}'.format(
                 resp.headers['Content-Type'], resp.content,
