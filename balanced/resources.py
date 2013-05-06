@@ -7,7 +7,9 @@ import warnings
 import iso8601
 
 from balanced.utils import cached_property, url_encode, classproperty
-from balanced.exc import NoResultFound, MultipleResultsFound, ResourceError
+from balanced.exc import (
+    NoResultFound, MultipleResultsFound, ResourceError, BalancedError,
+)
 
 
 LOGGER = logging.getLogger(__name__)
@@ -1161,6 +1163,147 @@ class Callback(Resource):
     """
     __metaclass__ = resource_base(collection='callbacks',
                                   resides_under_marketplace=True)
+
+
+class Customer(Resource):
+    """
+    A customer represents a business or person within your Marketplace. A
+    customer can have many funding instruments such as cards and bank accounts
+    associated to them.
+    """
+    __metaclass__ = resource_base(collection='customers',
+                                  resides_under_marketplace=False)
+
+    def add_card(self, card):
+        """
+        Associates the `Card` represented by `card` with this `Customer`.
+        """
+        if isinstance(card, basestring):
+            self.card_uri = card
+        elif hasattr(card, 'uri'):
+            self.card_uri = card.uri
+        else:
+            self.card = card
+        self.save()
+
+    def add_bank_account(self, bank_account):
+        """
+        Associates the `BankAccount` represented by `bank_account` with this
+        `Customer`.
+        """
+        if isinstance(bank_account, basestring):
+            self.bank_account_uri = bank_account
+        elif hasattr(bank_account, 'uri'):
+            self.bank_account_uri = bank_account.uri
+        else:
+            self.bank_account = bank_account
+        self.save()
+
+    def debit(self,
+              amount=None,
+              appears_on_statement_as=None,
+              hold_uri=None,
+              meta=None,
+              description=None,
+              source_uri=None,
+              merchant_uri=None,
+              on_behalf_of=None,
+              **kwargs):
+        """
+        :rtype: A `Debit` representing a flow of money from this Customer to
+            your Marketplace's escrow account.
+        :param amount: Amount to debit in cents, must be >= 50
+        :param appears_on_statement_as: description of the payment as it needs
+        to appear on this customer's card statement
+        :param meta: Key/value collection
+        :param description: Human readable description
+        :param source_uri: A specific funding source such as a `Card`
+            associated with this account. If not specified the `Card` most
+            recently added to this `Account` is used.
+        :param on_behalf_of: the customer uri of whomever is providing the
+               service or delivering the product.
+        """
+        if not any((amount, hold_uri)):
+            raise ResourceError('Must have an amount or hold uri')
+        if all([hold_uri, source_uri]):
+            raise ResourceError('Must specify either hold_uri OR source_uri')
+
+        if on_behalf_of:
+
+            if hasattr(on_behalf_of, 'uri'):
+                on_behalf_of = on_behalf_of.uri
+
+            if not isinstance(on_behalf_of, basestring):
+                raise ValueError(
+                    'The on_behalf_of parameter needs to be an account uri'
+                )
+
+            if on_behalf_of == self.uri:
+                raise ValueError(
+                    'The on_behalf_of parameter MAY NOT be the same account'
+                    ' as the account you are debiting!'
+                )
+
+        meta = meta or {}
+        return Debit(
+            uri=self.debits_uri,
+            amount=amount,
+            appears_on_statement_as=appears_on_statement_as,
+            hold_uri=hold_uri,
+            meta=meta,
+            description=description,
+            source_uri=source_uri,
+            merchant_uri=merchant_uri,
+            on_behalf_of_uri=on_behalf_of,
+            **kwargs
+        ).save()
+
+    def credit(self,
+               amount,
+               description=None,
+               meta=None,
+               destination_uri=None,
+               appears_on_statement_as=None,
+               debit_uri=None,
+               **kwargs):
+        """
+        Returns a new Credit representing a transfer of funds from your
+        Marketplace's escrow account to this Customer.
+
+        :param amount: Amount to hold in cents
+        :param description: Human readable description
+        :param meta: Key/value collection
+        :param destination_uri: A specific funding destination such as a
+                `BankAccount` associated with this account.
+        :param appears_on_statement_as: description of the payment as it needs
+        :param debit_uri: the debit corresponding to this particular credit
+
+        Returns:
+            A `Credit` representing the transfer of funds from your
+            Marketplace's escrow account to this Customer.
+        """
+        meta = meta or {}
+        return Credit(
+            uri=self.credits_uri,
+            amount=amount,
+            description=description,
+            meta=meta,
+            destination_uri=destination_uri,
+            appears_on_statement_as=appears_on_statement_as,
+            debit_uri=debit_uri,
+            **kwargs
+        ).save()
+
+    @property
+    def active_card(self):
+        cards = self.cards.filter(is_valid=True, sort='created_at,desc')
+        return cards[0] if cards else None
+
+    @property
+    def active_bank_account(self):
+        bank_accounts = self.bank_accounts.filter(is_valid=True,
+                                                  sort='created_at,desc')
+        return bank_accounts[0] if bank_accounts else None
 
 
 class FilterExpression(object):
