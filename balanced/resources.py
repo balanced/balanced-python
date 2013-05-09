@@ -1218,15 +1218,15 @@ class Customer(Resource):
         :param meta: Key/value collection
         :param description: Human readable description
         :param source_uri: A specific funding source such as a `Card`
-            associated with this account. If not specified the `Card` most
-            recently added to this `Account` is used.
+            associated with this customer. If not specified the `Card` most
+            recently added to this `Customer` is used.
         :param on_behalf_of: the customer uri of whomever is providing the
                service or delivering the product.
         """
         if not any((amount, hold_uri)):
             raise ResourceError('Must have an amount or hold uri')
         if all([hold_uri, source_uri]):
-            raise ResourceError('Must specify either hold_uri OR source_uri')
+            raise ResourceError('Must specify only one of hold_uri OR source_uri')
 
         if on_behalf_of:
 
@@ -1235,12 +1235,12 @@ class Customer(Resource):
 
             if not isinstance(on_behalf_of, basestring):
                 raise ValueError(
-                    'The on_behalf_of parameter needs to be an account uri'
+                    'The on_behalf_of parameter should to be a customer uri'
                 )
 
             if on_behalf_of == self.uri:
                 raise ValueError(
-                    'The on_behalf_of parameter MAY NOT be the same account'
+                    'The on_behalf_of parameter MAY NOT be the same customer'
                     ' as the account you are debiting!'
                 )
 
@@ -1274,7 +1274,7 @@ class Customer(Resource):
         :param description: Human readable description
         :param meta: Key/value collection
         :param destination_uri: A specific funding destination such as a
-                `BankAccount` associated with this account.
+                `BankAccount` associated with this customer.
         :param appears_on_statement_as: description of the payment as it needs
         :param debit_uri: the debit corresponding to this particular credit
 
