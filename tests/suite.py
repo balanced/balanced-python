@@ -538,3 +538,33 @@ class BasicUseCases(unittest.TestCase):
                 exc.exception.args[0],
                 'The on_behalf_of parameter needs to be an account uri'
             )
+
+    def test_29_customers(self):
+        mp = self._create_marketplace()
+        customer = balanced.Customer().save()
+
+        self.assertIsNone(customer.source)
+        card = mp.create_card(**CARD)
+        customer.add_card(card.uri)
+        card = mp.create_card(**CARD)
+        customer.add_card(card)
+        customer.add_card(CARD)
+        self.assertIsNotNone(customer.source)
+        self.assertEqual(customer.source.id, customer.active_card.id)
+
+        self.assertIsNone(customer.destination)
+        bank_account = mp.create_bank_account(**BANK_ACCOUNT)
+        customer.add_bank_account(bank_account.uri)
+        bank_account = mp.create_bank_account(**BANK_ACCOUNT)
+        customer.add_bank_account(bank_account)
+        customer.add_bank_account(BANK_ACCOUNT)
+        self.assertIsNotNone(customer.destination)
+        self.assertEqual(customer.destination.id,
+                         customer.active_bank_account.id)
+
+        debit = customer.debit(100)
+        self.assertEqual(customer.active_card.id, debit.source.id)
+
+        credit = customer.credit(100)
+        self.assertEqual(customer.active_bank_account.id,
+                         credit.destination.id)
