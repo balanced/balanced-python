@@ -2,7 +2,7 @@ import json
 import threading
 
 import requests
-from requests.models import REDIRECT_STATI
+from requests.sessions import REDIRECT_STATI
 
 from balanced import exc
 from balanced.config import Config
