@@ -385,6 +385,10 @@ def make_constructors():
 
     """
 
+    # these keys have key/value data but it should not be expanded into a
+    # resource.
+    NON_EXPANDABLE_KEYS = ['meta']
+
     def the_new(cls, **kwargs):
         for key in kwargs.iterkeys():
 
@@ -405,7 +409,7 @@ def make_constructors():
 
         # iterate through the schema that comes back
         for key, value in kwargs.iteritems():
-            if is_subresource(value):
+            if key not in NON_EXPANDABLE_KEYS and is_subresource(value):
                 # sub resources have a uri in them
                 uri = value['uri']
                 try:

@@ -139,7 +139,7 @@ class TestHTTPClient(unittest.TestCase):
 
 
 class TestConfigThread(threading.Thread):
-    def __init__( self ):
+    def __init__(self):
         threading.Thread.__init__(self)
         self.key = False
 

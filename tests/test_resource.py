@@ -41,7 +41,17 @@ class TestResourceConstruction(WSGIServerTest):
             self.assertEqual(
                 exception.response.headers['location'],
                 '/v1/your-mom'
-                )
+            )
+
+    def test_does_not_parse_meta(self):
+        payload = {
+            'uri': '/v1/yo-momma',
+            'meta': {
+                'uri': 'None',
+            }
+        }
+
+        balanced.Account(**payload)
 
 
 class TestPage(unittest.TestCase):
@@ -67,20 +77,22 @@ class TestPage(unittest.TestCase):
 
         self.assertDictEqual(
             dict(parsed_qs),
-            {'a': 'b',
-             'a[!=]': '101',
-             'b[<=]': '5',
-             'b[<]': '4',
-             'c[>=]': '44',
-             'c[>]': '123',
-             'd[!in]': '6,33,55',
-             'd[in]': '1,2,3',
-             'e[!contains]': 'soda',
-             'e[contains]': 'it',
-             'f[endswith]': 'lo',
-             'f[startswith]': 'la',
-             'g': '12',
-         })
+            {
+                'a': 'b',
+                'a[!=]': '101',
+                'b[<=]': '5',
+                'b[<]': '4',
+                'c[>=]': '44',
+                'c[>]': '123',
+                'd[!in]': '6,33,55',
+                'd[in]': '1,2,3',
+                'e[!contains]': 'soda',
+                'e[contains]': 'it',
+                'f[endswith]': 'lo',
+                'f[startswith]': 'la',
+                'g': '12',
+            }
+        )
 
     def test_sort(self):
         q = balanced.Marketplace.query

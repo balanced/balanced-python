@@ -15,7 +15,8 @@ except ImportError:
 
 
 _JSON_ERROR_MSG = (
-    'Object of type {0} with value of {1} is not JSON serializable')
+    'Object of type {0} with value of {1} is not JSON serializable'
+)
 
 
 def iter_multi_items(mapping):
