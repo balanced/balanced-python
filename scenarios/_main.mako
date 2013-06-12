@@ -2,13 +2,13 @@
 <%
     if not dikt:
         raise StopIteration
-    
+
     keys = sorted(dikt.keys(), key=lambda x: isinstance(dikt[x], dict))
     try:
         last = keys[-1]
     except IndexError:
         last = keys[0]
-    
+
     lines = []
     for k in keys:
         if isinstance(dikt[k], dict):
@@ -69,7 +69,7 @@ import balanced
 %if api_location:
 balanced.config.root_uri = "${api_location}"
 %endif
-balanced.configure("${ctx.api_key}")
+balanced.configure("${api_key}")
 
 </%def>
 
