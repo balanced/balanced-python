@@ -1,4 +1,8 @@
-${main.python_boilerplate()}
+import balanced
 
-bank_account = balanced.BankAccount.find("${request['bank_account_uri']}")
+balanced.configure("46c08048cd8811e2acae026ba7c1aba6")
+
+
+
+bank_account = balanced.BankAccount.find("/v1/bank_accounts/BA2mettVyrsL0krXEXeS1kes")
 verification = bank_account.verification

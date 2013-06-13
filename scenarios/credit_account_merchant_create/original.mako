@@ -1,10 +1,13 @@
-<%namespace file='/_main.mako' name='main'/>
 % if mode == 'definition':
-balanced.Account.credit()
 
+balanced.Account.credit()
 % else:
-${main.python_boilerplate()}
-merchant =  balanced.Account.find('${request['account_uri']}')
-merchant.credit(${payload['amount']})
+import balanced
+
+balanced.configure("46c08048cd8811e2acae026ba7c1aba6")
+
+
+merchant =  balanced.Account.find('/v1/marketplaces/TEST-MP29J5STPtZVvnjAFndM0N62/accounts/AC2CcqNuwOGPFi8oaeeVik6y')
+merchant.credit(100)
 
 % endif

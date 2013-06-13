@@ -1,9 +1,12 @@
-<%namespace file='/_main.mako' name='main'/>
 % if mode == 'definition':
-balanced.Card.query()
 
+balanced.Card.query()
 % else:
-${main.python_boilerplate()}
+import balanced
+
+balanced.configure("46c08048cd8811e2acae026ba7c1aba6")
+
+
 cards = balanced.Card.query.all();
 
 % endif

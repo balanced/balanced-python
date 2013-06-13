@@ -1,13 +1,19 @@
-<%namespace file='/_main.mako' name='main'/>
 % if mode == 'definition':
-balanced.Marketplace.create_merchant()
 
+balanced.Marketplace.create_merchant()
 % else:
-${main.python_boilerplate()}
+import balanced
+
+balanced.configure("46c08048cd8811e2acae026ba7c1aba6")
+
+
 merchant_data = {
-% for k, v in payload['merchant'].iteritems():
-    '${k}': '${v}',
-% endfor
+    'phone_number': '+14089999999',
+    'name': 'Timmy Q. CopyPasta',
+    'dob': '1989-12',
+    'postal_code': '94110',
+    'type': 'person',
+    'street_address': '121 Skriptkid Row',
 }
 
 

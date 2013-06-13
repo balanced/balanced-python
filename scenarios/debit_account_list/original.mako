@@ -1,10 +1,13 @@
-<%namespace file='/_main.mako' name='main'/>
 % if mode == 'definition':
-balanced.Account.debits
 
+balanced.Account.debits
 % else:
-${main.python_boilerplate()}
-account = balanced.Account.find('${request['uri']}')
+import balanced
+
+balanced.configure("46c08048cd8811e2acae026ba7c1aba6")
+
+
+account = balanced.Account.find('/v1/marketplaces/TEST-MP29J5STPtZVvnjAFndM0N62/accounts/AC2CcqNuwOGPFi8oaeeVik6y')
 debits = account.debits.all()
 
 % endif

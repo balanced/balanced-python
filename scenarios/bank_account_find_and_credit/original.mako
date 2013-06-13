@@ -1,8 +1,13 @@
-<%namespace file='/_main.mako' name='main'/>
+% if mode == 'definition':
 
-% if request is not UNDEFINED:
-${main.python_boilerplate()}
-bank_account = balanced.BankAccount.find("${request['uri']}")
-bank_account.credit(${request['amount']})
+
+% else:
+import balanced
+
+balanced.configure("46c08048cd8811e2acae026ba7c1aba6")
+
+
+bank_account = balanced.BankAccount.find("/v1/bank_accounts/BA3CGZogWn0gWzoYA5jALkZs")
+bank_account.credit(1000)
 
 % endif

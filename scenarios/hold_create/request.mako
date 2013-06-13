@@ -1,6 +1,6 @@
 ${main.python_boilerplate()}
-buyer = balanced.Account.find('${request['account_uri']}')
-buyer.hold(
+customer = balanced.Customer.find('${request['customer_uri']}')
+customer.hold(
 % for k, v in payload.iteritems():
     ${k}='${v}',
 % endfor

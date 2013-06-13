@@ -1,10 +1,13 @@
-<%namespace file='/_main.mako' name='main'/>
 % if mode == 'definition':
-balanced.Customer.add_card
 
+balanced.Customer.add_card
 % else:
-${main.python_boilerplate()}
-customer = balanced.Customer.find('${request['uri']}')
-customer.add_card('${payload['card_uri']}')
+import balanced
+
+balanced.configure("46c08048cd8811e2acae026ba7c1aba6")
+
+
+customer = balanced.Customer.find('/v1/customers/CU3yjAGMemMoFZobP2nTfFmo')
+customer.add_card('/v1/marketplaces/TEST-MP29J5STPtZVvnjAFndM0N62/cards/CC3zvlRrKda8oJ5jUNIdk7rg')
 
 % endif

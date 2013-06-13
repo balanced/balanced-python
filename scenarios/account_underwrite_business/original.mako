@@ -1,19 +1,25 @@
-<%namespace file='/_main.mako' name='main'/>
 % if mode == 'definition':
-balanced.Marketplace.create_merchant()
 
+balanced.Marketplace.create_merchant()
 % else:
-${main.python_boilerplate()}
+import balanced
+
+balanced.configure("46c08048cd8811e2acae026ba7c1aba6")
+
+
 merchant_data = {
-% for k, v in payload['merchant'].iteritems():
-    % if k != 'person':
-    '${k}': '${v}',
-    % endif
-% endfor
+    'phone_number': '+140899188155',
+    'name': 'Skripts4Kids',
+    'postal_code': '91111',
+    'type': 'business',
+    'street_address': '555 VoidMain Road',
+    'tax_id': '211111111',
     'person': {
-    % for k, v in payload['merchant']['person'].iteritems():
-        '${k}': '${v}',
-    % endfor
+        'dob': '1989-12',
+        'phone_number': '+14089999999',
+        'postal_code': '94110',
+        'name': 'Timmy Q. CopyPasta',
+        'street_address': '121 Skriptkid Row',
     },
 }
 

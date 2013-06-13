@@ -1,11 +1,11 @@
 <%namespace file='/_main.mako' name='main'/>
 % if mode == 'definition':
-balanced.Account.hold(...)
+balanced.Customer.hold(...)
 
 % else:
 ${main.python_boilerplate()}
-buyer = balanced.Account.find('${request['account_uri']}')
-buyer.hold(
+customer = balanced.Customer.find('${request['customer_uri']}')
+customer.hold(
 % for k, v in payload.iteritems():
     ${k}='${v}',
 % endfor

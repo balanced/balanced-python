@@ -1,10 +1,13 @@
-<%namespace file='/_main.mako' name='main'/>
 % if mode == 'definition':
-balanced.Account.add_bank_account
 
+balanced.Account.add_bank_account
 % else:
-${main.python_boilerplate()}
-account = balanced.Account.find('${request['uri']}')
-account.add_bank_account('${payload['bank_account_uri']}')
+import balanced
+
+balanced.configure("46c08048cd8811e2acae026ba7c1aba6")
+
+
+account = balanced.Account.find('/v1/marketplaces/TEST-MP29J5STPtZVvnjAFndM0N62/accounts/AC2CcqNuwOGPFi8oaeeVik6y')
+account.add_bank_account('/v1/bank_accounts/BA2G3VwpWEazRJliQSQfDmgU')
 
 % endif

@@ -1,13 +1,17 @@
-<%namespace file='/_main.mako' name='main'/>
 % if mode == 'definition':
-balanced.BankAccount.save()
 
+balanced.BankAccount.save()
 % else:
-${main.python_boilerplate()}
+import balanced
+
+balanced.configure("46c08048cd8811e2acae026ba7c1aba6")
+
+
 bank_account = balanced.BankAccount(
-% for k, v in payload.iteritems():
-    ${k}='${v}',
-% endfor
+    routing_number='121000358',
+    type='checking',
+    account_number='9900000001',
+    name='Johann Bernoulli',
 ).save()
 
 % endif

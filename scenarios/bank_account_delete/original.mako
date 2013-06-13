@@ -1,11 +1,13 @@
-<%namespace file='/_main.mako' name='main'/>
-
 % if mode == 'definition':
-balanced.BankAccount.delete()
 
+balanced.BankAccount.delete()
 % else:
-${main.python_boilerplate()}
-bank_account = balanced.BankAccount.find("${request['uri']}")
+import balanced
+
+balanced.configure("46c08048cd8811e2acae026ba7c1aba6")
+
+
+bank_account = balanced.BankAccount.find("/v1/bank_accounts/BA2af6ai3i6WZZ0FMrI4OKhk")
 bank_account.delete()
 
 % endif

@@ -1,10 +1,10 @@
 import balanced
 
-balanced.configure("46c08048cd8811e2acae026ba7c1aba6")
+balanced.configure("c72cb360d3ae11e29593026ba7d31e6f")
 
 
-buyer = balanced.Account.find('/v1/marketplaces/TEST-MP29J5STPtZVvnjAFndM0N62/accounts/AC2CcqNuwOGPFi8oaeeVik6y')
-buyer.hold(
+customer = balanced.Customer.find('/v1/customers/CU7GuPv9Y2F8ySwJHuHL0YWq')
+customer.hold(
     amount='5000',
     description='Some descriptive text for the debit in the dashboard',
 )
