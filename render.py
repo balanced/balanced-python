@@ -44,17 +44,14 @@ def create_request(path):
 
 
 def run_fix():
-    for path in  glob2.glob('./scenarios/**/python.mako'):
-        print path
+    for path in  glob2.glob('./scenarios/**/python.original.mako'):
         create_definitions(path)
         create_request(path)
-
-
 
 def render_mako():
     data = json.load(open('scenario.cache','r'))
     lookup = TemplateLookup(directories=['./scenarios'])
-    for path in glob2.glob('./scenarios/**/python.mako'):
+    for path in glob2.glob('./scenarios/**/python.original.mako'):
         event_name = path.split('/')[-2]
         template = Template(filename=path, lookup=lookup,)
         try:
@@ -73,4 +70,5 @@ def render_mako():
 
 
 if __name__ == "__main__":
+    run_fix()
     render_mako()
