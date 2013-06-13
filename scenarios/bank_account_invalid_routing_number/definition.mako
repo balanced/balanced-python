@@ -1,0 +1,1 @@
+balanced.exc.HTTPError
