@@ -1,7 +1,7 @@
 import balanced
 
-balanced.configure("2fd37702d33511e2a00f026ba7d31e6f")
+balanced.configure("46c08048cd8811e2acae026ba7c1aba6")
 
 
-account = balanced.Account.find('/v1/marketplaces/TEST-MP1sqiJRpcbwFbP7ihahsjCG/accounts/AC1QTKcWo0yb9qxov4B2rVIC')
-account.add_card('/v1/marketplaces/TEST-MP1sqiJRpcbwFbP7ihahsjCG/cards/CC1ScWdon0LVMYfeHpDOLNm6')
+account = balanced.Account.find('/v1/marketplaces/TEST-MP29J5STPtZVvnjAFndM0N62/accounts/AC1SUaFl5mNtKGOA3LeO2IxN')
+account.add_card('/v1/marketplaces/TEST-MP29J5STPtZVvnjAFndM0N62/cards/CC1UxG1UwXYFcslMhp4wq2Mg')
