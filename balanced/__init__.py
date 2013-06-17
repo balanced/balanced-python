@@ -2,7 +2,7 @@ __version__ = '0.11.4'
 from collections import defaultdict
 import contextlib
 
-from balanced.http_client import HTTPClient
+from balanced._http_client import HTTPClient
 from balanced.resources import (
     Resource, Marketplace, Account, APIKey,
     Hold, Credit, Debit, Refund,
@@ -35,6 +35,7 @@ __all__ = [
     exc.__name__.partition('.')[-1],
 ]
 
+# See https://github.com/balanced/balanced-python/issues/44 re: naming.
 http_client = HTTPClient()
 config = http_client.config
 
