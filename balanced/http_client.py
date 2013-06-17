@@ -60,7 +60,7 @@ def wrap_raise_for_status(http_client):
         redirection.redirect_uri = response.headers['Location']
         raise redirection
 
-    def wrapper(response):
+    def wrapper(response, **kwargs):
 
         try:
             response.raise_for_status()
