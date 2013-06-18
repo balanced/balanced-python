@@ -1,7 +1,7 @@
 """
 Balanced Python client library.
 
-See ``README.mkd`` for usage advice.
+See ``README.md`` for usage advice.
 """
 import os
 import pickle
@@ -73,7 +73,7 @@ def _get_version():
 
 
 def _get_long_description():
-    path = os.path.join(PATH_TO_FILE, 'README.mkd')
+    path = os.path.join(PATH_TO_FILE, 'README.md')
     fo = open(path)
     try:
         return fo.read()
