@@ -2,7 +2,7 @@
 import unittest2 as unittest
 
 import balanced
-from balanced.http_client import wrap_raise_for_status, before_request_hooks
+from balanced._http_client import wrap_raise_for_status, before_request_hooks
 import mock
 
 import threading
