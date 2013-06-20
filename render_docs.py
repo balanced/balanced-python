@@ -69,17 +69,17 @@ def render_exec():
         template = Template(filename=path, lookup=lookup,)
         try:
             request = data[event_name].get('request', {})
+
             payload = request.get('payload')
             text = template.render(api_key=data['api_key'],
-                                  request=request, payload=payload).strip()
-            with open(os.path.join(os.path.dirname(path),
-                                   '{}.py'.format(event_name)),
-                                   'w+'
-                      ) as write_to:
-                write_to.write(text)
+                                   request=request, payload=payload).strip()
         except KeyError:
+            text = ''
             print "WARN: Skipped {} since {} not in scenario.cache".format(
                 path, event_name)
+        with open(os.path.join(os.path.dirname(path),
+                               '{}.py'.format(event_name)), 'w+') as write_to:
+            write_to.write(text)
 
 def render_rest():
     for path in glob2.glob('./scenarios/**/*.py'):
@@ -88,10 +88,19 @@ def render_rest():
             top = open(os.path.join(dir, 'definition.mako'),'r').read()
             bottom = open(path).read()
             body = "% if mode == 'definition':\n\n{}".format(top) + "\n% " \
-                            "else:\n" + bottom + "\n\n% endif"
+                                                                    "else:\n" + bottom + "\n\n% endif"
             wfile.write(body)
 
+def no_python_mako():
 
+    set_has_mako = set([])
+    set_no_python_mako = set([])
+    for path in glob2.glob('./scenarios/**/*.mako'):
+        set_has_mako.add(os.path.dirname(path))
+    for path in glob2.glob('./scenarios/**/python.mako'):
+        set_no_python_mako.add(os.path.dirname(path))
+    print 'The following dont have a python.mako file. Look into it!'
+    print set_has_mako.difference(set_no_python_mako)
 
 
 
@@ -109,5 +118,6 @@ if __name__ == "__main__":
     render_exec()
     print "Rendering new mako files"
     render_rest()
-
+    delete_by_file_type('original.mako')
+    no_python_mako()
 
