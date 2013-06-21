@@ -425,7 +425,7 @@ class BasicUseCases(unittest.TestCase):
     def test_21_mask_bank_account(self):
         mp = self._create_marketplace()
         payload = BANK_ACCOUNT.copy()
-        payload['account_number'] = '1212121-110-019'
+        payload['account_number'] = '1212121110019'
         bank_account = mp.create_bank_account(**payload)
         self.assertEqual(bank_account.last_four, '0019')
 
