@@ -1300,6 +1300,8 @@ class Customer(Resource):
 
     @property
     def active_card(self):
+        if isinstance(self.source, Card):
+            return self.source
         cards = self.cards.filter(is_valid=True, sort='created_at,desc')
         return cards[0] if cards else None
 
