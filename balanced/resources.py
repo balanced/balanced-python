@@ -1016,9 +1016,9 @@ class Card(Resource):
             raise ResourceError('Must have amount or hold_uri')
 
         meta = meta or {}
-        parent = getattr(self, 'account', None) or self.customer
+        participant = getattr(self, 'account', None) or self.customer
         return Debit(
-            uri=parent.debits_uri,
+            uri=participant.debits_uri,
             amount=amount,
             appears_on_statement_as=appears_on_statement_as,
             hold_uri=hold_uri,
@@ -1035,9 +1035,9 @@ class Card(Resource):
         :rtype: Hold
         """
         meta = meta or {}
-        parent = getattr(self, 'account', None) or self.customer
+        participant = getattr(self, 'account', None) or self.customer
         return Hold(
-            uri=parent.holds_uri,
+            uri=participant.holds_uri,
             amount=amount,
             meta=meta,
             description=description,
@@ -1069,9 +1069,9 @@ class BankAccount(Resource):
         if not amount or amount <= 0:
             raise ResourceError('Must have an amount')
         meta = meta or {}
-        parent = getattr(self, 'account', None) or self.customer
+        participant = getattr(self, 'account', None) or self.customer
         return Debit(
-            uri=parent.debits_uri,
+            uri=participant.debits_uri,
             amount=amount,
             appears_on_statement_as=appears_on_statement_as,
             meta=meta,
