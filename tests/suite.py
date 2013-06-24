@@ -568,3 +568,26 @@ class BasicUseCases(unittest.TestCase):
         credit = customer.credit(100)
         self.assertEqual(customer.active_bank_account.id,
                          credit.destination.id)
+
+    def test_30_customer_transactions(self):
+        mp = self._create_marketplace()
+        customer = balanced.Customer().save()
+
+        self.assertIsNone(customer.source)
+        card = mp.create_card(**CARD)
+        bank_account = mp.create_bank_account(**BANK_ACCOUNT)
+
+        with self.assertRaises(balanced.exc.ResourceError):
+            card.hold(amount=100)
+
+        with self.assertRaises(balanced.exc.ResourceError):
+            card.debit(amount=100)
+
+        with self.assertRaises(balanced.exc.ResourceError):
+            bank_account.debit(amount=100)
+
+        customer.add_card(card.uri)
+        customer.source.hold(amount=100)
+        customer.source.debit(amount=100)
+        customer.add_bank_account(bank_account.uri)
+        customer.destination.credit(amount=100)

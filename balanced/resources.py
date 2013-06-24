@@ -6,9 +6,11 @@ import warnings
 
 import iso8601
 
-from balanced.utils import cached_property, url_encode, classproperty
+from balanced.utils import (
+    cached_property, url_encode, classproperty, requires_participant,
+)
 from balanced.exc import (
-    NoResultFound, MultipleResultsFound, ResourceError, BalancedError,
+    NoResultFound, MultipleResultsFound, ResourceError,
 )
 
 
@@ -998,6 +1000,7 @@ class Card(Resource):
     """
     __metaclass__ = resource_base(collection='cards')
 
+    @requires_participant
     def debit(self, amount=None, appears_on_statement_as=None,
               hold_uri=None, meta=None, description=None):
         """
@@ -1013,8 +1016,9 @@ class Card(Resource):
             raise ResourceError('Must have amount or hold_uri')
 
         meta = meta or {}
+        parent = getattr(self, 'account', None) or self.customer
         return Debit(
-            uri=self.account.debits_uri,
+            uri=parent.debits_uri,
             amount=amount,
             appears_on_statement_as=appears_on_statement_as,
             hold_uri=hold_uri,
@@ -1023,6 +1027,7 @@ class Card(Resource):
             source_uri=self.uri,
         ).save()
 
+    @requires_participant
     def hold(self, amount, meta=None, description=None):
         """
         Creates a Hold of funds from this Card to your Marketplace.
@@ -1030,8 +1035,9 @@ class Card(Resource):
         :rtype: Hold
         """
         meta = meta or {}
+        parent = getattr(self, 'account', None) or self.customer
         return Hold(
-            uri=self.account.holds_uri,
+            uri=parent.holds_uri,
             amount=amount,
             meta=meta,
             description=description,
@@ -1049,6 +1055,7 @@ class BankAccount(Resource):
     __metaclass__ = resource_base(collection='bank_accounts',
                                   resides_under_marketplace=False)
 
+    @requires_participant
     def debit(self, amount, appears_on_statement_as=None,
               meta=None, description=None):
         """
@@ -1061,13 +1068,10 @@ class BankAccount(Resource):
         """
         if not amount or amount <= 0:
             raise ResourceError('Must have an amount')
-        if not hasattr(self, 'account'):
-            raise ResourceError(
-                '{} must be associated with an account'.format(self)
-            )
         meta = meta or {}
+        parent = getattr(self, 'account', None) or self.customer
         return Debit(
-            uri=self.account.debits_uri,
+            uri=parent.debits_uri,
             amount=amount,
             appears_on_statement_as=appears_on_statement_as,
             meta=meta,
@@ -1089,6 +1093,8 @@ class BankAccount(Resource):
 
         if getattr(self, 'account', None):
             uri = self.account.credits_uri
+        elif getattr(self, 'customer', None):
+            uri = self.customer.credits_uri
         else:
             uri = self.credits_uri
         destination_uri = self.uri
@@ -1230,7 +1236,8 @@ class Customer(Resource):
         if not any((amount, hold_uri)):
             raise ResourceError('Must have an amount or hold uri')
         if all([hold_uri, source_uri]):
-            raise ResourceError('Must specify only one of hold_uri OR source_uri')
+            raise ResourceError(
+                'Must specify only one of hold_uri OR source_uri')
 
         if on_behalf_of:
 
@@ -1307,8 +1314,6 @@ class Customer(Resource):
 
     @property
     def active_bank_account(self):
-        if isinstance(self.destination, BankAccount):
-            return self.destination
         bank_accounts = self.bank_accounts.filter(is_valid=True,
                                                   sort='created_at,desc')
         return bank_accounts[0] if bank_accounts else None
