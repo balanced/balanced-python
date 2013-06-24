@@ -40,7 +40,7 @@ def wrap_raise_for_status(http_client):
             code=deserialized['status_code'],
             msg=deserialized['description'].encode('utf8'),
             extra=extra.encode('utf8'),
-            )
+        )
         category_code = deserialized.get('category_code', None)
         error_cls = exc.category_code_map.get(
             category_code, exc.HTTPError)
@@ -53,7 +53,7 @@ def wrap_raise_for_status(http_client):
         reason = '%s Client Error: %s' % (
             response.status_code,
             response.reason,
-            )
+        )
         redirection = exc.MoreInformationRequiredError(reason)
         redirection.status_code = response.status_code
         redirection.response = response
