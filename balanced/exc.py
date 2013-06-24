@@ -38,9 +38,9 @@ class BankAccountVerificationFailure(FundingInstrumentVerificationFailure):
 
 category_code_map = {
     'bank-account-authentication-not-pending':
-        BankAccountVerificationFailure,
+    BankAccountVerificationFailure,
     'bank-account-authentication-failed':
-        BankAccountVerificationFailure,
+    BankAccountVerificationFailure,
     'bank-account-authentication-already-exists':
-        BankAccountVerificationFailure,
+    BankAccountVerificationFailure,
 }
