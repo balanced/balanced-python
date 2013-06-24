@@ -8,6 +8,9 @@ import hashlib
 import hmac
 import inspect
 
+from balanced.exc import ResourceError
+
+
 try:
     import simplejson as json
 except ImportError:
@@ -265,3 +268,19 @@ def to_json(*args, **kwargs):
 
 def urljoin(*args):
     return '/'.join(map(lambda x: str(x).strip('/'), args))
+
+
+def requires_participant(func):
+
+    def wrapper(self, *args, **kwargs):
+
+        if not any([getattr(self, 'account', None),
+                    getattr(self, 'customer', None)]):
+            raise ResourceError(
+                '{} must be associated with an account or customer'.format(
+                    self)
+            )
+
+        return func(self, *args, **kwargs)
+
+    return wrapper

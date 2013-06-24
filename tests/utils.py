@@ -15,7 +15,7 @@ class WSGIServerTest(unittest.TestCase):
         server = make_server('', port, app)
         self.server_process = multiprocessing.Process(
             target=server.serve_forever
-            )
+        )
         try:
             self.server_process.start()
             yield
