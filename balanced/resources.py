@@ -1314,6 +1314,8 @@ class Customer(Resource):
 
     @property
     def active_bank_account(self):
+        if isinstance(self.destination, BankAccount):
+            return self.destination
         bank_accounts = self.bank_accounts.filter(is_valid=True,
                                                   sort='created_at,desc')
         return bank_accounts[0] if bank_accounts else None
