@@ -510,6 +510,7 @@ class BasicUseCases(unittest.TestCase):
 
         self.assertIsNotNone(buyer.debit(2222, on_behalf_of=merchant.uri))
 
+
         with warnings.catch_warnings(record=True) as w:
             self.assertIsNotNone(buyer.debit(1111, merchant_uri=merchant.uri))
             self.assertEqual(len(w), 1)
@@ -591,3 +592,12 @@ class BasicUseCases(unittest.TestCase):
         customer.source.debit(amount=100)
         customer.add_bank_account(bank_account.uri)
         customer.destination.credit(amount=100)
+
+
+    def test_31_delete_card(self):
+        mp = self._create_marketplace()
+        customer = balanced.Customer().save()
+        card = mp.create_card(**CARD)
+        customer.add_card(card)
+        card.delete()
+
