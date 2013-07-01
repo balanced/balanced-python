@@ -1,1 +1,1 @@
-balanced.Card.delete()
+balanced.Card.unstore()

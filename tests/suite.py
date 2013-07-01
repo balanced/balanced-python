@@ -593,11 +593,17 @@ class BasicUseCases(unittest.TestCase):
         customer.add_bank_account(bank_account.uri)
         customer.destination.credit(amount=100)
 
+    def test_31_delete_bank_account(self):
+        mp = self._create_marketplace()
+        customer = balanced.Customer().save()
+        bank_account = mp.create_bank_account(**BANK_ACCOUNT)
+        customer.add_bank_account(bank_account)
+        bank_account.unstore()
 
-    def test_31_delete_card(self):
+    def test_32_delete_card(self):
         mp = self._create_marketplace()
         customer = balanced.Customer().save()
         card = mp.create_card(**CARD)
         customer.add_card(card)
-        card.delete()
+        card.unstore()
 
