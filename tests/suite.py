@@ -591,3 +591,14 @@ class BasicUseCases(unittest.TestCase):
         customer.source.debit(amount=100)
         customer.add_bank_account(bank_account.uri)
         customer.destination.credit(amount=100)
+
+    def test_31_reverse(self):
+        self._create_marketplace()
+        buyer = self._find_account('buyer')
+        card = balanced.Marketplace.my_marketplace.create_card(**CARD)
+        buyer.add_card(card.uri)
+        buyer.debit(100000)
+        merchant = self._find_account('merchant')
+        credit = merchant.credit(amount=5000)
+        reverse = credit.reverse()
+        self.assertEqual(reverse.amount, 5000)

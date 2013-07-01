@@ -935,6 +935,23 @@ class Credit(Resource):
     __metaclass__ = resource_base(collection='credits',
                                   resides_under_marketplace=False)
 
+    def reverse(self, amount=None, description=None, meta=None):
+        """
+        Reverse a Credit.  If no amount is specified it will reverse the entire
+        amount of the Credit, you may create many Reversals up to the sum of the
+        total of the origional Credit amount.
+
+        :rtype: Reversal
+        """
+        meta = meta or {}
+        return Refund(
+            uri=self.reversals_uri,
+            credits_uri=self.uri,
+            amount=amount,
+            description=description,
+            meta=meta,
+        ).save()
+
 
 class Refund(Resource):
     """
@@ -945,6 +962,14 @@ class Refund(Resource):
     """
     __metaclass__ = resource_base(collection='refunds')
 
+class Reverse(Resource):
+    """
+    A Reverse represents a reversal of funds from a Credit. A Credit can have
+    many Reverses associated with it up to the total amount of the original
+    Credit. Funds are returned to your Marketplace's Merchant Account
+    proportional to the amount of the Refund.
+    """
+    __metaclass__ = resource_base(collection='refunds')
 
 class Hold(Resource):
     """
