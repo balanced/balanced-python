@@ -602,3 +602,5 @@ class BasicUseCases(unittest.TestCase):
         credit = merchant.credit(amount=5000)
         reverse = credit.reverse()
         self.assertEqual(reverse.amount, 5000)
+        self.assertIn('reversal', reverse.uri)
+        self.assertEqual(reverse.credit.uri, credit.uri)
