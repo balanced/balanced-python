@@ -326,6 +326,9 @@ class Resource(object):
     def delete(self):
         self.http_client.delete(self.uri)
 
+    def unstore(self):
+        self.delete()
+
 
 def uri_discovery(resource):
     uri = resource.RESOURCE['collection']

@@ -598,9 +598,31 @@ class BasicUseCases(unittest.TestCase):
         card = balanced.Marketplace.my_marketplace.create_card(**CARD)
         buyer.add_card(card.uri)
         buyer.debit(100000)
-        merchant = self._find_account('merchant')
+        # create bank account where transactions will switched to payed
+        merchant = balanced.Customer().save()
+        ba = balanced.BankAccount(
+            routing_number="021000021",
+            account_number="9900000002",
+            name="lolz ftw",
+        ).save()
+        merchant.add_bank_account(ba)
+        merchant.save()
         credit = merchant.credit(amount=5000)
         reverse = credit.reverse()
         self.assertEqual(reverse.amount, 5000)
         self.assertIn('reversal', reverse.uri)
-        self.assertEqual(reverse.credit.uri, credit.uri)
+        self.assertIn(credit.id, reverse.credit.uri)
+
+    def test_32_delete_bank_account(self):
+        mp = self._create_marketplace()
+        customer = balanced.Customer().save()
+        bank_account = mp.create_bank_account(**BANK_ACCOUNT)
+        customer.add_bank_account(bank_account)
+        bank_account.unstore()
+
+    def test_33_delete_card(self):
+        mp = self._create_marketplace()
+        customer = balanced.Customer().save()
+        card = mp.create_card(**CARD)
+        customer.add_card(card)
+        card.unstore()
