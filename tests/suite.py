@@ -9,7 +9,7 @@ import unittest2 as unittest
 import requests
 
 import balanced
-from balanced.exc import NoResultFound, MoreInformationRequiredError
+from balanced.exc import NoResultFound, MoreInformationRequiredError, HTTPError
 
 
 # fixtures
@@ -597,11 +597,17 @@ class BasicUseCases(unittest.TestCase):
         customer = balanced.Customer().save()
         bank_account = mp.create_bank_account(**BANK_ACCOUNT)
         customer.add_bank_account(bank_account)
+        uri = bank_account.uri
         bank_account.unstore()
+        with self.assertRaises(HTTPError):
+            balanced.BankAccount.find(uri)
 
     def test_32_delete_card(self):
         mp = self._create_marketplace()
         customer = balanced.Customer().save()
         card = mp.create_card(**CARD)
         customer.add_card(card)
+        uri = card.uri
         card.unstore()
+        with self.assertRaises(HTTPError):
+            balanced.Card.find(uri)
