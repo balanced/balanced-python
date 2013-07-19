@@ -868,6 +868,22 @@ class Marketplace(Resource):
             meta=meta,
         ).save()
 
+    @staticmethod
+    def create_customer(**kwargs):
+        """
+        Creates a Customer under the marketplace associated with the current
+        API key used for this request.
+
+        :rtype: Customer
+        :raises: balanced.exc.HTTPError
+
+            Check the `status_code` and `category_code` properties of the
+            exception.
+
+        """
+        kwargs['resides_under_marketplace'] = True
+        return Customer(**kwargs).save()
+
     @classproperty
     @cached_per_api_key()
     def my_marketplace(cls):
