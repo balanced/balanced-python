@@ -592,6 +592,29 @@ class BasicUseCases(unittest.TestCase):
         customer.add_bank_account(bank_account.uri)
         customer.destination.credit(amount=100)
 
+    def test_marketplace_customer_helper(self):
+        mp = self._create_marketplace()
+        customer = mp.create_customer()
+
+        self.assertIsNone(customer.source)
+        card = mp.create_card(**CARD)
+        bank_account = mp.create_bank_account(**BANK_ACCOUNT)
+
+        with self.assertRaises(balanced.exc.ResourceError):
+            card.hold(amount=100)
+
+        with self.assertRaises(balanced.exc.ResourceError):
+            card.debit(amount=100)
+
+        with self.assertRaises(balanced.exc.ResourceError):
+            bank_account.debit(amount=100)
+
+        customer.add_card(card.uri)
+        customer.source.hold(amount=100)
+        customer.source.debit(amount=100)
+        customer.add_bank_account(bank_account.uri)
+        customer.destination.credit(amount=100)
+
     def test_31_reverse(self):
         self._create_marketplace()
         buyer = self._find_account('buyer')
