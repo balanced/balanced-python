@@ -1072,7 +1072,8 @@ class Card(Resource):
         ).save()
 
     @requires_participant
-    def hold(self, amount, meta=None, description=None):
+    def hold(self, amount, meta=None, description=None,
+             appears_on_statement_as=None):
         """
         Creates a Hold of funds from this Card to your Marketplace.
 
@@ -1086,6 +1087,7 @@ class Card(Resource):
             meta=meta,
             description=description,
             source_uri=self.uri,
+            appears_on_statement_as=appears_on_statement_as,
         ).save()
 
 
