@@ -4,10 +4,10 @@ balanced.Customer.add_card
 % else:
 import balanced
 
-balanced.configure("46c08048cd8811e2acae026ba7c1aba6")
+balanced.configure("8386409cfeea11e2b3ee026ba7c1aba6")
 
 
-customer = balanced.Customer.find('/v1/customers/CU3yjAGMemMoFZobP2nTfFmo')
-customer.add_card('/v1/marketplaces/TEST-MP29J5STPtZVvnjAFndM0N62/cards/CC3zvlRrKda8oJ5jUNIdk7rg')
+customer = balanced.Customer.find('/v1/customers/CU50w7Cg6mD57vSK0K5nMi2i')
+customer.add_card('/v1/marketplaces/TEST-MP40BcQ7XUk3TlZOupT5Y3Nm/cards/CC523BGAwIKAD6qmDRggQW9V')
 
 % endif

@@ -1,1 +1,1 @@
-balanced.Customer.debit(...)
+balanced.Account.debit(...)

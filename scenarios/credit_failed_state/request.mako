@@ -1,15 +1,10 @@
-import balanced
-
-balanced.configure("46c08048cd8811e2acae026ba7c1aba6")
-
-
+${main.python_boilerplate()}
 bank_account_info = dict(
-    routing_number='121000358',
-    type='checking',
-    account_number='9900000005',
-    name='Johann Bernoulli',
+% for k, v in request['bank_account'].iteritems():
+    ${k}='${v}',
+% endfor
 )
 credit = balanced.Credit(
-    amount=10000,
+    amount=${request['amount']},
     bank_account=bank_account_info
 ).save()

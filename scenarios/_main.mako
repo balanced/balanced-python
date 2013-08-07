@@ -2,13 +2,13 @@
 <%
     if not dikt:
         raise StopIteration
-    
+
     keys = sorted(dikt.keys(), key=lambda x: isinstance(dikt[x], dict))
     try:
         last = keys[-1]
     except IndexError:
         last = keys[0]
-    
+
     lines = []
     for k in keys:
         if isinstance(dikt[k], dict):
@@ -21,7 +21,7 @@
 </%def>
 
 ## http://stackoverflow.com/a/6701741/133514
-<%def name="route_for_endpoint(endpoint, select=None)">
+<%def name="route_for_endpoint(endpoint, select='shortest')">
 <%
   return context['Endpoint'](ctx, endpoint, select)
 %>
@@ -171,7 +171,7 @@ Balanced.configure('${api_key}')
 
 <%def name="curl_delete_template(endpoint_name, ep=None)">
 <%
-  ep = Endpoint(ctx, endpoint_name)
+  ep = Endpoint(ctx, endpoint_name, select='shortest')
 %>
 % if mode == 'definition':
   ${ep.method} ${ep.url}
@@ -184,4 +184,3 @@ Balanced.configure('${api_key}')
      -X DELETE
 % endif
 </%def>
-

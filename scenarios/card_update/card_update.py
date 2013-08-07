@@ -1,9 +1,9 @@
 import balanced
 
-balanced.configure("46c08048cd8811e2acae026ba7c1aba6")
+balanced.configure("8386409cfeea11e2b3ee026ba7c1aba6")
 
 
-card = balanced.Card.find('/v1/marketplaces/TEST-MP29J5STPtZVvnjAFndM0N62/cards/CC2thwNijAS2qdwoWtqanNh6')
+card = balanced.Card.find('/v1/marketplaces/TEST-MP40BcQ7XUk3TlZOupT5Y3Nm/cards/CC4DcM3FqXvWA3oIzVgwrG2s')
 card.meta = {
   'twitter.id': '1234987650',
   'facebook.user_id': '0192837465',

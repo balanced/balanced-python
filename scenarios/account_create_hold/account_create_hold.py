@@ -1,6 +1,7 @@
 import balanced
 
-balanced.configure("46c08048cd8811e2acae026ba7c1aba6")
+balanced.configure("8386409cfeea11e2b3ee026ba7c1aba6")
 
-account = balanced.Account.find('/v1/marketplaces/TEST-MP29J5STPtZVvnjAFndM0N62/accounts/AC1SUaFl5mNtKGOA3LeO2IxN')
-account.hold(100)
+
+account = balanced.Account.find('/v1/marketplaces/TEST-MP40BcQ7XUk3TlZOupT5Y3Nm/accounts/AC5YbzH94PeuRxZicqtxCmE8')
+account.hold(amount='1000')

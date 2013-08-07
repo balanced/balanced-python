@@ -1,10 +1,7 @@
-import balanced
-
-balanced.configure("46c08048cd8811e2acae026ba7c1aba6")
-
-
-bank_account = balanced.BankAccount.find('/v1/bank_accounts/BA2q0W6DqBAtytLyfBAD4p3y')
+${main.python_boilerplate()}
+bank_account = balanced.BankAccount.find('${request['bank_account_uri']}')
 verification = bank_account.verification
-verification.amount_1 = 1
-verification.amount_2 = 1
+    % for k, v in payload.iteritems():
+verification.${k} = ${v}
+    % endfor
 verification.save

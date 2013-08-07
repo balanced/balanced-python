@@ -1,6 +1,6 @@
 import balanced
 
-balanced.configure("46c08048cd8811e2acae026ba7c1aba6")
+balanced.configure("8386409cfeea11e2b3ee026ba7c1aba6")
 
 
-credit = balanced.Credit.find('/v1/credits/CR2M7u0Orut0VyFgtba8GAMf')
+credit = balanced.Credit.find('/v1/credits/CR4L4fINGRljGmx0jbwH32RA')

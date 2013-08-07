@@ -1,9 +1,9 @@
 import balanced
 
-balanced.configure("46c08048cd8811e2acae026ba7c1aba6")
+balanced.configure("8386409cfeea11e2b3ee026ba7c1aba6")
 
 
-bank_account = balanced.BankAccount.find('/v1/bank_accounts/BA2q0W6DqBAtytLyfBAD4p3y')
+bank_account = balanced.BankAccount.find('/v1/bank_accounts/BA4sfKpb9c7jNeC6iHKvFwDc')
 verification = bank_account.verification
 verification.amount_1 = 1
 verification.amount_2 = 1

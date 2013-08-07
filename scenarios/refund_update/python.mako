@@ -4,10 +4,10 @@ balanced.Refund.save()
 % else:
 import balanced
 
-balanced.configure("46c08048cd8811e2acae026ba7c1aba6")
+balanced.configure("8386409cfeea11e2b3ee026ba7c1aba6")
 
 
-refund = balanced.Refund.find('/v1/marketplaces/TEST-MP29J5STPtZVvnjAFndM0N62/refunds/RF3n0NOGtl7IeHTwp1c5Bvfw')
+refund = balanced.Refund.find('/v1/marketplaces/TEST-MP40BcQ7XUk3TlZOupT5Y3Nm/refunds/RF5IbmNudG8OWk1TzjdwmvOu')
 refund.description = 'update this description'
 refund.meta = {
   'user.refund.count': '3',

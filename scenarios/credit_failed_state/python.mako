@@ -4,13 +4,13 @@ balanced.Credit.save()
 % else:
 import balanced
 
-balanced.configure("46c08048cd8811e2acae026ba7c1aba6")
+balanced.configure("8386409cfeea11e2b3ee026ba7c1aba6")
 
 
 bank_account_info = dict(
     routing_number='121000358',
     type='checking',
-    account_number='9900000005',
+    account_number='9900000004',
     name='Johann Bernoulli',
 )
 credit = balanced.Credit(

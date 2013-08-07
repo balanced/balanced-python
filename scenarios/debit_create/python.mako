@@ -1,14 +1,14 @@
 % if mode == 'definition':
 
-balanced.Customer.debit(...)
+balanced.Account.debit(...)
 % else:
 import balanced
 
-balanced.configure("c72cb360d3ae11e29593026ba7d31e6f")
+balanced.configure("8386409cfeea11e2b3ee026ba7c1aba6")
 
 
-customer = balanced.Customer.find('/v1/customers/CU6W5pSk2CUXQxhENqyGRvQe')
-customer.debit(
+buyer = balanced.Account.find('/v1/marketplaces/TEST-MP40BcQ7XUk3TlZOupT5Y3Nm/accounts/AC4aHI8dZiHocr1M5FARdZzg')
+buyer.debit(
     appears_on_statement_as='Statement text',
     amount='5000',
     description='Some descriptive text for the debit in the dashboard',
