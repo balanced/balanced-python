@@ -916,7 +916,7 @@ class Debit(Resource):
     """
     __metaclass__ = resource_base(collection='debits')
 
-    def refund(self, amount=None, description=None, meta=None):
+    def refund(self, appears_on_statement_as=None, amount=None, description=None, meta=None):
         """
         Refunds this Debit. If no amount is specified it will refund the entire
         amount of the Debit, you may create many Refunds up to the sum total
@@ -926,6 +926,7 @@ class Debit(Resource):
         """
         meta = meta or {}
         return Refund(
+            appears_on_statement_as=appears_on_statement_as,
             uri=self.refunds_uri,
             debit_uri=self.uri,
             amount=amount,
