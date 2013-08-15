@@ -615,6 +615,9 @@ class BasicUseCases(unittest.TestCase):
         customer.add_bank_account(bank_account.uri)
         customer.destination.credit(amount=100)
 
+        hold = customer.source.hold(amount=100)
+        hold.capture()
+
     def test_31_reverse(self):
         self._create_marketplace()
         buyer = self._find_account('buyer')
