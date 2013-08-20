@@ -1020,7 +1020,8 @@ class Hold(Resource):
 
         :rtype: Debit
         """
-        return self.account.debit(hold_uri=self.uri, **kwargs)
+        participant = getattr(self, 'account', None) or self.customer
+        return participant.debit(hold_uri=self.uri, **kwargs)
 
 
 class APIKey(Resource):
