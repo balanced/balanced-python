@@ -649,3 +649,26 @@ class BasicUseCases(unittest.TestCase):
         card = mp.create_card(**CARD)
         customer.add_card(card)
         card.unstore()
+
+    def test_34_create_merchant_with_attributes(self):
+        marketplace = self._create_marketplace()
+        merchant_attributes = {
+          'type': 'person',
+          'name': 'Billy Jones',
+          'street_address': '801 High St.',
+          'postal_code': '94301',
+          'country': 'USA',
+          'dob': '1842-01',
+          'phone_number': '+16505551234'
+        }
+        bank_account = marketplace.create_bank_account(**BANK_ACCOUNT)
+        merchant = balanced.Account(
+          uri=marketplace.accounts_uri,
+          email_address='merchant@example.org',
+          merchant=merchant_attributes,
+          bank_account_uri=bank_account.uri,
+          name='Jack Q Merchant'
+        ).save()
+        self.assertEqual(merchant.email_address, 'merchant@example.org')
+        assert("merchant" in merchant.roles)
+        self.assertEqual(merchant.name, 'Jack Q Merchant')
