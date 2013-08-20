@@ -670,5 +670,5 @@ class BasicUseCases(unittest.TestCase):
           name='Jack Q Merchant'
         ).save()
         self.assertEqual(merchant.email_address, 'merchant@example.org')
-        assert("merchant" in merchant.roles)
+        self.assertIn('merchant', merchant.roles)
         self.assertEqual(merchant.name, 'Jack Q Merchant')
