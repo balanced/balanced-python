@@ -1,13 +1,11 @@
 % if mode == 'definition':
-
 balanced.Customer.refunds
 % else:
 import balanced
 
-balanced.configure("c72cb360d3ae11e29593026ba7d31e6f")
+balanced.configure('b5de51921b2d11e389c4026ba7cac9da')
 
 
-customer = balanced.Customer.find('/v1/customers/CU6W5pSk2CUXQxhENqyGRvQe')
+customer = balanced.Customer.find('/v1/customers/AC7uApw73nVe459gEQ4ynVJu')
 refunds = customer.refunds.all()
-
 % endif

@@ -1,11 +1,7 @@
-import balanced
+<%namespace file='/_main.mako' name='main'/>
+<% main.python_boilerplate() %>
 
-balanced.configure("c72cb360d3ae11e29593026ba7d31e6f")
-
-
-customer = balanced.Customer.find('/v1/customers/CU6W5pSk2CUXQxhENqyGRvQe')
+customer = balanced.Customer.find('${request['customer_uri']}')
 customer.debit(
-    appears_on_statement_as='Statement text',
-    amount='5000',
-    description='Some descriptive text for the debit in the dashboard',
+  <% main.payload_expand(request['payload']) %>
 )

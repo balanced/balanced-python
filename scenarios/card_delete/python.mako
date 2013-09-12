@@ -1,13 +1,11 @@
 % if mode == 'definition':
-
 balanced.Card.unstore()
 % else:
 import balanced
 
-balanced.configure("46c08048cd8811e2acae026ba7c1aba6")
+balanced.configure('b5de51921b2d11e389c4026ba7cac9da')
 
 
-card = balanced.Card.find("/v1/bank_accounts/BA2af6ai3i6WZZ0FMrI4OKhk")
+card = balanced.Card.find('/v1/marketplaces/TEST-MP5xnSCw6SffAgT7r9dYSGeP/cards/CC6bHZHMa2mDHFlBawUfKFvG')
 card.unstore()
-
 % endif

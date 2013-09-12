@@ -1,14 +1,12 @@
 % if mode == 'definition':
-
 balanced.Account(...).save()
 % else:
 import balanced
 
-balanced.configure("46c08048cd8811e2acae026ba7c1aba6")
+balanced.configure('b5de51921b2d11e389c4026ba7cac9da')
 
 
 buyer = balanced.Marketplace.my_marketplace.create_buyer(
-    card_uri='/v1/marketplaces/TEST-MP29J5STPtZVvnjAFndM0N62/cards/CC1SAhs8uur7HA0JoyocY7Cw',
+  card_uri='/v1/marketplaces/TEST-MP5xnSCw6SffAgT7r9dYSGeP/cards/CC5GilLPTp4N4vYHwzwGEsR9'
 )
-
 % endif

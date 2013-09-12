@@ -1,17 +1,8 @@
-import balanced
-
-balanced.configure("46c08048cd8811e2acae026ba7c1aba6")
-
-
-merchant_data = {
-    'phone_number': '+14089999999',
-    'name': 'Timmy Q. CopyPasta',
-    'dob': '1989-12',
-    'postal_code': '94110',
-    'type': 'person',
-    'street_address': '121 Skriptkid Row',
-}
-
+<%namespace file='/_main.mako' name='main'/>
+<% main.python_boilerplate() %>
+<% import json %>
+merchant_data = \
+${json.dumps(request['payload']['merchant'], indent=4)}
 
 account = balanced.Account().save()
 

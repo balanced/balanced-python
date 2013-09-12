@@ -1,1 +1,1 @@
-balanced.Customer.hold(...)
+balanced.Hold(...)

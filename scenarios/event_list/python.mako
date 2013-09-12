@@ -1,12 +1,10 @@
 % if mode == 'definition':
-
 balanced.Event.query
 % else:
 import balanced
 
-balanced.configure("46c08048cd8811e2acae026ba7c1aba6")
+balanced.configure('b5de51921b2d11e389c4026ba7cac9da')
 
 
 callbacks = balanced.Event.query.all();
-
 % endif

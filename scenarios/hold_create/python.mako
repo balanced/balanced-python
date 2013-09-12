@@ -1,16 +1,14 @@
 % if mode == 'definition':
-
-balanced.Customer.hold(...)
+balanced.Hold(...)
 % else:
 import balanced
 
-balanced.configure("c72cb360d3ae11e29593026ba7d31e6f")
+balanced.configure('b5de51921b2d11e389c4026ba7cac9da')
 
 
-customer = balanced.Customer.find('/v1/customers/CU7GuPv9Y2F8ySwJHuHL0YWq')
-customer.hold(
-    amount='5000',
-    description='Some descriptive text for the debit in the dashboard',
+hold = balanced.Hold(
+  source_uri='/v1/marketplaces/TEST-MP5xnSCw6SffAgT7r9dYSGeP/cards/CC7tkR6NetljW3FrVHQ0368'
+  amount='5000'
+  description='Some descriptive text for the debit in the dashboard'
 )
-
 % endif
