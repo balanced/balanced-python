@@ -1,12 +1,10 @@
 % if mode == 'definition':
-
 balanced.Credit.find()
 % else:
 import balanced
 
-balanced.configure("46c08048cd8811e2acae026ba7c1aba6")
+balanced.configure('b5de51921b2d11e389c4026ba7cac9da')
 
 
-credit = balanced.Credit.find('/v1/credits/CR2M7u0Orut0VyFgtba8GAMf')
-
+credit = balanced.Credit.find('/v1/marketplaces/TEST-MP5xnSCw6SffAgT7r9dYSGeP/credits/CR6m6xbfRswklzk2LNPfuPgs')
 % endif

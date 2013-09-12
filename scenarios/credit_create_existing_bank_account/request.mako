@@ -1,7 +1,5 @@
-import balanced
+<%namespace file='/_main.mako' name='main'/>
+<% main.python_boilerplate() %>
 
-balanced.configure("46c08048cd8811e2acae026ba7c1aba6")
-
-
-bank_account = balanced.BankAccount.find('/v1/bank_accounts/BA2fU4b0MNuBHuI3NrvyOsTE')
-credit = bank_account.credit(10000)
+bank_account = balanced.BankAccount.find('${request['uri']}')
+credit = bank_account.credit(amount=${request['payload']['amount']})

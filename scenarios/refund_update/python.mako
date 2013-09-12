@@ -1,13 +1,12 @@
 % if mode == 'definition':
-
 balanced.Refund.save()
 % else:
 import balanced
 
-balanced.configure("46c08048cd8811e2acae026ba7c1aba6")
+balanced.configure('b5de51921b2d11e389c4026ba7cac9da')
 
 
-refund = balanced.Refund.find('/v1/marketplaces/TEST-MP29J5STPtZVvnjAFndM0N62/refunds/RF3n0NOGtl7IeHTwp1c5Bvfw')
+refund = balanced.Refund.find('/v1/customers/AC7uApw73nVe459gEQ4ynVJu/refunds/RF7DgCMEweMG2iUl2MYw56cn')
 refund.description = 'update this description'
 refund.meta = {
   'user.refund.count': '3',
@@ -15,5 +14,4 @@ refund.meta = {
   'user.notes': 'very polite on the phone',
 }
 refund.save()
-
 % endif

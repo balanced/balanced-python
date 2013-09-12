@@ -1,17 +1,15 @@
 % if mode == 'definition':
-
 balanced.BankAccount.save()
 % else:
 import balanced
 
-balanced.configure("46c08048cd8811e2acae026ba7c1aba6")
+balanced.configure('b5de51921b2d11e389c4026ba7cac9da')
 
 
 bank_account = balanced.BankAccount(
-    routing_number='121000358',
-    type='checking',
-    account_number='9900000001',
-    name='Johann Bernoulli',
+  routing_number='121000358'
+  type='checking'
+  account_number='9900000001'
+  name='Johann Bernoulli'
 ).save()
-
 % endif

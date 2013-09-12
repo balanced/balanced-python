@@ -1,13 +1,11 @@
 % if mode == 'definition':
-
 balanced.Hold.void()
 % else:
 import balanced
 
-balanced.configure("46c08048cd8811e2acae026ba7c1aba6")
+balanced.configure('b5de51921b2d11e389c4026ba7cac9da')
 
 
-hold = balanced.Hold.find('/v1/marketplaces/TEST-MP29J5STPtZVvnjAFndM0N62/holds/HL3hEt8bLti69i3rvYVuQ2WC')
+hold = balanced.Hold.find('/v1/marketplaces/TEST-MP5xnSCw6SffAgT7r9dYSGeP/holds/HL7yIVmRKUFKGcERaqNgUJOS')
 hold.void()
-
 % endif

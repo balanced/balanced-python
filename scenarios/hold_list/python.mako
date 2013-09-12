@@ -1,12 +1,10 @@
 % if mode == 'definition':
-
 balanced.Hold.query()
 % else:
 import balanced
 
-balanced.configure("46c08048cd8811e2acae026ba7c1aba6")
+balanced.configure('b5de51921b2d11e389c4026ba7cac9da')
 
 
 holds = balanced.Hold.query.all();
-
 % endif

@@ -1,13 +1,11 @@
 % if mode == 'definition':
-
 balanced.Customer.debit()
 % else:
 import balanced
 
-balanced.configure("c72cb360d3ae11e29593026ba7d31e6f")
+balanced.configure('b5de51921b2d11e389c4026ba7cac9da')
 
 
-customer = balanced.Customer.find('/v1/customers/CU7GuPv9Y2F8ySwJHuHL0YWq')
-customer.debit(amount='1000')
-
+customer = balanced.Customer.find('/v1/customers/AC6M5tIyndBqrv4fEdubPUhg')
+customer.debit(amount=5000)
 % endif
