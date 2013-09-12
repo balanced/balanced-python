@@ -1,13 +1,11 @@
 % if mode == 'definition':
-
 balanced.Customer.credits
 % else:
 import balanced
 
-balanced.configure("c72cb360d3ae11e29593026ba7d31e6f")
+balanced.configure('b5de51921b2d11e389c4026ba7cac9da')
 
 
-customer = balanced.Customer.find('/v1/customers/CU6PXyMacKRYKNJPJFKtONK0')
+customer = balanced.Customer.find('/v1/customers/AC6vNITlEx4Uq6NM04q9ykre/credits')
 credits = customer.credits.all()
-
 % endif

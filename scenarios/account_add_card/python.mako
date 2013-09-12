@@ -1,13 +1,11 @@
 % if mode == 'definition':
-
 balanced.Account.add_card
 % else:
 import balanced
 
-balanced.configure("46c08048cd8811e2acae026ba7c1aba6")
+balanced.configure('b5de51921b2d11e389c4026ba7cac9da')
 
 
-account = balanced.Account.find('/v1/marketplaces/TEST-MP29J5STPtZVvnjAFndM0N62/accounts/AC1SUaFl5mNtKGOA3LeO2IxN')
-account.add_card('/v1/marketplaces/TEST-MP29J5STPtZVvnjAFndM0N62/cards/CC1UxG1UwXYFcslMhp4wq2Mg')
-
+account = balanced.Account.find('/v1/marketplaces/TEST-MP5xnSCw6SffAgT7r9dYSGeP/accounts/AC5GKj4twnXFbC4fXnpA9KOY')
+account.add_card('/v1/marketplaces/TEST-MP5xnSCw6SffAgT7r9dYSGeP/cards/CC5IAVJ3sMG0Ci1FbmizIRYY')
 % endif

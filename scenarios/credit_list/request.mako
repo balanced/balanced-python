@@ -1,6 +1,4 @@
-import balanced
-
-balanced.configure("46c08048cd8811e2acae026ba7c1aba6")
-
+<%namespace file='/_main.mako' name='main'/>
+<% main.python_boilerplate() %>
 
 credits = balanced.Credit.query.all()

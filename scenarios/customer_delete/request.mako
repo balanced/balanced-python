@@ -1,6 +1,5 @@
-import balanced
+<%namespace file='/_main.mako' name='main'/>
+<% main.python_boilerplate() %>
 
-balanced.configure("46c08048cd8811e2acae026ba7c1aba6")
-
-customer = balanced.Customer.find('/v1/customers/CU6PXyMacKRYKNJPJFKtONK0')
+customer = balanced.Customer.find('${request['uri']}')
 customer.unstore()

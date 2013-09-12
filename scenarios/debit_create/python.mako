@@ -1,17 +1,15 @@
 % if mode == 'definition':
-
 balanced.Customer.debit(...)
 % else:
 import balanced
 
-balanced.configure("c72cb360d3ae11e29593026ba7d31e6f")
+balanced.configure('b5de51921b2d11e389c4026ba7cac9da')
 
 
-customer = balanced.Customer.find('/v1/customers/CU6W5pSk2CUXQxhENqyGRvQe')
+customer = balanced.Customer.find('/v1/customers/AC7uApw73nVe459gEQ4ynVJu')
 customer.debit(
-    appears_on_statement_as='Statement text',
-    amount='5000',
-    description='Some descriptive text for the debit in the dashboard',
+  appears_on_statement_as='Statement text'
+  amount='5000'
+  description='Some descriptive text for the debit in the dashboard'
 )
-
 % endif
