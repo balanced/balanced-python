@@ -34,7 +34,8 @@ TEST_CARDS = {
     'discover': [
         '6011016011016011',
         '6559906559906557',
-    ]}
+    ]
+}
 
 PERSON_MERCHANT = {
     'type': 'person',
@@ -190,7 +191,6 @@ class BasicUseCases(unittest.TestCase):
                                 card_uri=card_uri,
                                 meta={'test#': 'test_d'}
                                 )
-        self.assertTrue(buyer.id.startswith('AC'), buyer.id)
         self.assertEqual(buyer.name, 'khalkhalash onastick')
         self.assertEqual(buyer.roles, ['buyer'])
         self.assertIsNotNone(buyer.created_at)
@@ -656,21 +656,21 @@ class BasicUseCases(unittest.TestCase):
     def test_34_create_merchant_with_attributes(self):
         marketplace = self._create_marketplace()
         merchant_attributes = {
-          'type': 'person',
-          'name': 'Billy Jones',
-          'street_address': '801 High St.',
-          'postal_code': '94301',
-          'country': 'USA',
-          'dob': '1842-01',
-          'phone_number': '+16505551234'
+            'type': 'person',
+            'name': 'Billy Jones',
+            'street_address': '801 High St.',
+            'postal_code': '94301',
+            'country': 'USA',
+            'dob': '1842-01',
+            'phone_number': '+16505551234'
         }
         bank_account = marketplace.create_bank_account(**BANK_ACCOUNT)
         merchant = balanced.Account(
-          uri=marketplace.accounts_uri,
-          email_address='merchant@example.org',
-          merchant=merchant_attributes,
-          bank_account_uri=bank_account.uri,
-          name='Jack Q Merchant'
+            uri=marketplace.accounts_uri,
+            email_address='merchant@example.org',
+            merchant=merchant_attributes,
+            bank_account_uri=bank_account.uri,
+            name='Jack Q Merchant'
         ).save()
         self.assertEqual(merchant.email_address, 'merchant@example.org')
         self.assertIn('merchant', merchant.roles)
