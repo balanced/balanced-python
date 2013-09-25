@@ -675,3 +675,26 @@ class BasicUseCases(unittest.TestCase):
         self.assertEqual(merchant.email_address, 'merchant@example.org')
         self.assertIn('merchant', merchant.roles)
         self.assertEqual(merchant.name, 'Jack Q Merchant')
+
+    def test_test_funding_instruments(self):
+        bank_accounts = [
+            ('021000021', '9900000000', 'pending'),
+            ('321174851', '9900000001', 'pending'),
+            ('021000021', '9900000002', 'paid'),
+            ('321174851', '9900000003', 'paid'),
+            ('021000021', '9900000004', 'failed'),
+            ('321174851', '9900000005', 'failed'),
+        ]
+        self._create_marketplace()
+        account = self._find_account('buyer')
+        account.debit(amount=100 * len(bank_accounts))
+
+        for routing_number, account_number, expected_state in bank_accounts:
+            ba = balanced.BankAccount(
+                name='Test {} {}'.format(routing_number, account_number),
+                routing_number=routing_number,
+                account_number=account_number,
+                type='CHECKING',
+            ).save()
+            credit = ba.credit(amount=100)
+            self.assertEqual(credit.status, expected_state)
