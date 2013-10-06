@@ -3,9 +3,8 @@ balanced.Verification.save
 % else:
 import balanced
 
-balanced.configure('b5de51921b2d11e389c4026ba7cac9da')
-
-verification = balanced.BankAccountVerification.find('/v1/bank_accounts/BA5YXVcU9ExcM8jXQhQt7ZY6/verifications/BZ610Qohtgs6VzPXQ2OFve6y')
+balanced.configure('ak-test-1p1Tsac7gHeMQowL2seB7ieliuAJAufyq')
+verification = balanced.BankAccountVerification.find('/v1/bank_accounts/BA6nZLdijPKzQ8RhJNnN1OD6/verifications/BZ6s3ghAmwY5BhnJIrCKSkUo')
 verification.amount_1 = 1
 verification.amount_2 = 1
 verification.save

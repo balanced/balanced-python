@@ -30,7 +30,7 @@
 </%def>
 
 
-<%def name="python_boilerplate()">
+<%def name="python_boilerplate()" filter="trim">
 import balanced
 
 %if api_location:
@@ -44,7 +44,7 @@ balanced.configure('${api_key}')
 <%def name="payload_expand(payload)" filter="trim">
   <%
     foo = ''
-    for k, v, slash in recursive_expand(request['payload']):
+    for k, v, slash in recursive_expand(payload):
       foo += "{0}='{1}'\n".format(k,v)
   %>
   ${reindent(foo, 2)}
