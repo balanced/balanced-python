@@ -3,9 +3,8 @@ balanced.Customer.holds
 % else:
 import balanced
 
-balanced.configure('b5de51921b2d11e389c4026ba7cac9da')
+balanced.configure('ak-test-1p1Tsac7gHeMQowL2seB7ieliuAJAufyq')
 
-
-customer = balanced.Customer.find('/v1/customers/AC7dx1IBJGzHjr579XEZAvLc/holds')
+customer = balanced.Customer.find('/v1/customers/CUcKunVjtvF7v8JlC5ZBdeM/holds')
 holds = customer.holds.all()
 % endif

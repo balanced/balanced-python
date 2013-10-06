@@ -3,8 +3,7 @@ balanced.Credit.find()
 % else:
 import balanced
 
-balanced.configure('b5de51921b2d11e389c4026ba7cac9da')
+balanced.configure('ak-test-1p1Tsac7gHeMQowL2seB7ieliuAJAufyq')
 
-
-credit = balanced.Credit.find('/v1/marketplaces/TEST-MP5xnSCw6SffAgT7r9dYSGeP/credits/CR6m6xbfRswklzk2LNPfuPgs')
+credit = balanced.Credit.find('/v1/marketplaces/TEST-MP5FKPQwyjvVgTDt7EiRw3Kq/credits/CR6Y384863fzeb73YbW5NHVe')
 % endif

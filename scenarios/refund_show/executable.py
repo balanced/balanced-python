@@ -1,6 +1,5 @@
 import balanced
 
-balanced.configure('b5de51921b2d11e389c4026ba7cac9da')
+balanced.configure('ak-test-1p1Tsac7gHeMQowL2seB7ieliuAJAufyq')
 
-
-refund = balanced.Refund.find('/v1/customers/AC7uApw73nVe459gEQ4ynVJu/refunds/RF7DgCMEweMG2iUl2MYw56cn')
+refund = balanced.Refund.find('/v1/customers/CUuDKfPHvZhTmaNbEsg1BOO/refunds/RFHBiohkzkfO6RPYOrjc9US')

@@ -3,9 +3,8 @@ balanced.Customer(...).unstore()
 % else:
 import balanced
 
-balanced.configure('b5de51921b2d11e389c4026ba7cac9da')
+balanced.configure('ak-test-1p1Tsac7gHeMQowL2seB7ieliuAJAufyq')
 
-
-customer = balanced.Customer.find('/v1/customers/AC6JFZyy8FN8rHX1xsg2ucKA')
+customer = balanced.Customer.find('/v1/customers/CU7tcMPhFkoiaOjRkmmdBhXO')
 customer.unstore()
 % endif

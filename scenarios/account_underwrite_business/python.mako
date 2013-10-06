@@ -3,8 +3,7 @@ balanced.Marketplace.create_merchant()
 % else:
 import balanced
 
-balanced.configure('b5de51921b2d11e389c4026ba7cac9da')
-
+balanced.configure('ak-test-1p1Tsac7gHeMQowL2seB7ieliuAJAufyq')
 
 merchant_data = {
     "phone_number": "+140899188155", 
