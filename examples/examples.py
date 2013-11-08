@@ -109,7 +109,7 @@ print "ok lets invalid a card"
 card.is_valid = False
 card.save()
 
-if card.is_valid:
+if hasattr(card, 'is_valid') and card.is_valid:
     raise Exception("This card is INCORRECTLY VALID")
 
 print "invalidating a bank account"
