@@ -43,13 +43,21 @@ balanced.configure('${api_key}')
 
 <%def name="payload_expand(payload)" filter="trim">
   <%
-    foo = ''
+    formatted_payload = ''
+    delimiter = ",\n"
+    keys = payload.keys()
+    try:
+        last = keys[-1]
+    except IndexError:
+        last = keys[0]
+
     for k, v, slash in recursive_expand(payload):
         if isinstance(v, basestring):
-            foo += "{0}='{1}'\n".format(k,v)
+            formatted_payload += "{0}='{1}'".format(k,v)
         else:
-            foo += "{0}={1}\n".format(k,v)
+            formatted_payload += "{0}={1}".format(k,v)
+        formatted_payload += '' if k is last else delimiter
   %>
-  ${reindent(foo, 2)}
+  ${reindent(formatted_payload, 2)}
 </%def>
 
