@@ -45,7 +45,10 @@ balanced.configure('${api_key}')
   <%
     foo = ''
     for k, v, slash in recursive_expand(payload):
-      foo += "{0}='{1}'\n".format(k,v)
+        if isinstance(v, basestring):
+            foo += "{0}='{1}'\n".format(k,v)
+        else:
+            foo += "{0}={1}\n".format(k,v)
   %>
   ${reindent(foo, 2)}
 </%def>
