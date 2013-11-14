@@ -3,9 +3,9 @@ balanced.Refund.save()
 % else:
 import balanced
 
-balanced.configure('ak-test-1p1Tsac7gHeMQowL2seB7ieliuAJAufyq')
+balanced.configure('ak-test-14W5azoiV99O1XiPwZ3faH10MaUdZ1kCA')
 
-refund = balanced.Refund.find('/v1/customers/CUuDKfPHvZhTmaNbEsg1BOO/refunds/RFHBiohkzkfO6RPYOrjc9US')
+refund = balanced.Refund.find('/v1/customers/CU35rlJBXqlvD9LC26PWu0cy/refunds/RF3fVPCag0ppfvvWLSc2oQ4O')
 refund.description = 'update this description'
 refund.meta = {
   'user.refund.count': '3',

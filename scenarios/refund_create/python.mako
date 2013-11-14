@@ -3,9 +3,9 @@ balanced.Debit.refund()
 % else:
 import balanced
 
-balanced.configure('ak-test-1p1Tsac7gHeMQowL2seB7ieliuAJAufyq')
+balanced.configure('ak-test-14W5azoiV99O1XiPwZ3faH10MaUdZ1kCA')
 
-debit = balanced.Debit.find('/v1/marketplaces/TEST-MP5FKPQwyjvVgTDt7EiRw3Kq/debits/WDE7lu1wLfsf2JhWHYM6U2W')
+debit = balanced.Debit.find('/v1/marketplaces/TEST-MP52IlCmywk6hGbgS75QSlN/debits/WD3dI1cfIvXo7p2f9tNMNSc2')
 debit.refund(
     description='Refund for Order #1111',
     meta={

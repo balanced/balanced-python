@@ -1,6 +1,6 @@
 import balanced
 
-balanced.configure('ak-test-1p1Tsac7gHeMQowL2seB7ieliuAJAufyq')
+balanced.configure('ak-test-14W5azoiV99O1XiPwZ3faH10MaUdZ1kCA')
 
-customer = balanced.Customer.find('/v1/customers/CUcKunVjtvF7v8JlC5ZBdeM/holds')
+customer = balanced.Customer.find('/v1/customers/CU2L1UERNEH5anL0rl1gAgW4/holds')
 holds = customer.holds.all()

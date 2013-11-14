@@ -1,10 +1,9 @@
 import balanced
 
-balanced.configure('ak-test-1p1Tsac7gHeMQowL2seB7ieliuAJAufyq')
+balanced.configure('ak-test-14W5azoiV99O1XiPwZ3faH10MaUdZ1kCA')
 
-hold = balanced.Hold.find('/v1/marketplaces/TEST-MP5FKPQwyjvVgTDt7EiRw3Kq/holds/HL1a9V1z4YLJd0vTGWOvXxs2')
+hold = balanced.Hold.find('/v1/marketplaces/TEST-MP52IlCmywk6hGbgS75QSlN/holds/HL3CgDhSRS2YOwbR7Uj0eXtU')
 debit = hold.capture(
-  appears_on_statement_as='ShowsUpOnStmt'
-  hold_uri='/v1/marketplaces/TEST-MP5FKPQwyjvVgTDt7EiRw3Kq/holds/HL1a9V1z4YLJd0vTGWOvXxs2'
+  appears_on_statement_as='ShowsUpOnStmt',
   description='Some descriptive text for the debit in the dashboard'
 )

@@ -3,8 +3,8 @@ balanced.Customer.refunds
 % else:
 import balanced
 
-balanced.configure('ak-test-1p1Tsac7gHeMQowL2seB7ieliuAJAufyq')
+balanced.configure('ak-test-14W5azoiV99O1XiPwZ3faH10MaUdZ1kCA')
 
-customer = balanced.Customer.find('/v1/customers/CUuDKfPHvZhTmaNbEsg1BOO')
+customer = balanced.Customer.find('/v1/customers/CU35rlJBXqlvD9LC26PWu0cy')
 refunds = customer.refunds.all()
 % endif

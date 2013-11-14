@@ -3,9 +3,9 @@ balanced.Card.save()
 % else:
 import balanced
 
-balanced.configure('ak-test-1p1Tsac7gHeMQowL2seB7ieliuAJAufyq')
+balanced.configure('ak-test-14W5azoiV99O1XiPwZ3faH10MaUdZ1kCA')
 
-card = balanced.Card.find('/v1/marketplaces/TEST-MP5FKPQwyjvVgTDt7EiRw3Kq/cards/CC6NiW8huZV4AxYTDJsjOd7k')
+card = balanced.Card.find('/v1/marketplaces/TEST-MP52IlCmywk6hGbgS75QSlN/cards/CC1i5vMNFo69BmOfBWcx5iZM')
 card.is_valid = False
 card.save()
 % endif

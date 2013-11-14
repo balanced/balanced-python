@@ -1,6 +1,6 @@
 import balanced
 
-balanced.configure('ak-test-1p1Tsac7gHeMQowL2seB7ieliuAJAufyq')
+balanced.configure('ak-test-14W5azoiV99O1XiPwZ3faH10MaUdZ1kCA')
 
-customer = balanced.Customer.find('/v1/customers/CU7o5OSA8KuFSSjweE54NITe')
-customer.add_bank_account('/v1/bank_accounts/BA7q1HxYvJr41fVUPk8vMrCm')
+customer = balanced.Customer.find('/v1/customers/CU22xHvLbgGKfzamLW8IZJsr')
+customer.add_bank_account('/v1/bank_accounts/BA24Zc2jo1moflunJDxKrCrB')

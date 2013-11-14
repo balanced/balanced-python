@@ -3,7 +3,7 @@ balanced.Hold.find
 % else:
 import balanced
 
-balanced.configure('ak-test-1p1Tsac7gHeMQowL2seB7ieliuAJAufyq')
+balanced.configure('ak-test-14W5azoiV99O1XiPwZ3faH10MaUdZ1kCA')
 
-hold = balanced.Hold.find('/v1/marketplaces/TEST-MP5FKPQwyjvVgTDt7EiRw3Kq/holds/HLgZ3lv8DVAtfnxDJmieJ5S')
+hold = balanced.Hold.find('/v1/marketplaces/TEST-MP52IlCmywk6hGbgS75QSlN/holds/HL2PtUrw5zStavbcn933ZsmW')
 % endif
