@@ -11,6 +11,7 @@ from . import __version__
 
 API_ROOT = 'https://api.balancedpayments.com'
 
+
 # config
 def configure(
         user=None,
@@ -55,8 +56,9 @@ class Client(wac.Client):
         if isinstance(o, datetime):
             return o.isoformat() + 'Z'
         raise TypeError(
-            'Object of type {} with value of {} is not JSON serializable'
-                .format(type(o), repr(o)))
+            'Object of type {} with value of {} is not '
+            'JSON serializable'.format(type(o), repr(o))
+        )
 
     def _serialize(self, data):
         data = json.dumps(data, default=self._default_serialize)
@@ -84,4 +86,3 @@ class Client(wac.Client):
 configure()
 
 client = Client()
-

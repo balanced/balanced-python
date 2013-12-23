@@ -70,7 +70,8 @@ class ObjectifyMixin(wac._ObjectifyMixin):
             for item in payload[collection]:
                 # find type, fallback to Resource if we can't determine the
                 # type e.g. marketplace.owner_customer
-                collection_type = Resource.registry.get(resource_type, Resource)
+                collection_type = Resource.registry.get(resource_type,
+                                                        Resource)
                 if item_attribute in item['links']:
                     # singular
                     uri_value = item['links'][item_attribute]
@@ -86,7 +87,8 @@ class ObjectifyMixin(wac._ObjectifyMixin):
                     # collection
                     uri_value = item.get(item_attribute, None)
                     parsed_link = uritemplate.expand(
-                        uri, {'.'.join([collection, item_attribute]): uri_value}
+                        uri,
+                        {'.'.join([collection, item_attribute]): uri_value}
                     )
                     lazy_href = JSONSchemaCollection(
                         collection_type, parsed_link)
