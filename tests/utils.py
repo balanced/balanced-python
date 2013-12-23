@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 import contextlib
 import multiprocessing
 import unittest2 as unittest
@@ -5,7 +7,11 @@ import unittest2 as unittest
 from wsgiref.simple_server import make_server
 
 
-class WSGIServerTest(unittest.TestCase):
+class TestCase(unittest.TestCase):
+    pass
+
+
+class WSGIServerTest(TestCase):
 
     def setUp(self):
         self.server_process = None

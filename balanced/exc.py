@@ -1,4 +1,6 @@
-import requests
+from __future__ import unicode_literals
+
+import wac
 
 
 class BalancedError(Exception):
@@ -17,15 +19,29 @@ class MultipleResultsFound(BalancedError):
     pass
 
 
-class HTTPError(BalancedError, requests.HTTPError):
-    """
-    Baseclass for all HTTP exceptions.
-    """
-    status_code = None
+class HTTPError(BalancedError, wac.Error):
 
+    class __metaclass__(type):
 
-class MoreInformationRequiredError(HTTPError):
-    redirect_uri = None
+        def __new__(meta_cls, name, bases, dikt):
+            cls = type.__new__(meta_cls, name, bases, dikt)
+            cls.types = [
+                getattr(cls, k)
+                for k in dir(cls)
+                if k.isupper() and isinstance(getattr(cls, k), basestring)
+            ]
+            cls.type_to_error.update(zip(cls.types, [cls] * len(cls.types)))
+            return cls
+
+    @classmethod
+    def from_response(cls, r):
+        if not hasattr(r, 'data') or 'type' not in r.data:
+            exc = wac.Error
+        else:
+            exc = cls.type_to_error.get(r.data['type'], HTTPError)
+        return exc(r)
+
+    type_to_error = {}
 
 
 class FundingInstrumentVerificationFailure(HTTPError):
@@ -33,14 +49,6 @@ class FundingInstrumentVerificationFailure(HTTPError):
 
 
 class BankAccountVerificationFailure(FundingInstrumentVerificationFailure):
-    pass
-
-
-category_code_map = {
-    'bank-account-authentication-not-pending':
-    BankAccountVerificationFailure,
-    'bank-account-authentication-failed':
-    BankAccountVerificationFailure,
-    'bank-account-authentication-already-exists':
-    BankAccountVerificationFailure,
-}
+    AUTH_NOT_PENDING = 'bank-account-authentication-not-pending'
+    AUTH_FAILED = 'bank-account-authentication-failed'
+    AUTH_DUPLICATED = 'bank-account-authentication-already-exists'

@@ -1,34 +1,87 @@
-from balanced import __version__
-from balanced.utils import urljoin
+from __future__ import unicode_literals
+from datetime import datetime
+
+import simplejson as json
+from iso8601 import iso8601
+import wac
+
+from balanced import exc
+from . import __version__
 
 
-def _make_user_agent():
-    return 'balanced-python/' + __version__
+API_ROOT = 'https://api.balancedpayments.com'
 
-
-class Config(object):
-
-    def __init__(self):
-        super(Config, self).__init__()
-        self.api_key_secret = None
-        self.api_version = '1'
-        self.root_uri = 'https://api.balancedpayments.com'
-        # this is requests' config that get passed down on
-        # every http operation.
-        #
-        # see: http://docs.python-requests.org/en/v0.10.4/api/#configurations
-        self.requests = {
-            'base_headers': {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json',
-                'User-agent': _make_user_agent(),
-            },
+# config
+def configure(
+        user=None,
+        root_url=API_ROOT,
+        api_revision='1.1',
+        user_agent='balanced-python/' + __version__,
+        **kwargs
+):
+    # http
+    kwargs['client_agent'] = 'knox-client/' + __version__
+    if 'headers' not in kwargs:
+        kwargs['headers'] = {
+            'accept': 'application/vnd.api+json;revision=' + api_revision
         }
+    kwargs['headers']['Accept-Type'] = 'application/json'
+    if 'error_cls' not in kwargs:
+        kwargs['error_cls'] = exc.HTTPError
+    if user:
+        kwargs['auth'] = (user, None)
+    # apply
+    Client.config = Config(root_url, user_agent=user_agent, **kwargs)
 
-    @property
-    def uri(self):
-        return urljoin(self.root_uri, self.version)
 
-    @property
-    def version(self):
-        return 'v' + self.api_version
+class Config(wac.Config):
+
+    api_revision = None
+
+    user_agent = None
+
+
+default_config = Config(API_ROOT)
+
+
+# client
+
+class Client(wac.Client):
+
+    config = default_config
+
+    @staticmethod
+    def _default_serialize(o):
+        if isinstance(o, datetime):
+            return o.isoformat() + 'Z'
+        raise TypeError(
+            'Object of type {} with value of {} is not JSON serializable'
+                .format(type(o), repr(o)))
+
+    def _serialize(self, data):
+        data = json.dumps(data, default=self._default_serialize)
+        return 'application/json', data
+
+    @staticmethod
+    def _parse_deserialized(e):
+        if isinstance(e, dict):
+            for k in e.iterkeys():
+                if k.endswith('_at') and isinstance(e[k], basestring):
+                    e[k] = iso8601.parse_date(e[k])
+        return e
+
+    def _deserialize(self, response):
+        if response.headers['Content-Type'] != 'application/json':
+            raise Exception("Unsupported content-type '{}'".format(
+                response.headers['Content-Type']
+            ))
+        if not response.content:
+            return None
+        data = json.loads(response.content)
+        return self._parse_deserialized(data)
+
+
+configure()
+
+client = Client()
+
