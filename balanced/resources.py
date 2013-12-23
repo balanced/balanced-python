@@ -1124,7 +1124,7 @@ class BankAccount(Resource):
             source_uri=self.uri,
         ).save()
 
-    def credit(self, amount, description=None, meta=None):
+    def credit(self, amount, description=None, meta=None, appears_on_statement_as=None):
         """
         Creates a Credit of funds from your Marketplace's escrow account to
         this BankAccount.
@@ -1150,6 +1150,7 @@ class BankAccount(Resource):
             description=description,
             meta=meta,
             destination_uri=destination_uri,
+            appears_on_statement_as=appears_on_statement_as
         )
         credit.save()
         return credit
