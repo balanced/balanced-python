@@ -292,14 +292,14 @@ class FundingInstrument(Resource):
             href=self.debits.href,
             amount=amount,
             **kwargs
-        )
+        ).save()
 
     def credit(self, amount, **kwargs):
         return Credit(
             href=self.credits.href,
             amount=amount,
             **kwargs
-        )
+        ).save()
 
 
 class BankAccount(FundingInstrument):
@@ -308,10 +308,20 @@ class BankAccount(FundingInstrument):
 
     uri_gen = wac.URIGen('/bank_accounts', '{bank_account}')
 
+    def verify(self):
+        return BankAccountVerification(
+            href=self.bank_account_verifications.href
+        ).save()
+
 
 class BankAccountVerification(Resource):
 
     type = 'bank_account_verifications'
+
+    def confirm(self, amount_1, amount_2):
+        self.amount_1 = amount_1
+        self.amount_2 = amount_2
+        return self.save()
 
 
 class Card(FundingInstrument):

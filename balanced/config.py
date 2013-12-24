@@ -28,7 +28,7 @@ def configure(
         }
     kwargs['headers']['Accept-Type'] = 'application/json'
     if 'error_cls' not in kwargs:
-        kwargs['error_cls'] = exc.HTTPError
+        kwargs['error_cls'] = exc.convert_error
     if user:
         kwargs['auth'] = (user, None)
     # apply
