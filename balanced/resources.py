@@ -3,20 +3,27 @@ from __future__ import unicode_literals
 import uritemplate
 import wac
 
-from balanced import exc, config
+from balanced import exc, config, utils
 
 
 registry = wac.ResourceRegistry(route_prefix='/')
 
 
 class JSONSchemaCollection(wac.ResourceCollection):
-    pass
+
+    @property
+    def href(self):
+        return self.uri
 
 
 class ObjectifyMixin(wac._ObjectifyMixin):
 
     def _objectify(self, resource_cls, **fields):
-        self._construct_from_response(**fields)
+        if 'links' not in fields:
+            for key, value in fields.iteritems():
+                setattr(self, key, value)
+        else:
+            self._construct_from_response(**fields)
 
     def _construct_from_response(self, **payload):
         payload = self._hydrate(payload)
@@ -109,13 +116,53 @@ class JSONSchemaResource(wac.Resource, ObjectifyMixin):
 
     page_cls = JSONSchemaPage
 
+    def save(self):
+        cls = type(self)
+        attrs = self.__dict__.copy()
+        href = attrs.pop('href', None)
+
+        if not href:
+            if not cls.uri_gen or not cls.uri_gen.root_uri:
+                raise TypeError(
+                    'Unable to create {0} resources directly'.format(
+                        cls.__name__
+                    )
+                )
+            href = cls.uri_gen.root_uri
+
+        method = cls.client.put if 'id' in attrs else cls.client.post
+
+        attrs = dict(
+            (k, v.href if isinstance(v, Resource) else v)
+            for k, v in attrs.iteritems()
+            if not isinstance(v, (cls.collection_cls))
+        )
+
+        resp = method(href, data=attrs)
+
+        instance = self.__class__(**resp.data)
+        self.__dict__.clear()
+        self.__dict__.update(instance.__dict__)
+
+        return self
+
+    def delete(self):
+        self.client.delete(self.href)
+
+    def __dir__(self):
+        return self.__dict__.keys()
+
     def __getattr__(self, item):
         if isinstance(item, basestring):
             suffix = '_href'
-            href = getattr(self, item + suffix, None)
-            if href:
-                setattr(self, item, Resource.get(href))
-                return getattr(self, item)
+            if suffix not in item:
+                href = getattr(self, item + suffix, None)
+                if href:
+                    setattr(self, item, Resource.get(href))
+                    return getattr(self, item)
+        raise AttributeError(
+            "'{}' has no attribute '{}'".format(self.__class__.__name__, item)
+        )
 
 
 class Resource(JSONSchemaResource):
@@ -133,13 +180,15 @@ class Marketplace(Resource):
 
     uri_gen = wac.URIGen('/marketplaces', '{marketplace}')
 
-    @classmethod
+    @utils.classproperty
     def mine(cls):
         """
         Returns an instance representing the marketplace associated with the
         current API key used for this request.
         """
         return cls.query.one()
+
+    my_marketplace = mine
 
 
 class APIKey(Resource):
@@ -153,36 +202,61 @@ class CardHold(Resource):
 
     type = 'card_holds'
 
+    uri_gen = wac.URIGen('/card_holds', '{card_hold}')
+
+    def cancel(self):
+        self.is_valid = False
+        return self.save()
+
+    def capture(self, **kwargs):
+        return Debit(
+            href=self.debits.href,
+            **kwargs
+        ).save()
+
 
 class Transaction(Resource):
 
     type = 'transactions'
-
-    def refund(self, **kwargs):
-        raise NotImplementedError()
-
-    def reverse(self, **kwargs):
-        raise NotImplementedError()
 
 
 class Credit(Transaction):
 
     type = 'credits'
 
+    uri_gen = wac.URIGen('/credits', '{credit}')
+
+    def reverse(self, **kwargs):
+        return Reversal(
+            href=self.reversals.href
+        )
+
 
 class Debit(Transaction):
 
     type = 'debits'
+
+    uri_gen = wac.URIGen('/debits', '{debit}')
+
+    def refund(self, **kwargs):
+        return Refund(
+            href=self.refunds.href,
+            **kwargs
+        ).save()
 
 
 class Refund(Transaction):
 
     type = 'refunds'
 
+    uri_gen = wac.URIGen('/refunds', '{refund}')
+
 
 class Reversal(Transaction):
 
     type = 'reversals'
+
+    uri_gen = wac.URIGen('/reversals', '{reversal}')
 
 
 class FundingInstrument(Resource):
@@ -190,18 +264,33 @@ class FundingInstrument(Resource):
     type = 'funding_instruments'
 
     def associate_to(self, customer):
-        raise NotImplementedError()
+        try:
+            self.links
+        except AttributeError:
+            self.links = {}
+        self.links['customer'] = utils.extract_href_from_object(customer)
+        self.save()
 
-    def debit(self, **kwargs):
-        raise NotImplementedError()
+    def debit(self, amount, **kwargs):
+        return Debit(
+            href=self.debits.href,
+            amount=amount,
+            **kwargs
+        )
 
-    def credit(self, **kwargs):
-        raise NotImplementedError()
+    def credit(self, amount, **kwargs):
+        return Credit(
+            href=self.credits.href,
+            amount=amount,
+            **kwargs
+        )
 
 
 class BankAccount(FundingInstrument):
 
     type = 'bank_accounts'
+
+    uri_gen = wac.URIGen('/bank_accounts', '{bank_account}')
 
 
 class BankAccountVerification(Resource):
@@ -213,20 +302,35 @@ class Card(FundingInstrument):
 
     type = 'cards'
 
+    uri_gen = wac.URIGen('/cards', '{card}')
+
+    def hold(self, amount, **kwargs):
+        return CardHold(
+            href=self.card_holds.href,
+            amount=amount,
+            **kwargs
+        ).save()
+
 
 class Customer(Resource):
 
     type = 'customers'
+
+    uri_gen = wac.URIGen('/customers', '{customer}')
 
 
 class Order(Resource):
 
     type = 'orders'
 
+    uri_gen = wac.URIGen('/orders', '{order}')
+
 
 class Callback(Resource):
 
     type = 'callbacks'
+
+    uri_gen = wac.URIGen('/callbacks', '{callback}')
 
 
 class Event(Resource):
