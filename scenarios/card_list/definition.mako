@@ -1,1 +1,0 @@
-balanced.Card.query()
