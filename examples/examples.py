@@ -1,5 +1,4 @@
 from __future__ import unicode_literals
-import os
 
 import balanced
 
@@ -93,6 +92,8 @@ mp_credit = marketplace.owner_customer.bank_accounts.first().credit(
 print "ok lets invalid a card"
 card.delete()
 
+assert buyer.cards.count() == 0
+
 print "invalidating a bank account"
 bank_account.delete()
 
@@ -105,6 +106,6 @@ card = balanced.Card(
 
 card.associate_to(buyer)
 
-assert buyer.cards.count() == 2
+assert buyer.cards.count() == 1
 
 print "and there you have it :)"

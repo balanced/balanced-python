@@ -29,16 +29,13 @@ def main():
     print 'let\'s create a card and associate it with a new account'
     card = balanced.Card(
         expiration_month='12',
-        security_code='123',
-        card_number='5105105105105100',
+        csc='123',
+        number='5105105105105100',
         expiration_year='2020',
-    ).save()
-    buyer = balanced.Account(
-        card_uri=card.uri,
     ).save()
 
     print 'generate a debit (which implicitly creates and captures a hold)'
-    buyer.debit(100)
+    card.debit(100)
 
     print 'event creation is an async operation, let\'s wait until we have ' \
           'some events!'
@@ -56,7 +53,7 @@ def main():
         )
 
     print 'you can inspect each event to see the logs'
-    event = balanced.Event.query[0]
+    event = balanced.Event.query.first()
     for callback in event.callbacks:
         print 'inspecting callback to {0} for event {1}'.format(
             callback.url,

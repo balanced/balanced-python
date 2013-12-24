@@ -71,32 +71,44 @@ class ObjectifyMixin(wac._ObjectifyMixin):
             collection, resource_type = key.split('.')
             item_attribute = item_property = resource_type
             # if parsed from uri then retrieve. e.g. customer.id
-            for v in variables:
-                collection, item_attribute = v.split('.')
-
             for item in payload[collection]:
                 # find type, fallback to Resource if we can't determine the
                 # type e.g. marketplace.owner_customer
                 collection_type = Resource.registry.get(resource_type,
                                                         Resource)
-                if item_attribute in item['links']:
+
+                def extract_variables_from_item(item, variables):
+                    for v in variables:
+                        _, item_attribute = v.split('.')
+                        # HACK: https://github.com/PoundPay/balanced/issues/184
+                        if item_attribute == 'self':
+                            item_attribute = 'id'
+                        item_value = item['links'].get(
+                            item_attribute, item.get(item_attribute)
+                        )
+                        if item_value:
+                            yield v, item_value
+
+                item_variables = dict(
+                    extract_variables_from_item(item, variables))
+
+                # expand variables if we have them, else this is a link like
+                # /debits
+                if item_variables:
+                    parsed_link = uritemplate.expand(uri, item_variables)
+                else:
+                    parsed_link = uri
+
+                # check if this is a collection or a singular item
+                if any(
+                        parsed_link.endswith(value)
+                        for value in item_variables.itervalues()
+                ):
                     # singular
-                    uri_value = item['links'][item_attribute]
-                    parsed_link = uritemplate.expand(
-                        uri, {key: uri_value}
-                    )
-                    if uri_value:
-                        item_property += '_href'
-                        lazy_href = parsed_link
-                    else:
-                        lazy_href = None
+                    item_property += '_href'
+                    lazy_href = parsed_link
                 else:
                     # collection
-                    uri_value = item.get(item_attribute, None)
-                    parsed_link = uritemplate.expand(
-                        uri,
-                        {'.'.join([collection, item_attribute]): uri_value}
-                    )
                     lazy_href = JSONSchemaCollection(
                         collection_type, parsed_link)
                 item.setdefault(item_property, lazy_href)
@@ -107,7 +119,11 @@ class JSONSchemaPage(wac.Page, ObjectifyMixin):
 
     @property
     def items(self):
-        return getattr(self, self.resource_cls.type)
+        try:
+            return getattr(self, self.resource_cls.type)
+        except AttributeError:
+            # horrid hack because event callbacks are misnamed.
+            return self.event_callbacks
 
 
 class JSONSchemaResource(wac.Resource, ObjectifyMixin):
@@ -337,10 +353,14 @@ class Event(Resource):
 
     type = 'events'
 
+    uri_gen = wac.URIGen('/events', '{event}')
+
 
 class EventCallback(Resource):
-    pass
+
+    type = 'event_callbacks'
 
 
 class EventCallbackLog(Resource):
-    pass
+
+    type = 'event_callback_logs'
