@@ -1,6 +1,6 @@
 from __future__ import unicode_literals
 
-__version__ = '1.1.0pre'
+__version__ = '1.1.0dev'
 
 from balanced.config import configure
 from balanced.resources import (
@@ -11,6 +11,7 @@ from balanced.resources import (
     BankAccountVerification, Customer,
 )
 from balanced import exc
+
 
 __all__ = [
     APIKey.__name__,
@@ -30,5 +31,5 @@ __all__ = [
     Refund.__name__,
     Reversal.__name__,
     Transaction.__name__,
-    exc.__name__.partition('.')[-1],
+    str(exc.__name__.partition('.')[-1])
 ]

@@ -189,6 +189,9 @@ class Resource(JSONSchemaResource):
 
     uri_gen = wac.URIGen('/resources', '{resource}')
 
+    def unstore(self):
+        return self.delete()
+
 
 class Marketplace(Resource):
 
@@ -221,7 +224,7 @@ class CardHold(Resource):
     uri_gen = wac.URIGen('/card_holds', '{card_hold}')
 
     def cancel(self):
-        self.is_valid = False
+        self.is_void = False
         return self.save()
 
     def capture(self, **kwargs):
@@ -244,8 +247,9 @@ class Credit(Transaction):
 
     def reverse(self, **kwargs):
         return Reversal(
-            href=self.reversals.href
-        )
+            href=self.reversals.href,
+            **kwargs
+        ).save()
 
 
 class Debit(Transaction):
