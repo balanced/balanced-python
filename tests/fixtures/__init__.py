@@ -9,7 +9,7 @@ class ResourceMeta(type):
     def __getattr__(cls, item):
         return json.load(open(os.path.join(
             os.path.dirname(os.path.abspath(__file__)),
-            'resources/{}.json'.format(item))
+            'resources/{0}.json'.format(item))
         ))
 
 
