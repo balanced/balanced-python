@@ -19,6 +19,7 @@ class JSONSchemaCollection(wac.ResourceCollection):
 class ObjectifyMixin(wac._ObjectifyMixin):
 
     def _objectify(self, resource_cls, **fields):
+        # setting values locally, not from server
         if 'links' not in fields:
             for key, value in fields.iteritems():
                 setattr(self, key, value)
@@ -38,15 +39,15 @@ class ObjectifyMixin(wac._ObjectifyMixin):
             # Singular resources are represented as JSON objects. However,
             # they are still wrapped inside an array:
             cls = Resource.registry[_type]
-            # if we couldn't determine the type of this object we use a
-            # generic resource object, target that instead.
-            if isinstance(self, (cls, Resource)):
-                # we are loading onto our self, self is the target
-                target = self
-            else:
-                target = cls(**payload)
 
             for resource_body in resources:
+                # if we couldn't determine the type of this object we use a
+                # generic resource object, target that instead.
+                if isinstance(self, (cls, Resource)):
+                    # we are loading onto our self, self is the target
+                    target = self
+                else:
+                    target = cls()
                 for key, value in resource_body.iteritems():
                     if key in ('links',):
                         continue
@@ -105,7 +106,8 @@ class ObjectifyMixin(wac._ObjectifyMixin):
                         for value in item_variables.itervalues()
                 ):
                     # singular
-                    item_property += '_href'
+                    if not item_property.endswith('_href'):
+                        item_property += '_href'
                     lazy_href = parsed_link
                 else:
                     # collection

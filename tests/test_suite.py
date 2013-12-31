@@ -124,6 +124,8 @@ class BasicUseCases(unittest.TestCase):
         self.assertEqual(buyer.name, PERSON['name'])
         self.assertIsNotNone(buyer.created_at)
         self.assertIsNotNone(buyer.href)
+        self.assertEqual(buyer.cards.count(), 1)
+        self.assertEqual(buyer.cards.first().id, card.id)
 
     def test_debit_a_card_and_refund(self):
         card = balanced.Card(**CARD).save()
