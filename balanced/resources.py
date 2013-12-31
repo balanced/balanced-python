@@ -179,7 +179,9 @@ class JSONSchemaResource(wac.Resource, ObjectifyMixin):
                     setattr(self, item, Resource.get(href))
                     return getattr(self, item)
         raise AttributeError(
-            "'{}' has no attribute '{}'".format(self.__class__.__name__, item)
+            "'{0}' has no attribute '{1}'".format(
+                self.__class__.__name__, item
+            )
         )
 
 
