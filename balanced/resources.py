@@ -198,6 +198,19 @@ class Resource(JSONSchemaResource):
 
 
 class Marketplace(Resource):
+    """
+    A Marketplace represents your central broker for all operations on the
+    Balanced API.
+
+    A Marketplace has a single `owner_customer` which represents your person or
+    business.
+
+    All Resources apart from APIKeys are associated with a Marketplace.
+
+    A Marketplace has an escrow account which receives all funds from Debits
+    that are not associated with Orders. The sum of the escrow (`in_escrow`) is
+    (Debits - Refunds + Reversals - Credits).
+    """
 
     type = 'marketplaces'
 
@@ -215,7 +228,13 @@ class Marketplace(Resource):
 
 
 class APIKey(Resource):
+    """
+    Your APIKey is used to authenticate when performing operations on the
+    Balanced API. You must create an APIKey before you create a Marketplace.
 
+    **NOTE:** Never give out or expose your APIKey. You may POST to this
+    endpoint to create new APIKeys and then DELETE any old keys.
+    """
     type = 'api_keys'
 
     uri_gen = wac.URIGen('/api_keys', '{api_key}')
@@ -239,17 +258,38 @@ class CardHold(Resource):
 
 
 class Transaction(Resource):
+    """
+    Any transfer, funds from or to, your Marketplace's escrow account or the
+    escrow account of an Order associated with your Marketplace.
+    E.g. a Credit, Debit, Refund, or Reversal.
+
+    If the Transaction is associated with an Order then it will be applied to
+    the Order's escrow account, not to the Marketplace's escrow account.
+    """
 
     type = 'transactions'
 
 
 class Credit(Transaction):
+    """
+    A Credit represents a transfer of funds from your Marketplace's
+    escrow account to a FundingInstrument.
+
+    Credits are created by calling the `credit` method on a FundingInstrument.
+    """
 
     type = 'credits'
 
     uri_gen = wac.URIGen('/credits', '{credit}')
 
     def reverse(self, **kwargs):
+        """
+        Reverse a Credit.  If no amount is specified it will reverse the entire
+        amount of the Credit, you may create many Reversals up to the sum of
+        the total amount of the original Credit.
+
+        :rtype: Reversal
+        """
         return Reversal(
             href=self.reversals.href,
             **kwargs
@@ -257,12 +297,27 @@ class Credit(Transaction):
 
 
 class Debit(Transaction):
+    """
+    A Debit represents a transfer of funds from a FundingInstrument to your
+    Marketplace's escrow account.
+
+    A Debit may be created directly, or it will be created as a side-effect
+    of capturing a CardHold. If you create a Debit directly it will implicitly
+    create the associated CardHold if the FundingInstrument supports this.
+    """
 
     type = 'debits'
 
     uri_gen = wac.URIGen('/debits', '{debit}')
 
     def refund(self, **kwargs):
+        """
+        Refunds this Debit. If no amount is specified it will refund the entire
+        amount of the Debit, you may create many Refunds up to the sum total
+        of the original Debit's amount.
+
+        :rtype: Refund
+        """
         return Refund(
             href=self.refunds.href,
             **kwargs
@@ -270,6 +325,12 @@ class Debit(Transaction):
 
 
 class Refund(Transaction):
+    """
+    A Refund represents a reversal of funds from a Debit. A Debit can have
+    many Refunds associated with it up to the total amount of the original
+    Debit. Funds are returned to your Marketplace's escrow account
+    proportional to the amount of the Refund.
+    """
 
     type = 'refunds'
 
@@ -277,6 +338,12 @@ class Refund(Transaction):
 
 
 class Reversal(Transaction):
+    """
+    A Reversal represents a reversal of funds from a Credit. A Credit can have
+    many Reversal associated with it up to the total amount of the original
+    Credit. Funds are returned to your Marketplace's escrow account
+    proportional to the amount of the Reversal.
+    """
 
     type = 'reversals'
 
@@ -284,6 +351,11 @@ class Reversal(Transaction):
 
 
 class FundingInstrument(Resource):
+    """
+    A FundingInstrument is either (or both) a source or destination of funds.
+    You may perform `debit` or `credit` operations on a FundingInstrument to
+    transfer funds to or from your Marketplace's escrow.
+    """
 
     type = 'funding_instruments'
 
@@ -296,6 +368,14 @@ class FundingInstrument(Resource):
         self.save()
 
     def debit(self, amount, **kwargs):
+        """
+        Creates a Debit of funds from this FundingInstrument to your
+        Marketplace's escrow account.
+
+        :param appears_on_statement_as: If None then Balanced will use the
+            `domain_name` property from your Marketplace.
+        :rtype: Debit
+        """
         return Debit(
             href=self.debits.href,
             amount=amount,
@@ -303,6 +383,12 @@ class FundingInstrument(Resource):
         ).save()
 
     def credit(self, amount, **kwargs):
+        """
+        Creates a Credit of funds from your Marketplace's escrow account to
+        this FundingInstrument.
+
+        :rtype: Credit
+       """
         return Credit(
             href=self.credits.href,
             amount=amount,
@@ -311,18 +397,32 @@ class FundingInstrument(Resource):
 
 
 class BankAccount(FundingInstrument):
+    """
+    A BankAccount is both a source, and a destination of, funds. You may
+    create Debits and Credits to and from, this funding instrument.
+    """
 
     type = 'bank_accounts'
 
     uri_gen = wac.URIGen('/bank_accounts', '{bank_account}')
 
     def verify(self):
+        """
+        Creates a verification of the associated BankAccount so it can
+        perform verified operations (debits).
+
+        :rtype: BankAccountVerification
+        """
         return BankAccountVerification(
             href=self.bank_account_verifications.href
         ).save()
 
 
 class BankAccountVerification(Resource):
+    """
+    Represents an attempt to verify the associated BankAccount so it can
+    perform verified operations (debits).
+    """
 
     type = 'bank_account_verifications'
 
@@ -333,6 +433,9 @@ class BankAccountVerification(Resource):
 
 
 class Card(FundingInstrument):
+    """
+    A card represents a source of funds. You may Debit funds from the Card.
+    """
 
     type = 'cards'
 
@@ -347,6 +450,12 @@ class Card(FundingInstrument):
 
 
 class Customer(Resource):
+    """
+    A Customer represents a business or person within your Marketplace. A
+    Customer can have many funding instruments such as cards and bank accounts
+    associated to them. Customers are logical grouping constructs for
+    associating many Transactions and FundingInstruments.
+    """
 
     type = 'customers'
 
@@ -354,6 +463,13 @@ class Customer(Resource):
 
 
 class Order(Resource):
+    """
+    An Order is a logical construct for grouping Transactions.
+
+    An Order may have 0:n Transactions associated with it so long as the sum
+    (`amount_escrowed`) which is calculated as
+    (Debits - Refunds - Credits + Reversals), is always >= 0.
+    """
 
     type = 'orders'
 
@@ -361,6 +477,10 @@ class Order(Resource):
 
 
 class Callback(Resource):
+    """
+    A Callback is a publicly accessible location that can receive POSTed JSON
+    data whenever an Event is generated.
+    """
 
     type = 'callbacks'
 
@@ -368,6 +488,12 @@ class Callback(Resource):
 
 
 class Event(Resource):
+    """
+    An Event is a snapshot of another resource at a point in time when
+    something significant occurred. Events are created when resources are
+    created, updated, deleted or otherwise change state such as a Credit being
+    marked as failed.
+    """
 
     type = 'events'
 
@@ -375,10 +501,17 @@ class Event(Resource):
 
 
 class EventCallback(Resource):
+    """
+    Represents a single event being sent to a callback.
+    """
 
     type = 'event_callbacks'
 
 
 class EventCallbackLog(Resource):
+    """
+    Represents a request and response from single attempt to notify a callback
+    of an event.
+    """
 
     type = 'event_callback_logs'
