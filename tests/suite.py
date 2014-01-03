@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from __future__ import unicode_literals
+from datetime import date
 import mock
 import warnings
 import re
@@ -77,7 +78,7 @@ CARD = {
     'name': 'Johnny Fresh',
     'card_number': '4444424444444440',
     'expiration_month': 12,
-    'expiration_year': 2013,
+    'expiration_year': date.today().year + 1,
 }
 
 INTERNATIONAL_CARD = {
@@ -89,7 +90,7 @@ INTERNATIONAL_CARD = {
     'name': 'Johnny Fresh',
     'card_number': '4444424444444440',
     'expiration_month': 12,
-    'expiration_year': 2014,
+    'expiration_year': date.today().year + 1,
 }
 
 BANK_ACCOUNT = {
@@ -181,7 +182,7 @@ class BasicUseCases(unittest.TestCase):
             'name': buyer_name,
             'card_number': card_number,
             'expiration_month': 12,
-            'expiration_year': 2013,
+            'expiration_year': date.today().year + 1,
         }
         card = balanced.Card(**card_payload).save()
         card_uri = card.uri

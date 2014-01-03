@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
+from datetime import date
 import inspect
 import time
 
@@ -44,7 +45,7 @@ class AcceptanceUseCases(TestCases):
             'name': 'Richard Feynman',
             'card_number': cards.TEST_CARDS['visa'][0],
             'expiration_month': 12,
-            'expiration_year': 2013,
+            'expiration_year': date.today().year + 1,
         }
         self.us_card_payload.update(self.valid_us_address)
 
@@ -96,7 +97,7 @@ class AcceptanceUseCases(TestCases):
         card_payload = {
             'card_number': card_number,
             'expiration_month': 12,
-            'expiration_year': 2013,
+            'expiration_year': date.today().year + 1,
         }
         card_payload.update(self.valid_international_address)
         card_payload.update(self.person)

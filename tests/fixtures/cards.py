@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
+from datetime import date
+
 
 AUTH_INVALID_CARD = '4444444444444448'
 
@@ -40,7 +42,7 @@ def generate_international_card_payloads():
             'name': '徳川家康',
             'card_number': '4' + '1' * 15,
             'expiration_month': 12,
-            'expiration_year': 2014,
+            'expiration_year': date.today().year + 1,
         },
         {
             'street_address': 'Malmö högskola',
@@ -51,7 +53,7 @@ def generate_international_card_payloads():
             'name': 'Dolph Lundgren',
             'card_number': '4' + '1' * 15,
             'expiration_month': 12,
-            'expiration_year': 2014,
+            'expiration_year': date.today().year + 1,
         },
     ]
 
@@ -66,13 +68,13 @@ CARD = {
     'name': 'Johnny Fresh',
     'card_number': '4444424444444440',
     'expiration_month': 12,
-    'expiration_year': 2013,
-    }
+    'expiration_year': date.today().year + 1,
+}
 
 
 CARD_NO_ADDRESS = {
     'name': 'Johnny Fresh',
     'card_number': '4444424444444440',
     'expiration_month': 12,
-    'expiration_year': 2013,
-    }
+    'expiration_year': date.today().year + 1,
+}
