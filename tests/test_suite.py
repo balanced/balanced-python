@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from __future__ import unicode_literals
+from datetime import date
 
 import unittest2 as unittest
 import requests
@@ -56,7 +57,7 @@ CARD = {
     'name': 'Johnny Fresh',
     'number': '4444424444444440',
     'expiration_month': 12,
-    'expiration_year': 2013,
+    'expiration_year': date.today().year + 1,
     'csc': '123',
     'address': {
         'line1': '123 Fake Street',
@@ -72,7 +73,7 @@ INTERNATIONAL_CARD = {
     'name': 'Johnny Fresh',
     'number': '4444424444444440',
     'expiration_month': 12,
-    'expiration_year': 2014,
+    'expiration_year': date.today().year + 1,
     'address': {
         'street_address': '田原３ー８ー１',
         'city': '都留市',
