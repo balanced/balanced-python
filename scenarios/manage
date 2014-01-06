@@ -1,0 +1,74 @@
+#!/usr/bin/env python
+from __future__ import unicode_literals
+import argparse
+import fileinput
+import os
+import re
+import shutil
+import sys
+
+
+def convert(name):
+    s1 = re.sub('(.)([A-Z][a-z]+)', r'\1_\2', name)
+    return re.sub('([a-z0-9])([A-Z])', r'\1_\2', s1).lower()
+
+
+def get_file_paths(directory):
+    for root, directories, files in os.walk(directory):
+
+        for filename in files:
+
+            # Join the two strings in order to form the full filepath.
+            filepath = os.path.join(root, filename)
+
+            yield filepath
+
+
+def main(parser):
+    args = parser.parse_args()
+    args.command(args)
+
+
+def create(args):
+    resource = args.resource
+    try:
+        exec('from balanced import ' + resource)
+    except ImportError:
+        print 'Sorry, we cannot import the resource {} from balanced.'.format(
+            resource
+        )
+        sys.exit(1)
+    variable = convert(resource)
+    print resource, variable
+    file_root = os.path.dirname(os.path.abspath(__file__))
+    for op in ('create', 'delete', 'list', 'retrieve', 'update'):
+        # copy
+
+        src = os.path.join(file_root, '_template', '_' + op)
+        dst = os.path.join(file_root, '{}_{}'.format(variable, op))
+        try:
+            shutil.copytree(src, dst)
+        except OSError:
+            pass  # already exists?
+        # replace
+        for file in get_file_paths(dst):
+            # TODO: write back to file
+            for line in fileinput.input(file, inplace=True):
+                line.replace('VARIABLE', variable)
+                line.replace('RESOURCE', resource)
+
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(add_help=False)
+    parents = [parser]
+    root_parser = argparse.ArgumentParser(parents=parents)
+    sub_parsers = root_parser.add_subparsers(title='sub-commands')
+
+    sub_parser = sub_parsers.add_parser(
+        'create',
+        description='Create a new set of scenarios',
+        parents=parents)
+    sub_parser.add_argument('resource')
+    sub_parser.set_defaults(command=create)
+
+    main(root_parser)

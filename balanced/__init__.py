@@ -3,12 +3,13 @@ from __future__ import unicode_literals
 __version__ = '1.1.0dev'
 
 from balanced.config import configure
+from balanced import resources
 from balanced.resources import (
     Resource, Marketplace, APIKey,
     CardHold, Credit, Debit, Refund, Reversal,
     Transaction, BankAccount, Card,
     Callback, Event, EventCallback, EventCallbackLog,
-    BankAccountVerification, Customer,
+    BankAccountVerification, Customer, Order
 )
 from balanced import exc
 
@@ -27,6 +28,7 @@ __all__ = [
     EventCallback.__name__,
     EventCallbackLog.__name__,
     Marketplace.__name__,
+    Order.__name__,
     Resource.__name__,
     Refund.__name__,
     Reversal.__name__,
