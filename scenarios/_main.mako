@@ -34,10 +34,9 @@
 import balanced
 
 %if api_location:
-balanced.configure('${api_key}', root_url='${api_location}')
-%else:
-balanced.configure('${api_key}')
+balanced.config.root_uri = ${api_location}'
 %endif
+balanced.configure('${api_key}')
 </%def>
 
 

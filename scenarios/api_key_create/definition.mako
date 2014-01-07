@@ -1,1 +1,1 @@
-balanced.APIKey
+balanced.APIKey()

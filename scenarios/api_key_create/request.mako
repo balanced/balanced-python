@@ -1,5 +1,4 @@
 <%namespace file='/_main.mako' name='main'/>
 <% main.python_boilerplate() %>
 
-api_key = balanced.APIKey()
-api_key.save()
+bank_account = balanced.APIKey().save()
