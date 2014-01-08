@@ -1,11 +1,10 @@
 % if mode == 'definition':
-balanced.Verification.save
+balanced.BankAccountVerification().save()
 % else:
 import balanced
 
-balanced.configure('ak-test-1tUen2a604QT05iGc6p4pbPjTqsAPMFCl')
-verification = balanced.BankAccountVerification.find('/verifications/BZ6cD5IVyWprD3AJTwfi8Bvg')
-verification.amount_1 = 1
-verification.amount_2 = 1
-verification.save
+balanced.configure('ak-test-2IuKttETJEorSZLxA9tVbWBIWnRa1kC9P')
+
+verification = balanced.BankAccountVerification.find('/verifications/BZ2Sy2Z4Bp2mARnCLztiu2VG')
+verification.verify(amount_1=1, amount_2=1)
 % endif

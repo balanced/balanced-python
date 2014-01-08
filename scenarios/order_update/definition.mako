@@ -1,1 +1,1 @@
-balanced.Order.save()
+balanced.Order().save()

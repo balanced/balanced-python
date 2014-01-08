@@ -1,1 +1,1 @@
-balanced.BankAccount.find
+balanced.BankAccount().find()

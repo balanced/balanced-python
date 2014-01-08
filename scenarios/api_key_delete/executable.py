@@ -1,6 +1,6 @@
 import balanced
 
-balanced.configure('ak-test-1tUen2a604QT05iGc6p4pbPjTqsAPMFCl')
+balanced.configure('ak-test-2IuKttETJEorSZLxA9tVbWBIWnRa1kC9P')
 
-key = balanced.APIKey.find('/api_keys/AK66nZtNPbPw0Vnt3tmdVXpC')
+key = balanced.APIKey.find('/api_keys/AK2MIAdNHBolYbbacv2OSosg')
 key.delete()

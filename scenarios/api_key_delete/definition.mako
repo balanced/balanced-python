@@ -1,1 +1,1 @@
-balanced.APIKey.delete()
+balanced.APIKey().delete()

@@ -1,1 +1,1 @@
-balanced.CardHold.save()
+balanced.CardHold().save()

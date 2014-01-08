@@ -1,11 +1,11 @@
 % if mode == 'definition':
-balanced.Debit.save()
+balanced.Debit().save()
 % else:
 import balanced
 
-balanced.configure('ak-test-1tUen2a604QT05iGc6p4pbPjTqsAPMFCl')
+balanced.configure('ak-test-2IuKttETJEorSZLxA9tVbWBIWnRa1kC9P')
 
-debit = balanced.Debit.find('/debits/WD6TAVProqNixngz5tRCO52C')
+debit = balanced.Debit.find('/debits/WD3xghyI3uMTgjRP5aJugoQy')
 debit.description = 'New description for debit'
 debit.meta = {
   'facebook.id': '1234567890',

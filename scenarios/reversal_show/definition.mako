@@ -1,1 +1,1 @@
-balanced.Reversal.find()
+balanced.Reversal().find()

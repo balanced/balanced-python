@@ -1,1 +1,1 @@
-balanced.Credit.query()
+balanced.Credit().query

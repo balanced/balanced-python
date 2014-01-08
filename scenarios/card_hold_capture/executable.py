@@ -1,8 +1,8 @@
 import balanced
 
-balanced.configure('ak-test-1tUen2a604QT05iGc6p4pbPjTqsAPMFCl')
+balanced.configure('ak-test-2IuKttETJEorSZLxA9tVbWBIWnRa1kC9P')
 
-card_hold = balanced.CardHold.find('/card_holds/HL6za54jlFLUAvEqDEULOwXC')
+card_hold = balanced.CardHold.find('/card_holds/HL3dgrKQhecdILFZKW0FQLYs')
 debit = card_hold.capture(
   appears_on_statement_as='ShowsUpOnStmt',
   description='Some descriptive text for the debit in the dashboard'

@@ -1,11 +1,11 @@
 % if mode == 'definition':
-balanced.Card.hold()
+balanced.Card().hold()
 % else:
 import balanced
 
-balanced.configure('ak-test-1tUen2a604QT05iGc6p4pbPjTqsAPMFCl')
+balanced.configure('ak-test-2IuKttETJEorSZLxA9tVbWBIWnRa1kC9P')
 
-card = balanced.Card.find('/cards/CC6y7qpkXsrutTV0z1p4SbhI')
+card = balanced.Card.find('/cards/CC3cqYicdXFN8T1nX3frfRCW')
 card_hold = card.hold(
   amount=5000,
   description='Some descriptive text for the debit in the dashboard'

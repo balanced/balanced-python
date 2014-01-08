@@ -1,9 +1,9 @@
 % if mode == 'definition':
-balanced.Credit.find()
+balanced.Credit().find()
 % else:
 import balanced
 
-balanced.configure('ak-test-1tUen2a604QT05iGc6p4pbPjTqsAPMFCl')
+balanced.configure('ak-test-2IuKttETJEorSZLxA9tVbWBIWnRa1kC9P')
 
-credit = balanced.Credit.find('/credits/CR6YTbjFOeoK78NdjiGsCgxo')
+credit = balanced.Credit.find('/credits/CR3DLTIjMve5idvjBrXNKBHE')
 % endif

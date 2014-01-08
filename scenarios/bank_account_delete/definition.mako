@@ -1,1 +1,1 @@
-balanced.BankAccount.delete()
+balanced.BankAccount().delete()

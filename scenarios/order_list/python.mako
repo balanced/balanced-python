@@ -1,9 +1,9 @@
 % if mode == 'definition':
-balanced.Order.query()
+balanced.Order().query
 % else:
 import balanced
 
-balanced.configure('ak-test-1tUen2a604QT05iGc6p4pbPjTqsAPMFCl')
+balanced.configure('ak-test-2IuKttETJEorSZLxA9tVbWBIWnRa1kC9P')
 
 orders = balanced.Order.query.all()
 % endif

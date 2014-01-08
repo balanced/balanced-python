@@ -1,1 +1,1 @@
-balanced.BankAccount.debit()
+balanced.BankAccount().debit()

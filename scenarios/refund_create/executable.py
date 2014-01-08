@@ -1,6 +1,6 @@
 import balanced
 
-balanced.configure('ak-test-1tUen2a604QT05iGc6p4pbPjTqsAPMFCl')
+balanced.configure('ak-test-2IuKttETJEorSZLxA9tVbWBIWnRa1kC9P')
 
-debit = balanced.Debit.find('/debits/WD7yQnigdgrO2Bkc7vLIdkeW')
+debit = balanced.Debit.find('/debits/WD4d9CgVjg8lX8g8l1638Bor')
 refund = debit.refund()

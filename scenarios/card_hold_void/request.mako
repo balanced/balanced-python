@@ -2,4 +2,4 @@
 <% main.python_boilerplate() %>
 
 card_hold = balanced.CardHold.find('${request['uri']}')
-card_hold.void()
+card_hold.cancel()

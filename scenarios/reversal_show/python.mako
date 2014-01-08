@@ -1,9 +1,9 @@
 % if mode == 'definition':
-balanced.Reversal.find()
+balanced.Reversal().find()
 % else:
 import balanced
 
-balanced.configure('ak-test-1tUen2a604QT05iGc6p4pbPjTqsAPMFCl')
+balanced.configure('ak-test-2IuKttETJEorSZLxA9tVbWBIWnRa1kC9P')
 
-refund = balanced.Reversal.find('/reversals/RV7IMMa8PGy8obFm8g5fnvP1')
+refund = balanced.Reversal.find('/reversals/RV4mvdReJFZTySZXe8IyQ8Bi')
 % endif

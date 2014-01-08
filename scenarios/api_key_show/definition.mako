@@ -1,1 +1,1 @@
-balanced.APIKey.find
+balanced.APIKey().find()

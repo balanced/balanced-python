@@ -1,1 +1,1 @@
-balanced.BankAccount.save()
+balanced.BankAccount().save()

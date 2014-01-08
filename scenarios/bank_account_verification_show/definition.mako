@@ -1,1 +1,1 @@
-balanced.Verification.find
+balanced.BankAccountVerification().find()

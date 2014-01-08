@@ -1,1 +1,1 @@
-balanced.Customer.unstore()
+balanced.Customer().unstore()

@@ -1,1 +1,1 @@
-balanced.CardHold.capture()
+balanced.CardHold().capture()

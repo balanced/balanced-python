@@ -1,6 +1,6 @@
 import balanced
 
-balanced.configure('ak-test-1tUen2a604QT05iGc6p4pbPjTqsAPMFCl')
+balanced.configure('ak-test-2IuKttETJEorSZLxA9tVbWBIWnRa1kC9P')
 
-credit = balanced.Credit.find('/credits/CR7HIdtAm4eFX1weOgiaRGQM')
+credit = balanced.Credit.find('/credits/CR4lqO3NwBWdLYGvMAUeKt7g')
 reversal = credit.reverse()

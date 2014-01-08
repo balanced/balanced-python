@@ -1,6 +1,6 @@
 import balanced
 
-balanced.configure('ak-test-1tUen2a604QT05iGc6p4pbPjTqsAPMFCl')
+balanced.configure('ak-test-2IuKttETJEorSZLxA9tVbWBIWnRa1kC9P')
 
-bank_account = balanced.BankAccount.find('/bank_accounts/BA6jsxwAXYrt4sLjYUw1a1gS/credits')
+bank_account = balanced.BankAccount.find('/bank_accounts/BA2Yl8BXIiDIdRGu75Ef2mhi/credits')
 credits = bank_account.credits.all()

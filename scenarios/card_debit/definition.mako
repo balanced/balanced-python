@@ -1,1 +1,1 @@
-balanced.Card.debit()
+balanced.Card().debit()

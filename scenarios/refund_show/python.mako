@@ -1,9 +1,9 @@
 % if mode == 'definition':
-balanced.Refund.find()
+balanced.Refund().find()
 % else:
 import balanced
 
-balanced.configure('ak-test-1tUen2a604QT05iGc6p4pbPjTqsAPMFCl')
+balanced.configure('ak-test-2IuKttETJEorSZLxA9tVbWBIWnRa1kC9P')
 
-refund = balanced.Refund.find('/refunds/RF7AxY5iLVIl7a3QtcoVZocS')
+refund = balanced.Refund.find('/refunds/RF4eXqVaytz4vN4NwOAfFHXO')
 % endif

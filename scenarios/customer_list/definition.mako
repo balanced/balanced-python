@@ -1,1 +1,1 @@
-balanced.Customer.query()
+balanced.Customer().query

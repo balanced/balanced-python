@@ -1,1 +1,1 @@
-balanced.CardHold.query()
+balanced.CardHold().query

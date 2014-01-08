@@ -1,1 +1,1 @@
-balanced.BankAccount.credit()
+balanced.BankAccount().credit()

@@ -1,1 +1,1 @@
-balanced.Customer.save()
+balanced.Customer().save()

@@ -1,1 +1,1 @@
-balanced.Debit.save()
+balanced.Debit().save()

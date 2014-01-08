@@ -1,9 +1,9 @@
 % if mode == 'definition':
-balanced.Customer.find
+balanced.Customer().find()
 % else:
 import balanced
 
-balanced.configure('ak-test-1tUen2a604QT05iGc6p4pbPjTqsAPMFCl')
+balanced.configure('ak-test-2IuKttETJEorSZLxA9tVbWBIWnRa1kC9P')
 
-customer = balanced.Customer.find('/customers/CU77fJ0bjn9xBZYlzIYkpUQU')
+customer = balanced.Customer.find('/customers/CU3LNFIXs33DopZuksrfp0KY')
 % endif

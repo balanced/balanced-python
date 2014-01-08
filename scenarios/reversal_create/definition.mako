@@ -1,1 +1,1 @@
-balanced.Credit.reverse()
+balanced.Credit().reverse()

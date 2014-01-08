@@ -1,1 +1,1 @@
-balanced.BankAccount.query()
+balanced.BankAccount().query

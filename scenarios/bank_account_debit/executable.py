@@ -1,8 +1,8 @@
 import balanced
 
-balanced.configure('ak-test-1tUen2a604QT05iGc6p4pbPjTqsAPMFCl')
+balanced.configure('ak-test-2IuKttETJEorSZLxA9tVbWBIWnRa1kC9P')
 
-bank_account = balanced.BankAccount.find('/bank_accounts/BA6b9fFSyfhg5xK51iCmPjNZ/debits')
+bank_account = balanced.BankAccount.find('/bank_accounts/BA2RfTVAgg4CdTJrVc7RPw7s/debits')
 bank_account.debit(
   appears_on_statement_as='Statement text',
   amount=5000,
