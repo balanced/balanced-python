@@ -1,1 +1,1 @@
-balanced.Customer().add_card
+balanced.Card().associate_to()

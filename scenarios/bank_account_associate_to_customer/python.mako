@@ -1,5 +1,5 @@
 % if mode == 'definition':
-balanced.Customer().add_bank_account
+balanced.Card().associate_to()
 % else:
 import balanced
 
