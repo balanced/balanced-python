@@ -196,6 +196,10 @@ class Resource(JSONSchemaResource):
     def unstore(self):
         return self.delete()
 
+    @classmethod
+    def fetch(cls, uri):
+        return cls.get(uri)
+
 
 class Marketplace(Resource):
     """

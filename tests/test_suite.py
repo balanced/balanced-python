@@ -272,3 +272,12 @@ class BasicUseCases(unittest.TestCase):
         card = balanced.Card(**CARD).save()
         card.associate_to(customer)
         card.unstore()
+
+    def test_fetch_resource(self):
+        customer = balanced.Customer().save()
+        customer2 = balanced.Customer.fetch(customer.href)
+        for prop in ('id', 'href', 'name', 'created_at'):
+            self.assertEqual(
+                getattr(customer, prop),
+                getattr(customer2, prop),
+            )
