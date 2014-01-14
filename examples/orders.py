@@ -16,7 +16,6 @@ bank_account = balanced.BankAccount(
 ).save()
 bank_account.associate_to(merchant)
 
-# TODO: merchant.create_order(description=foo
 order = merchant.create_order(description='foo order')
 
 card = balanced.Card(

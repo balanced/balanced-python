@@ -281,3 +281,57 @@ class BasicUseCases(unittest.TestCase):
                 getattr(customer, prop),
                 getattr(customer2, prop),
             )
+
+    def test_order(self):
+        merchant = balanced.Customer().save()
+        bank_account = balanced.BankAccount(**BANK_ACCOUNT).save()
+        bank_account.associate_to(merchant)
+
+        order = merchant.create_order(description='foo order')
+
+        card = balanced.Card(**INTERNATIONAL_CARD).save()
+
+        # debit to increment escrow
+        card.debit(amount=1000)
+
+        # debit the card and associate with the order.
+        card.debit(amount=100, order=order)
+
+        order = balanced.Order.fetch(order.href)
+
+        # the order captured the amount of the debit
+        self.assertEqual(order.amount_escrowed, 100)
+
+        # pay out half
+        credit = bank_account.credit(amount=50, order=order)
+
+        self.assertEqual(credit.order.href, order.href)
+
+        order = balanced.Order.fetch(order.href)
+
+        # half the money remains
+        self.assertEqual(order.amount_escrowed, 50)
+
+        # not enough money in the order to pay out
+        with self.assertRaises(balanced.exc.BalancedError):
+            bank_account.credit(amount=150, order=order)
+
+    def test_order_restrictions(self):
+        merchant = balanced.Customer().save()
+
+        order = merchant.create_order(description='foo order')
+
+        card = balanced.Card(**INTERNATIONAL_CARD).save()
+
+        # debit the card and associate with the order.
+        card.debit(amount=100, order=order)
+
+        another_bank_account = balanced.BankAccount(
+            account_number="1234567890",
+            routing_number="321174851",
+            name="Jack Q Merchant",
+        ).save()
+
+        # not associated with the order
+        with self.assertRaises(balanced.exc.BalancedError):
+            another_bank_account.credit(amount=50, order=order)
