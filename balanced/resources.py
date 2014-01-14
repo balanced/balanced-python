@@ -197,8 +197,8 @@ class Resource(JSONSchemaResource):
         return self.delete()
 
     @classmethod
-    def fetch(cls, uri):
-        return cls.get(uri)
+    def fetch(cls, href):
+        return cls.get(href)
 
 
 class Marketplace(Resource):
@@ -464,6 +464,9 @@ class Customer(Resource):
     type = 'customers'
 
     uri_gen = wac.URIGen('/customers', '{customer}')
+
+    def create_order(self, **kwargs):
+        return Order(href=self.orders.href, **kwargs).save()
 
 
 class Order(Resource):
