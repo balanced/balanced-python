@@ -1,5 +1,5 @@
 % if mode == 'definition':
-balanced.CardHold().query
+balanced.CardHold.query
 % else:
 import balanced
 

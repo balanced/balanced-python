@@ -1,5 +1,5 @@
 % if mode == 'definition':
-balanced.Callback().find()
+balanced.Callback.fetch()
 % else:
 import balanced
 

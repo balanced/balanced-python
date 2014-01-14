@@ -1,5 +1,5 @@
 % if mode == 'definition':
-balanced.Event().find()
+balanced.Event.fetch()
 % else:
 import balanced
 

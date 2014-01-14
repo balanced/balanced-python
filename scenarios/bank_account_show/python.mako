@@ -1,5 +1,5 @@
 % if mode == 'definition':
-balanced.BankAccount().find()
+balanced.BankAccount.fetch()
 % else:
 import balanced
 

@@ -1,1 +1,1 @@
-balanced.CardHold().find()
+balanced.CardHold.fetch()

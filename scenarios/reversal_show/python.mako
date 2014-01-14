@@ -1,5 +1,5 @@
 % if mode == 'definition':
-balanced.Reversal().find()
+balanced.Reversal.fetch()
 % else:
 import balanced
 

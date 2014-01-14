@@ -1,5 +1,5 @@
 % if mode == 'definition':
-balanced.Debit().find()
+balanced.Debit.fetch()
 % else:
 import balanced
 

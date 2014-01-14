@@ -1,5 +1,5 @@
 % if mode == 'definition':
-balanced.Refund().query
+balanced.Refund.query
 % else:
 import balanced
 

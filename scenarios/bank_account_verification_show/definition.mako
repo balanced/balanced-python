@@ -1,1 +1,1 @@
-balanced.BankAccountVerification().find()
+balanced.BankAccountVerification.fetch()

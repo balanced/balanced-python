@@ -1,5 +1,5 @@
 % if mode == 'definition':
-balanced.Debit().query
+balanced.Debit.query
 % else:
 import balanced
 

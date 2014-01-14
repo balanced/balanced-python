@@ -1,1 +1,1 @@
-balanced.Order().query
+balanced.Order.query

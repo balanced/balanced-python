@@ -1,1 +1,1 @@
-balanced.Callback().find()
+balanced.Callback.fetch()

@@ -1,5 +1,5 @@
 % if mode == 'definition':
-balanced.Customer().find()
+balanced.Customer.fetch()
 % else:
 import balanced
 

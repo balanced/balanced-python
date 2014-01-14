@@ -1,1 +1,1 @@
-balanced.Card().query
+balanced.Card.query

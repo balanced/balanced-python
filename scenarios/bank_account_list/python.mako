@@ -1,5 +1,5 @@
 % if mode == 'definition':
-balanced.BankAccount().query
+balanced.BankAccount.query
 % else:
 import balanced
 

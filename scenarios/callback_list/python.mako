@@ -1,5 +1,5 @@
 % if mode == 'definition':
-balanced.Callback().query
+balanced.Callback.query
 % else:
 import balanced
 

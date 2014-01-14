@@ -1,1 +1,1 @@
-balanced.Callback().query
+balanced.Callback.query

@@ -1,1 +1,1 @@
-balanced.Customer().find()
+balanced.Customer.fetch()

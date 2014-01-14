@@ -1,5 +1,5 @@
 % if mode == 'definition':
-balanced.Refund().find()
+balanced.Refund.fetch()
 % else:
 import balanced
 

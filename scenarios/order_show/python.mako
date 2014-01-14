@@ -1,5 +1,5 @@
 % if mode == 'definition':
-balanced.Order().find()
+balanced.Order.fetch()
 % else:
 import balanced
 

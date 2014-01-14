@@ -1,5 +1,5 @@
 % if mode == 'definition':
-balanced.Order().query
+balanced.Order.query
 % else:
 import balanced
 

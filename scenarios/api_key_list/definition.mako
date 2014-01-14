@@ -1,1 +1,1 @@
-balanced.APIKey().query
+balanced.APIKey.query

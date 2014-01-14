@@ -1,5 +1,5 @@
 % if mode == 'definition':
-balanced.APIKey().find()
+balanced.APIKey.fetch()
 % else:
 import balanced
 

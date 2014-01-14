@@ -1,5 +1,5 @@
 % if mode == 'definition':
-balanced.Credit().query
+balanced.Credit.query
 % else:
 import balanced
 

@@ -1,5 +1,5 @@
 % if mode == 'definition':
-balanced.BankAccountVerification().find()
+balanced.BankAccountVerification.fetch()
 % else:
 import balanced
 

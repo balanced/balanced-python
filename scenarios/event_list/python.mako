@@ -1,5 +1,5 @@
 % if mode == 'definition':
-balanced.Event().query
+balanced.Event.query
 % else:
 import balanced
 

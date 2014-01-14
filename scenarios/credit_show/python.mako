@@ -1,5 +1,5 @@
 % if mode == 'definition':
-balanced.Credit().find()
+balanced.Credit.fetch()
 % else:
 import balanced
 

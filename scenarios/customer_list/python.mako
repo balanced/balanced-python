@@ -1,5 +1,5 @@
 % if mode == 'definition':
-balanced.Customer().query
+balanced.Customer.query
 % else:
 import balanced
 

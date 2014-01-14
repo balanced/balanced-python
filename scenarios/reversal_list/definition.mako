@@ -1,1 +1,1 @@
-balanced.Reversal().query()
+balanced.Reversal.query()

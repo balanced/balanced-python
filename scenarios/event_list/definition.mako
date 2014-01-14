@@ -1,1 +1,1 @@
-balanced.Event().query
+balanced.Event.query
