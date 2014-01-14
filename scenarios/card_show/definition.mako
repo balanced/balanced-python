@@ -1,1 +1,1 @@
-balanced.Card().find()
+balanced.Card().get()
