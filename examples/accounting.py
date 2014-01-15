@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 '''
-Generate a csv report of month end transaction balances
+Generate a csv report of month end transaction balances;
+please ensure your RAM is commensurate with your transaction volume.
 
 python examples/accounting.py --api_key [Marketplace API Key] > Report.csv
 python examples/accounting.py --api_key [Marketplace API Key] --use_cache > gnuplot ...
