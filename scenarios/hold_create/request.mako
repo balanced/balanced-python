@@ -4,3 +4,4 @@
 hold = balanced.Hold(
   <% main.payload_expand(request['payload']) %>
 )
+hold.save()

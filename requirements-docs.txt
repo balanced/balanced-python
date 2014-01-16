@@ -1,2 +1,4 @@
 Sphinx
 boto
+glob2
+mako>=0.7
