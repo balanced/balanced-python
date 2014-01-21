@@ -4,7 +4,7 @@
 order = balanced.Order.find('${request['uri']}')
 order.description = '${request['payload']['description']}'
 order.meta = {
-  'anykey' => 'valuegoeshere',
-  'product.id' => '1234567890'
+  'anykey': 'valuegoeshere',
+  'product.id': '1234567890'
 }
 order.save()
