@@ -6,5 +6,13 @@ import balanced
 balanced.configure('ak-test-2IuKttETJEorSZLxA9tVbWBIWnRa1kC9P')
 
 debit = balanced.Debit.find('/debits/WD4d9CgVjg8lX8g8l1638Bor')
-refund = debit.refund()
+refund = debit.refund(
+    amount=3000,
+    description="Refund for Order #1111",
+    meta={
+        "merchant.feedback": "positive",
+        "user.refund_reason": "not happy with product",
+        "fulfillment.item.condition": "OK",
+    }
+)
 % endif
