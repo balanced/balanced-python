@@ -1,6 +1,6 @@
 % if mode == 'definition':
-balanced.Card.get()
-% else:
+balanced.Card.fetch()
+% elif mode == 'request':
 import balanced
 
 balanced.configure('ak-test-2IuKttETJEorSZLxA9tVbWBIWnRa1kC9P')

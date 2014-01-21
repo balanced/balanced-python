@@ -1,6 +1,6 @@
 % if mode == 'definition':
 balanced.Card().save()
-% else:
+% elif mode == 'request':
 import balanced
 
 balanced.configure('ak-test-2IuKttETJEorSZLxA9tVbWBIWnRa1kC9P')

@@ -1,6 +1,6 @@
 % if mode == 'definition':
 balanced.RESOURCE
 
-% else:
+% elif mode == 'request':
 
 % endif
