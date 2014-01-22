@@ -35,7 +35,7 @@ def main():
 
     print 'PROTIP: for TEST bank accounts the valid amount is always 1 and 1'
     try:
-        verification.confirm(1, 2)
+        verification.confirm(amount_1=1, amount_2=1)
     except balanced.exc.BankAccountVerificationFailure as ex:
         print 'Authentication error , %s' % ex.message
 
