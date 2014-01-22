@@ -1,1 +1,1 @@
-balanced.BankAccountVerification().save()
+balanced.BankAccountVerification().confirm()

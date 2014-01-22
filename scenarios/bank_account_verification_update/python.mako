@@ -1,5 +1,5 @@
 % if mode == 'definition':
-balanced.BankAccountVerification().save()
+balanced.BankAccountVerification().confirm()
 % else:
 import balanced
 
