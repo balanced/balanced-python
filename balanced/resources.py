@@ -363,7 +363,7 @@ class FundingInstrument(Resource):
 
     type = 'funding_instruments'
 
-    def associate_to(self, customer):
+    def associate_to_customer(self, customer):
         try:
             self.links
         except AttributeError:

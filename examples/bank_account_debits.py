@@ -22,7 +22,7 @@ def main():
         name='Jack Q Merchant',
     ).save()
     customer = balanced.Customer().save()
-    bank_account.associate_to(customer)
+    bank_account.associate_to_customer(customer)
 
     print 'you can\'t debit until you authenticate'
     try:
