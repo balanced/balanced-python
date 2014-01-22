@@ -14,7 +14,7 @@ bank_account = balanced.BankAccount(
     routing_number="321174851",
     name="Jack Q Merchant",
 ).save()
-bank_account.associate_to(merchant)
+bank_account.associate_to_customer(merchant)
 
 order = merchant.create_order(description='foo order')
 
@@ -49,7 +49,7 @@ another_bank_account = balanced.BankAccount(
 ).save()
 
 another_merchant = balanced.Customer().save()
-another_bank_account.associate_to(another_merchant)
+another_bank_account.associate_to_customer(another_merchant)
 
 # cannot credit to a bank account which is not assigned to either the
 # marketplace or the merchant associated with the order.

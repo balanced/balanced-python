@@ -264,13 +264,13 @@ class BasicUseCases(unittest.TestCase):
     def test_delete_bank_account(self):
         customer = balanced.Customer().save()
         bank_account = balanced.BankAccount(**BANK_ACCOUNT_W_TYPE).save()
-        bank_account.associate_to(customer)
+        bank_account.associate_to_customer(customer)
         bank_account.unstore()
 
     def test_delete_card(self):
         customer = balanced.Customer().save()
         card = balanced.Card(**CARD).save()
-        card.associate_to(customer)
+        card.associate_to_customer(customer)
         card.unstore()
 
     def test_fetch_resource(self):
@@ -285,7 +285,7 @@ class BasicUseCases(unittest.TestCase):
     def test_order(self):
         merchant = balanced.Customer().save()
         bank_account = balanced.BankAccount(**BANK_ACCOUNT).save()
-        bank_account.associate_to(merchant)
+        bank_account.associate_to_customer(merchant)
 
         order = merchant.create_order(description='foo order')
 

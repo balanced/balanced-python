@@ -1,9 +1,10 @@
 % if mode == 'definition':
 balanced.APIKey.fetch()
-% else:
+
+% elif mode == 'request':
 import balanced
 
 balanced.configure('ak-test-2IuKttETJEorSZLxA9tVbWBIWnRa1kC9P')
 
-key = balanced.APIKey.find('/api_keys/AK2MIAdNHBolYbbacv2OSosg')
+key = balanced.APIKey.fetch('/api_keys/AK2MIAdNHBolYbbacv2OSosg')
 % endif

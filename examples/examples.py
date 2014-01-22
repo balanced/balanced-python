@@ -104,7 +104,7 @@ card = balanced.Card(
     expiration_year="2015",
 ).save()
 
-card.associate_to(buyer)
+card.associate_to_customer(buyer)
 
 assert buyer.cards.count() == 1
 

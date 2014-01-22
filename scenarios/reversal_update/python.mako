@@ -1,11 +1,11 @@
 % if mode == 'definition':
 balanced.Reversal().save()
-% else:
+% elif mode == 'request':
 import balanced
 
 balanced.configure('ak-test-2IuKttETJEorSZLxA9tVbWBIWnRa1kC9P')
 
-reversal = balanced.Reversal.find('/reversals/RV4mvdReJFZTySZXe8IyQ8Bi')
+reversal = balanced.Reversal.fetch('/reversals/RV4mvdReJFZTySZXe8IyQ8Bi')
 reversal.description = 'update this description'
 reversal.meta = {
   'user.refund.count': '3',

@@ -1,7 +1,7 @@
 % if mode == 'definition':
 balanced.APIKey
 
-% else:
+% elif mode == 'request':
 import balanced
 
 balanced.configure('ak-test-2IuKttETJEorSZLxA9tVbWBIWnRa1kC9P')

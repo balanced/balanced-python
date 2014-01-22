@@ -1,5 +1,5 @@
 % if mode == 'definition':
 
-% else:
+% elif mode == 'request':
 
 % endif

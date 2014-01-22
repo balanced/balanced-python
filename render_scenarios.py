@@ -29,10 +29,10 @@ def render_mako():
     for path in glob2.glob('./scenarios/**/request.mako'):
         dir = os.path.dirname(path)
         with open(os.path.join(dir, 'python.mako'), 'w+b') as wfile:
-            top = open(os.path.join(dir, 'definition.mako'),'r').read()
-            bottom = open(os.path.join(dir, 'executable.py'),'r').read()
-            body = "% if mode == 'definition':\n{}".format(top) + "\n% " \
-                                                                    "else:\n" + bottom + "\n% endif"
+            definition = open(os.path.join(dir, 'definition.mako'),'r').read()
+            request = open(os.path.join(dir, 'executable.py'),'r').read()
+            body = "% if mode == 'definition':\n{}".format(definition) + "\n" \
+                                                                    "% elif mode == 'request':\n" + request + "\n% endif"
             wfile.write(body)
 
 def issue_no_mako_warnings():
