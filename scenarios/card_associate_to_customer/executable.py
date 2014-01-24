@@ -1,6 +1,6 @@
 import balanced
 
-balanced.configure('ak-test-2IuKttETJEorSZLxA9tVbWBIWnRa1kC9P')
+balanced.configure('ak-test-nngzAf2ARJV0AA4zzxdyVYJWRa0WLa5I')
 
-card = balanced.Card.fetch('/cards/CC3q6xpE6zCz8OZTHcXYvHtS')
-card.associate_to_customer('/customers/CU4xIyjtjtamnhjJ0E6iW3Kq')
+card = balanced.Card.fetch('/cards/CC3VAbj4Ol8xojVU6MjI0G1F')
+card.associate_to_customer('/customers/CU3Ttx347VFA9lYT8dBOkwcu')

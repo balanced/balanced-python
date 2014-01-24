@@ -4,6 +4,6 @@ balanced.BankAccountVerification.fetch()
 % elif mode == 'request':
 import balanced
 
-balanced.configure('ak-test-2IuKttETJEorSZLxA9tVbWBIWnRa1kC9P')
-verification = balanced.BankAccountVerification.fetch('/verifications/BZ2Sy2Z4Bp2mARnCLztiu2VG')
+balanced.configure('ak-test-nngzAf2ARJV0AA4zzxdyVYJWRa0WLa5I')
+verification = balanced.BankAccountVerification.fetch('/verifications/BZ30hb4BvSmoUMZiDdIMyz8K')
 % endif

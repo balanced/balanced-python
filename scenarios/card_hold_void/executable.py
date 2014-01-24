@@ -1,6 +1,6 @@
 import balanced
 
-balanced.configure('ak-test-2IuKttETJEorSZLxA9tVbWBIWnRa1kC9P')
+balanced.configure('ak-test-nngzAf2ARJV0AA4zzxdyVYJWRa0WLa5I')
 
-card_hold = balanced.CardHold.fetch('/card_holds/HL3mplcWSeG79TTxpFyHlxTh')
+card_hold = balanced.CardHold.fetch('/card_holds/HL3qaOBRFhWgKwSPz7bCetSn')
 card_hold.cancel()

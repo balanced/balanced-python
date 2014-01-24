@@ -1,6 +1,6 @@
 import balanced
 
-balanced.configure('ak-test-2IuKttETJEorSZLxA9tVbWBIWnRa1kC9P')
+balanced.configure('ak-test-nngzAf2ARJV0AA4zzxdyVYJWRa0WLa5I')
 
 bank_account = balanced.BankAccount(
   routing_number='121000358',

@@ -3,7 +3,7 @@ balanced.Customer().save()
 % elif mode == 'request':
 import balanced
 
-balanced.configure('ak-test-2IuKttETJEorSZLxA9tVbWBIWnRa1kC9P')
+balanced.configure('ak-test-nngzAf2ARJV0AA4zzxdyVYJWRa0WLa5I')
 
 customer = balanced.Customer(
     dob_year=1963,
