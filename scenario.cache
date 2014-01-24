@@ -60,7 +60,7 @@
     }, 
     "bank_account_debit": {
         "request": {
-            "bank_account_href": "/bank_accounts/BA2RfTVAgg4CdTJrVc7RPw7s/debits", 
+            "bank_account_href": "/bank_accounts/BA2RfTVAgg4CdTJrVc7RPw7s",
             "payload": {
                 "amount": 5000, 
                 "appears_on_statement_as": "Statement text", 
