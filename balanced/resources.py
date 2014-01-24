@@ -482,6 +482,15 @@ class Order(Resource):
 
     uri_gen = wac.URIGen('/orders', '{order}')
 
+    def credit_to(self, destination, amount, **kwargs):
+        return destination.credit(order=self.href,
+                                  amount=amount,
+                                  **kwargs)
+
+    def debit_from(self, source, amount, **kwargs):
+        return source.debit(order=self.href,
+                            amount=amount,
+                            **kwargs)
 
 class Callback(Resource):
     """

@@ -335,3 +335,17 @@ class BasicUseCases(unittest.TestCase):
         # not associated with the order
         with self.assertRaises(balanced.exc.BalancedError):
             another_bank_account.credit(amount=50, order=order)
+
+    def test_order_helper_methods(self):
+        merchant = balanced.Customer().save()
+        order = merchant.create_order()
+        card = balanced.Card(**INTERNATIONAL_CARD).save()
+
+        debit = order.debit_from(source=card, amount=1234)
+        bank_account = balanced.BankAccount(
+            account_number='1234567890',
+            routing_number='321174851',
+            name='Someone',
+        ).save()
+        bank_account.associate_to_customer(merchant)
+        order.credit_to(destination=bank_account, amount=1234)
