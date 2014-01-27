@@ -1,6 +1,6 @@
 import balanced
 
-balanced.configure('ak-test-14W5azoiV99O1XiPwZ3faH10MaUdZ1kCA')
+balanced.configure('ak-test-2KZfoLyijij3Y6OyhDAvFRF9tXzelBLpD')
 
-customer = balanced.Customer.find('/v1/customers/CUyABeNYx8vHAaP4KRsd1j4/credits')
+customer = balanced.Customer.find('/v1/customers/CU5f64LhFMO8cf7N1sQSRVOo')
 customer.credit(amount=100)
