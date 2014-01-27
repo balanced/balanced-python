@@ -4,7 +4,7 @@ balanced.Refund.fetch()
 % elif mode == 'request':
 import balanced
 
-balanced.configure('ak-test-2IuKttETJEorSZLxA9tVbWBIWnRa1kC9P')
+balanced.configure('ak-test-nngzAf2ARJV0AA4zzxdyVYJWRa0WLa5I')
 
-refund = balanced.Refund.fetch('/refunds/RF4eXqVaytz4vN4NwOAfFHXO')
+refund = balanced.Refund.fetch('/refunds/RF4jM7mlJNnsZ3KWSQiQxFSw')
 % endif
