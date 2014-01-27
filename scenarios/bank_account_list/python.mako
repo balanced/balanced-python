@@ -4,7 +4,7 @@ balanced.BankAccount.query
 % elif mode == 'request':
 import balanced
 
-balanced.configure('ak-test-nngzAf2ARJV0AA4zzxdyVYJWRa0WLa5I')
+balanced.configure('ak-test-1kvvievk0Qqw5wQPsrlM9g7wQwNe62cyc')
 
 bank_accounts = balanced.BankAccount.query
 % endif

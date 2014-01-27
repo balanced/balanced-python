@@ -3,9 +3,9 @@ balanced.Refund().save()
 % elif mode == 'request':
 import balanced
 
-balanced.configure('ak-test-nngzAf2ARJV0AA4zzxdyVYJWRa0WLa5I')
+balanced.configure('ak-test-1kvvievk0Qqw5wQPsrlM9g7wQwNe62cyc')
 
-refund = balanced.Refund.fetch('/refunds/RF4jM7mlJNnsZ3KWSQiQxFSw')
+refund = balanced.Refund.fetch('/refunds/RF3RklPuFgsgI50UuYtr4g6I')
 refund.description = 'update this description'
 refund.meta = {
   'user.refund.count': '3',

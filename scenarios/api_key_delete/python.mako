@@ -3,8 +3,8 @@ balanced.APIKey().delete()
 % elif mode == 'request':
 import balanced
 
-balanced.configure('ak-test-nngzAf2ARJV0AA4zzxdyVYJWRa0WLa5I')
+balanced.configure('ak-test-1kvvievk0Qqw5wQPsrlM9g7wQwNe62cyc')
 
-key = balanced.APIKey.fetch('/api_keys/AK2TWX3j6gK68Qk8w4ZEqfmM')
+key = balanced.APIKey.fetch('/api_keys/AK1vqjn1eEHXP0JYXrBrjH5c')
 key.delete()
 % endif

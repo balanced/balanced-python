@@ -3,8 +3,8 @@ balanced.CardHold().cancel()
 % elif mode == 'request':
 import balanced
 
-balanced.configure('ak-test-nngzAf2ARJV0AA4zzxdyVYJWRa0WLa5I')
+balanced.configure('ak-test-1kvvievk0Qqw5wQPsrlM9g7wQwNe62cyc')
 
-card_hold = balanced.CardHold.fetch('/card_holds/HL3qaOBRFhWgKwSPz7bCetSn')
+card_hold = balanced.CardHold.fetch('/card_holds/HL2ncCO5Bir2S0PCdsDHV3cG')
 card_hold.cancel()
 % endif

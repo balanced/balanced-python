@@ -3,9 +3,9 @@ balanced.BankAccount().credit()
 % elif mode == 'request':
 import balanced
 
-balanced.configure('ak-test-nngzAf2ARJV0AA4zzxdyVYJWRa0WLa5I')
+balanced.configure('ak-test-1kvvievk0Qqw5wQPsrlM9g7wQwNe62cyc')
 
-bank_account = balanced.BankAccount.fetch('/bank_accounts/BA3YBUkHZNRVugUmhBGE3A9G')
+bank_account = balanced.BankAccount.fetch('/bank_accounts/BA3qNbYRqFM0Q7MXn3IcjGl0')
 bank_account.credit(
   amount=5000
 )

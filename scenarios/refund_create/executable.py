@@ -1,8 +1,8 @@
 import balanced
 
-balanced.configure('ak-test-nngzAf2ARJV0AA4zzxdyVYJWRa0WLa5I')
+balanced.configure('ak-test-1kvvievk0Qqw5wQPsrlM9g7wQwNe62cyc')
 
-debit = balanced.Debit.fetch('/debits/WD4fC2Wmv7z7LxWLQptwEv2n')
+debit = balanced.Debit.fetch('/debits/WD3MKNxNTKBGgA7mX50yogiu')
 refund = debit.refund(
     amount=3000,
     description="Refund for Order #1111",

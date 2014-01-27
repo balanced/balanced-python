@@ -3,8 +3,8 @@ balanced.Card().associate_to_customer()
 % elif mode == 'request':
 import balanced
 
-balanced.configure('ak-test-nngzAf2ARJV0AA4zzxdyVYJWRa0WLa5I')
+balanced.configure('ak-test-1kvvievk0Qqw5wQPsrlM9g7wQwNe62cyc')
 
-card = balanced.Card.fetch('/cards/CC3VAbj4Ol8xojVU6MjI0G1F')
-card.associate_to_customer('/customers/CU3Ttx347VFA9lYT8dBOkwcu')
+card = balanced.Card.fetch('/cards/CC3kqm84fxh50avenrUsSKbu')
+card.associate_to_customer('/customers/CU3eeasZ9yQ86uzzIYZkrPGg')
 % endif

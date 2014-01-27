@@ -4,7 +4,7 @@ balanced.Credit.fetch()
 % elif mode == 'request':
 import balanced
 
-balanced.configure('ak-test-nngzAf2ARJV0AA4zzxdyVYJWRa0WLa5I')
+balanced.configure('ak-test-1kvvievk0Qqw5wQPsrlM9g7wQwNe62cyc')
 
-credit = balanced.Credit.fetch('/credits/CR3H2YtoAbpQCQ4Ey3RTLxxc')
+credit = balanced.Credit.fetch('/credits/CR2UtQgq6L3FPd1YoOc8eyOC')
 % endif

@@ -4,7 +4,7 @@ balanced.Order.fetch()
 % elif mode == 'request':
 import balanced
 
-balanced.configure('ak-test-nngzAf2ARJV0AA4zzxdyVYJWRa0WLa5I')
+balanced.configure('ak-test-1kvvievk0Qqw5wQPsrlM9g7wQwNe62cyc')
 
-order = balanced.Order.fetch('/orders/OR4bkzheH5eeQpl0J9Dmrx27')
+order = balanced.Order.fetch('/orders/OR3FOihZa7lMHdAP5p8BJZVY')
 % endif

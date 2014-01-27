@@ -3,9 +3,9 @@ balanced.Card().save()
 % elif mode == 'request':
 import balanced
 
-balanced.configure('ak-test-nngzAf2ARJV0AA4zzxdyVYJWRa0WLa5I')
+balanced.configure('ak-test-1kvvievk0Qqw5wQPsrlM9g7wQwNe62cyc')
 
-card = balanced.Card.fetch('/cards/CC3txpMUnPuUSV6vGdaibuL4')
+card = balanced.Card.fetch('/cards/CC2uc8iPDjgyxOXHVtnZloyI')
 card.meta = {
   'twitter.id': '1234987650',
   'facebook.user_id': '0192837465',
