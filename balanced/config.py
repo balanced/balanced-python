@@ -20,17 +20,20 @@ def configure(
         user_agent='balanced-python/' + __version__,
         **kwargs
 ):
-    # http
-    kwargs['client_agent'] = 'knox-client/' + __version__
-    if 'headers' not in kwargs:
-        kwargs['headers'] = {
-            'accept': 'application/vnd.api+json;revision=' + api_revision
-        }
-    kwargs['headers']['Accept-Type'] = 'application/json'
+    kwargs.setdefault('headers', {})
+
+    for key, value in (
+        ('content-type', 'application/vnd.api+json;revision=' + api_revision),
+        ('accept', 'application/json;revision=' + api_revision)
+    ):
+        kwargs['headers'].setdefault(key, value)
+
     if 'error_cls' not in kwargs:
         kwargs['error_cls'] = exc.convert_error
+
     if user:
         kwargs['auth'] = (user, None)
+
     # apply
     Client.config = Config(root_url, user_agent=user_agent, **kwargs)
 
