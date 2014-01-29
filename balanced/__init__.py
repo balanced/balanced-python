@@ -1,6 +1,6 @@
 from __future__ import unicode_literals
 
-__version__ = '1.1.0dev'
+__version__ = '1.0dev1'
 
 from balanced.config import configure
 from balanced import resources
