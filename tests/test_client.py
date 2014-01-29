@@ -14,7 +14,7 @@ class TestClient(utils.TestCase):
         expected_headers = {
             'content-type': 'application/vnd.api+json;revision=1.1',
             'accept': 'application/json;revision=1.1',
-            'User-Agent': u'balanced-python/1.0dev1'
+            'User-Agent': u'balanced-python/1.0beta1'
         }
         self.assertDictContainsSubset(
             expected_headers, balanced.config.client.config.headers
