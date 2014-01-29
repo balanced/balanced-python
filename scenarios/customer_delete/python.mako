@@ -1,10 +1,10 @@
 % if mode == 'definition':
-balanced.Customer(...).unstore()
-% else:
+balanced.Customer().unstore()
+% elif mode == 'request':
 import balanced
 
-balanced.configure('ak-test-14W5azoiV99O1XiPwZ3faH10MaUdZ1kCA')
+balanced.configure('ak-test-1kvvievk0Qqw5wQPsrlM9g7wQwNe62cyc')
 
-customer = balanced.Customer.find('/v1/customers/CU29FAMV807phGkX4wGIuymW')
+customer = balanced.Customer.fetch('/customers/CU3eeasZ9yQ86uzzIYZkrPGg')
 customer.unstore()
 % endif

@@ -1,11 +1,11 @@
 % if mode == 'definition':
-balanced.Refund.save()
-% else:
+balanced.Refund().save()
+% elif mode == 'request':
 import balanced
 
-balanced.configure('ak-test-14W5azoiV99O1XiPwZ3faH10MaUdZ1kCA')
+balanced.configure('ak-test-1kvvievk0Qqw5wQPsrlM9g7wQwNe62cyc')
 
-refund = balanced.Refund.find('/v1/customers/CU35rlJBXqlvD9LC26PWu0cy/refunds/RF3fVPCag0ppfvvWLSc2oQ4O')
+refund = balanced.Refund.fetch('/refunds/RF3RklPuFgsgI50UuYtr4g6I')
 refund.description = 'update this description'
 refund.meta = {
   'user.refund.count': '3',

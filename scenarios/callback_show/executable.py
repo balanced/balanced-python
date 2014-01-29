@@ -1,5 +1,5 @@
 import balanced
 
-balanced.configure('ak-test-14W5azoiV99O1XiPwZ3faH10MaUdZ1kCA')
+balanced.configure('ak-test-1kvvievk0Qqw5wQPsrlM9g7wQwNe62cyc')
 
-callback = balanced.Callback.find('/v1/callbacks/CB18dXR1zGLZeawfMBIOPVYs')
+callback = balanced.Callback.fetch('/callbacks/CB224374R2NSyoYBpDV4r7C2')

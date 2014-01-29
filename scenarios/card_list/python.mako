@@ -1,9 +1,10 @@
 % if mode == 'definition':
-balanced.Card.query()
-% else:
+balanced.Card.query
+
+% elif mode == 'request':
 import balanced
 
-balanced.configure('ak-test-14W5azoiV99O1XiPwZ3faH10MaUdZ1kCA')
+balanced.configure('ak-test-1kvvievk0Qqw5wQPsrlM9g7wQwNe62cyc')
 
-cards = balanced.Card.query.all();
+cards = balanced.Card.query
 % endif

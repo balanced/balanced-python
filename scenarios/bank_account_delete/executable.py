@@ -1,6 +1,6 @@
 import balanced
 
-balanced.configure('ak-test-14W5azoiV99O1XiPwZ3faH10MaUdZ1kCA')
+balanced.configure('ak-test-1kvvievk0Qqw5wQPsrlM9g7wQwNe62cyc')
 
-bank_account = balanced.BankAccount.find('/v1/bank_accounts/BARHVIjybOf6v3uQsYOnAYE')
+bank_account = balanced.BankAccount.fetch('/bank_accounts/BA1QFf0LmIxr8p41msqX46Oy')
 bank_account.delete()

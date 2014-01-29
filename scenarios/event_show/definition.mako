@@ -1,1 +1,1 @@
-balanced.Event.find
+balanced.Event.fetch()

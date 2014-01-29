@@ -1,9 +1,10 @@
 % if mode == 'definition':
-balanced.Debit.query()
-% else:
+balanced.Debit.query
+
+% elif mode == 'request':
 import balanced
 
-balanced.configure('ak-test-14W5azoiV99O1XiPwZ3faH10MaUdZ1kCA')
+balanced.configure('ak-test-1kvvievk0Qqw5wQPsrlM9g7wQwNe62cyc')
 
-debits = balanced.Debit.query.all();
+debits = balanced.Debit.query
 % endif

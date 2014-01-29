@@ -1,9 +1,9 @@
 % if mode == 'definition':
-balanced.BankAccount.save()
-% else:
+balanced.BankAccount().save()
+% elif mode == 'request':
 import balanced
 
-balanced.configure('ak-test-14W5azoiV99O1XiPwZ3faH10MaUdZ1kCA')
+balanced.configure('ak-test-1kvvievk0Qqw5wQPsrlM9g7wQwNe62cyc')
 
 bank_account = balanced.BankAccount(
   routing_number='121000358',

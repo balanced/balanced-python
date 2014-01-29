@@ -1,1 +1,1 @@
-balanced.Debit.query()
+balanced.Debit.query

@@ -1,9 +1,10 @@
 % if mode == 'definition':
-balanced.Callback.query.all
-% else:
+balanced.Callback.query
+
+% elif mode == 'request':
 import balanced
 
-balanced.configure('ak-test-14W5azoiV99O1XiPwZ3faH10MaUdZ1kCA')
+balanced.configure('ak-test-1kvvievk0Qqw5wQPsrlM9g7wQwNe62cyc')
 
-callback = balanced.Callback.query.all()
+callbacks = balanced.Callback.query
 % endif

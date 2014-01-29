@@ -1,8 +1,9 @@
 % if mode == 'definition':
-balanced.Verification.find
-% else:
+balanced.BankAccountVerification.fetch()
+
+% elif mode == 'request':
 import balanced
 
-balanced.configure('ak-test-14W5azoiV99O1XiPwZ3faH10MaUdZ1kCA')
-verification = balanced.BankAccountVerification.find('/v1/bank_accounts/BAH8CyjUCJzGtnlG7jvGDHy/verifications/BZJPjdW217PPcBBBy1g3RBk')
+balanced.configure('ak-test-1kvvievk0Qqw5wQPsrlM9g7wQwNe62cyc')
+verification = balanced.BankAccountVerification.fetch('/verifications/BZ1FF2MHFH9upRu7C0QUwnby')
 % endif

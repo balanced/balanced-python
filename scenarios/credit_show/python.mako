@@ -1,9 +1,10 @@
 % if mode == 'definition':
-balanced.Credit.find()
-% else:
+balanced.Credit.fetch()
+
+% elif mode == 'request':
 import balanced
 
-balanced.configure('ak-test-14W5azoiV99O1XiPwZ3faH10MaUdZ1kCA')
+balanced.configure('ak-test-1kvvievk0Qqw5wQPsrlM9g7wQwNe62cyc')
 
-credit = balanced.Credit.find('/v1/marketplaces/TEST-MP52IlCmywk6hGbgS75QSlN/credits/CR1xunmvDnFBo3fynM1KnuUm')
+credit = balanced.Credit.fetch('/credits/CR2UtQgq6L3FPd1YoOc8eyOC')
 % endif

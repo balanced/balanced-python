@@ -34,9 +34,10 @@
 import balanced
 
 %if api_location:
-balanced.config.root_uri = ${api_location}'
-%endif
+balanced.configure('${api_key}', root_url='${api_location}')
+%else:
 balanced.configure('${api_key}')
+%endif
 </%def>
 
 
@@ -60,4 +61,3 @@ balanced.configure('${api_key}')
   %>
   ${reindent(formatted_payload, 2)}
 </%def>
-

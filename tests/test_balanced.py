@@ -1,7 +1,9 @@
-import unittest2 as unittest
+from __future__ import unicode_literals
+
+from tests.utils import TestCase
 
 
-class TestBalancedImportStar(unittest.TestCase):
+class TestBalancedImportStar(TestCase):
 
     def test_import_star(self):
         # not sure who uses import * any more, but we should
@@ -11,5 +13,5 @@ class TestBalancedImportStar(unittest.TestCase):
             # and doing a "from balanced import *" generates an
             # unsupressable SyntaxWarning.
             exec "from balanced import *"  # pylint: disable-msg=W0122
-        except Exception, exc:
+        except Exception as exc:
             raise ImportError("%s" % exc)

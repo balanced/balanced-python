@@ -1,9 +1,10 @@
 % if mode == 'definition':
-balanced.BankAccount.query()
-% else:
+balanced.BankAccount.query
+
+% elif mode == 'request':
 import balanced
 
-balanced.configure('ak-test-14W5azoiV99O1XiPwZ3faH10MaUdZ1kCA')
+balanced.configure('ak-test-1kvvievk0Qqw5wQPsrlM9g7wQwNe62cyc')
 
-bank_accounts = balanced.BankAccount.query.all()
+bank_accounts = balanced.BankAccount.query
 % endif

@@ -1,9 +1,9 @@
 % if mode == 'definition':
-balanced.Callback
-% else:
+balanced.Callback()
+% elif mode == 'request':
 import balanced
 
-balanced.configure('ak-test-14W5azoiV99O1XiPwZ3faH10MaUdZ1kCA')
+balanced.configure('ak-test-1kvvievk0Qqw5wQPsrlM9g7wQwNe62cyc')
 
 callback = balanced.Callback(
   url='http://www.example.com/callback'

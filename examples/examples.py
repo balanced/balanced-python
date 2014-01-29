@@ -1,17 +1,7 @@
 from __future__ import unicode_literals
-import os
 
 import balanced
 
-
-host = os.environ.get('BALANCED_HOST')
-options = {}
-if host:
-    options['scheme'] = 'http'
-    options['host'] = host
-    options['port'] = 5000
-
-balanced.configure(options)
 
 print "create our new api key"
 api_key = balanced.APIKey().save()
@@ -22,10 +12,6 @@ balanced.configure(api_key.secret)
 
 print "create our marketplace"
 marketplace = balanced.Marketplace().save()
-
-if not balanced.Merchant.me:
-    raise Exception("Merchant.me should not be nil")
-print "what's my merchant?, easy: Merchant.me: ", balanced.Merchant.me
 
 # what's my marketplace?
 if not balanced.Marketplace.my_marketplace:
@@ -44,24 +30,24 @@ if marketplace.name != 'TestFooey':
 
 print "cool! let's create a new card."
 card = balanced.Card(
-    card_number="5105105105105100",
+    number="5105105105105100",
     expiration_month="12",
     expiration_year="2015",
 ).save()
-print "Our card uri: " + card.uri
+
+print "Our card href: " + card.href
 
 print "create our **buyer** account"
-buyer = marketplace.create_buyer("buyer@example.org", card.uri)
-print "our buyer account: " + buyer.uri
+buyer = balanced.Customer(email="buyer@example.org", source=card).save()
+print "our buyer account: " + buyer.href
 
 print "hold some amount of funds on the buyer, lets say 15$"
-the_hold = buyer.hold(1500)
+the_hold = card.hold(1500)
 
 print "ok, no more holds! lets just capture it (for the full amount)"
 debit = the_hold.capture()
 
 print "hmm, how much money do i have in escrow? should equal the debit amount"
-balanced.bust_cache()
 marketplace = balanced.Marketplace.my_marketplace
 if marketplace.in_escrow != 1500:
     raise Exception("1500 is not in escrow! this is wrong")
@@ -75,59 +61,51 @@ print ("ok, we have a merchant that's signing up, let's create an account for "
 
 bank_account = balanced.BankAccount(
     account_number="1234567890",
-    bank_code="321174851",
+    routing_number="321174851",
     name="Jack Q Merchant",
 ).save()
 
-merchant = marketplace.create_merchant(
-    "merchant@example.org",
-        {
-        'type': "person",
-        'name': "Billy Jones",
+merchant = balanced.Customer(
+    email_address="merchant@example.org",
+    name="Billy Jones",
+    address={
         'street_address': "801 High St.",
         'postal_code': "94301",
         'country': "USA",
-        'dob': "1842-01",
-        'phone_number': "+16505551234",
-        },
-    bank_account.uri,
-    "Jack Q Merchant",
-    )
+    },
+    dob="1842-01",
+    phone_number="+16505551234",
+    destination=bank_account,
+).save()
 
 print "oh our buyer is interested in buying something for 130.00$"
-another_debit = buyer.debit(13000, "MARKETPLACE.COM")
+another_debit = card.debit(13000, appears_on_statement_as="MARKETPLACE.COM")
 
 print "lets credit our merchant 110.00$"
-credit = merchant.credit(11000, "Buyer purchased something on MARKETPLACE.COM")
+credit = bank_account.credit(
+    11000, description="Buyer purchased something on MARKETPLACE.COM")
 
 print "lets assume the marketplace charges 15%, so it earned $20"
-mp_credit = marketplace.owner_account.credit(2000,
-                                             "Our commission from MARKETPLACE"
-                                             ".COM")
+mp_credit = marketplace.owner_customer.bank_accounts.first().credit(
+    2000, description="Our commission from MARKETPLACE.COM")
 
 print "ok lets invalid a card"
-card.is_valid = False
-card.save()
+card.delete()
 
-if hasattr(card, 'is_valid') and card.is_valid:
-    raise Exception("This card is INCORRECTLY VALID")
+assert buyer.cards.count() == 0
 
 print "invalidating a bank account"
 bank_account.delete()
 
-# a little filtering
-merchants = balanced.Account.query.filter(roles='merchant')
-buyers = balanced.Account.query.filter(roles='buyer')
-print (
-    'we have {0} accounts, {1} with the role "buyer", '
-    'and {2} with the role "merchant"'.format(
-        balanced.Account.query.count(),
-        buyers.count(),
-        merchants.count(),
-    )
-)
+print "associate a card with an exiting customer"
+card = balanced.Card(
+    number="5105105105105100",
+    expiration_month="12",
+    expiration_year="2015",
+).save()
 
-print 'here are our merchants: {0}'.format([a.name for a in merchants])
-print 'here are our buyers: {0}'.format([a.name for a in buyers])
+card.associate_to_customer(buyer)
+
+assert buyer.cards.count() == 1
 
 print "and there you have it :)"

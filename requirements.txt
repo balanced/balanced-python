@@ -1,6 +1,3 @@
-certifi==0.0.8
-chardet==1.0.1
-simplejson==2.3.2
+wac==0.22
 iso8601==0.1.4
-requests==1.2.3
-mock>=0.8,<0.9
+uritemplate==0.6
