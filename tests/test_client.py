@@ -11,7 +11,6 @@ class TestClient(utils.TestCase):
         super(TestClient, self).setUp()
 
     def test_configure(self):
-        balanced.configure('XXX')
         expected_headers = {
             'content-type': 'application/vnd.api+json;revision=1.1',
             'accept': 'application/json;revision=1.1',
