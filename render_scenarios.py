@@ -4,19 +4,38 @@ import json
 from mako.template import Template
 from mako.lookup import TemplateLookup
 
+
+def construct_response(scenario_name):
+    # load up response data
+    data = json.load(open('scenario.cache','r'))
+    lookup = TemplateLookup(directories=['./scenarios'])
+
+    for path in glob2.glob('./scenarios/**/request.mako'):
+        if path != scenario_name:
+            continue
+        event_name = path.split('/')[-2]
+        template = Template("${response}")
+        try:
+            response = data[event_name].get('response', {})
+            text = template.render(response= response).strip()
+        except KeyError:
+            text = ''
+    return  text
+
 def render_executables():
     # load up scenario data
     data = json.load(open('scenario.cache','r'))
     lookup = TemplateLookup(directories=['./scenarios'])
-    
+
     for path in glob2.glob('./scenarios/**/request.mako'):
         event_name = path.split('/')[-2]
         template = Template(filename=path, lookup=lookup,)
         try:
             request = data[event_name].get('request', {})
+            response = data[event_name].get('response', {})
             payload = request.get('payload')
             text = template.render(api_key=data['api_key'],
-                                   request=request, payload=payload).strip()
+                                   request=request, payload=payload, response= response).strip()
         except KeyError:
             text = ''
             print "WARN: Skipped {} since {} not in scenario.cache".format(
@@ -31,8 +50,10 @@ def render_mako():
         with open(os.path.join(dir, 'python.mako'), 'w+b') as wfile:
             definition = open(os.path.join(dir, 'definition.mako'),'r').read()
             request = open(os.path.join(dir, 'executable.py'),'r').read()
+            response = construct_response(path)
             body = "% if mode == 'definition':\n{}".format(definition) + "\n" \
-                                                                    "% elif mode == 'request':\n" + request + "\n% endif"
+                   "% elif mode == 'request':\n" + request + "\n" \
+                    "% elif mode == 'response':\n" + response + "\n% endif"
             wfile.write(body)
 
 def issue_no_mako_warnings():
