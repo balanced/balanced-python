@@ -349,3 +349,6 @@ class BasicUseCases(unittest.TestCase):
         ).save()
         bank_account.associate_to_customer(merchant)
         order.credit_to(destination=bank_account, amount=1234)
+
+    def test_empty_list(self):
+        balanced.Credit.query.all()
