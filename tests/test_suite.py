@@ -357,6 +357,9 @@ class BasicUseCases(unittest.TestCase):
         order.credit_to(destination=bank_account, amount=1234)
 
     def test_empty_list(self):
+        # Notice: we need a whole new marketplace to reproduce the bug,
+        # otherwise, it's very likely we will consume records created
+        # by other tests
         balanced.configure(None)
         api_key = balanced.APIKey().save()
         balanced.configure(api_key.secret)

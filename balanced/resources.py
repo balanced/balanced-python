@@ -122,10 +122,20 @@ class JSONSchemaPage(wac.Page, ObjectifyMixin):
     @property
     def items(self):
         try:
-            return getattr(self, self.resource_cls.type)
+            try:
+                return getattr(self, self.resource_cls.type)
+            except AttributeError:
+                # horrid hack because event callbacks are misnamed.
+                return self.event_callbacks
         except AttributeError:
-            # horrid hack because event callbacks are misnamed.
-            return self.event_callbacks
+            # Notice:
+            # there is no resources key in the response from server
+            # if the list is empty, so when we try to get something like
+            # `debits`, an AttributeError will be raised. Not sure is this
+            # behavior a bug of server, but anyway, this is just a workaround here
+            # for solving the problem. The issue was posted here
+            # https://github.com/balanced/balanced-python/issues/93
+            return []
 
 
 class JSONSchemaResource(wac.Resource, ObjectifyMixin):
