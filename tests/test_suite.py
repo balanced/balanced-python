@@ -101,9 +101,15 @@ class BasicUseCases(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        api_key = balanced.APIKey().save()
-        balanced.configure(api_key.secret)
+        cls.api_key = balanced.APIKey().save()
+        balanced.configure(cls.api_key.secret)
         cls.marketplace = balanced.Marketplace().save()
+
+    def setUp(self):
+        super(BasicUseCases, self).setUp()
+        # some test might rewrite api_key, so we need to configure it
+        # here again
+        balanced.configure(self.api_key.secret)
 
     def test_create_a_second_marketplace_should_fail(self):
         with self.assertRaises(requests.HTTPError) as exc:
@@ -349,3 +355,13 @@ class BasicUseCases(unittest.TestCase):
         ).save()
         bank_account.associate_to_customer(merchant)
         order.credit_to(destination=bank_account, amount=1234)
+
+    def test_empty_list(self):
+        # Notice: we need a whole new marketplace to reproduce the bug,
+        # otherwise, it's very likely we will consume records created
+        # by other tests
+        balanced.configure(None)
+        api_key = balanced.APIKey().save()
+        balanced.configure(api_key.secret)
+        balanced.Marketplace().save()
+        self.assertEqual(balanced.Credit.query.all(), [])
