@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
-
 from __future__ import unicode_literals
+import sys
+import time
 from datetime import date
 
 import unittest2 as unittest
@@ -367,7 +368,6 @@ class BasicUseCases(unittest.TestCase):
         self.assertEqual(balanced.Credit.query.all(), [])
 
     def test_dispute(self):
-        import time
         # any debit to the card number `6500000000000002` will generate
         # dispute
         dispute_card = CARD.copy()
@@ -380,7 +380,7 @@ class BasicUseCases(unittest.TestCase):
         # TODO: this is ugly, I think we should provide a more
         # reliable way to generate dispute, at least it should not
         # take this long
-        print (
+        print >>sys.stderr, (
             'It takes a while before the dispute record created, '
             'take and nap and wake up, then it should be done :/ '
             '(last time I tried it took 10 minutes...)'
@@ -393,7 +393,7 @@ class BasicUseCases(unittest.TestCase):
                 break
             time.sleep(interval)
             elapsed = time.time() - begin
-            print 'Polling disputes..., elapsed', elapsed
+            print >>sys.stderr, 'Polling disputes..., elapsed', elapsed
             self.assertLess(elapsed, timeout, 'Ouch, timeout')
 
         disputes = balanced.Dispute.query.all()
