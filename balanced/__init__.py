@@ -7,7 +7,7 @@ from balanced import resources
 from balanced.resources import (
     Resource, Marketplace, APIKey,
     CardHold, Credit, Debit, Refund, Reversal,
-    Transaction, BankAccount, Card,
+    Transaction, BankAccount, Card, Dispute,
     Callback, Event, EventCallback, EventCallbackLog,
     BankAccountVerification, Customer, Order
 )
@@ -24,6 +24,7 @@ __all__ = [
     Credit.__name__,
     Customer.__name__,
     Debit.__name__,
+    Dispute.__name__,
     Event.__name__,
     EventCallback.__name__,
     EventCallbackLog.__name__,
