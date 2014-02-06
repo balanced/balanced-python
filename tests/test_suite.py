@@ -365,3 +365,41 @@ class BasicUseCases(unittest.TestCase):
         balanced.configure(api_key.secret)
         balanced.Marketplace().save()
         self.assertEqual(balanced.Credit.query.all(), [])
+
+    def test_dispute(self):
+        import time
+        # any debit to the card number `6500000000000002` will generate
+        # dispute
+        dispute_card = CARD.copy()
+        dispute_card['number'] = '6500000000000002'
+        card = balanced.Card(**dispute_card)
+        customer = balanced.Customer().save()
+        card.associate_to_customer(customer)
+        debit = card.debit(amount=100)
+
+        # TODO: this is ugly, I think we should provide a more
+        # reliable way to generate dispute, at least it should not
+        # take this long
+        print (
+            'It takes a while before the dispute record created, '
+            'take and nap and wake up, then it should be done :/ '
+            '(last time I tried it took 10 minutes...)'
+        )
+        timeout = 12 * 60
+        interval = 10
+        begin = time.time()
+        while True:
+            if balanced.Dispute.query.count():
+                break
+            time.sleep(interval)
+            elapsed = time.time() - begin
+            print 'Polling disputes..., elapsed', elapsed
+            self.assertLess(elapsed, timeout, 'Ouch, timeout')
+
+        disputes = balanced.Dispute.query.all()
+        self.assertEqual(len(disputes), 1)
+        dispute = disputes[0]
+
+        self.assertEqual(dispute.status, 'pending')
+        self.assertEqual(dispute.reason, 'fraud')
+        self.assertEqual(dispute.transaction.id, debit.id)
