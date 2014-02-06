@@ -32,10 +32,9 @@ def render_executables():
         template = Template(filename=path, lookup=lookup,)
         try:
             request = data[event_name].get('request', {})
-            response = data[event_name].get('response', {})
             payload = request.get('payload')
             text = template.render(api_key=data['api_key'],
-                                   request=request, payload=payload, response= response).strip()
+                                   request=request, payload=payload).strip()
         except KeyError:
             text = ''
             print "WARN: Skipped {} since {} not in scenario.cache".format(
