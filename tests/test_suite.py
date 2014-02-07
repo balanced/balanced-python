@@ -70,6 +70,10 @@ CARD = {
     }
 }
 
+#: a card which will always create a dispute when you debit it
+DISPUTE_CARD = CARD.copy()
+DISPUTE_CARD['number'] = '6500000000000002'
+
 INTERNATIONAL_CARD = {
     'name': 'Johnny Fresh',
     'number': '4444424444444440',
@@ -368,13 +372,7 @@ class BasicUseCases(unittest.TestCase):
         self.assertEqual(balanced.Credit.query.all(), [])
 
     def test_dispute(self):
-        # any debit to the card number `6500000000000002` will generate
-        # dispute
-        dispute_card = CARD.copy()
-        dispute_card['number'] = '6500000000000002'
-        card = balanced.Card(**dispute_card)
-        customer = balanced.Customer().save()
-        card.associate_to_customer(customer)
+        card = balanced.Card(**DISPUTE_CARD).save()
         debit = card.debit(amount=100)
 
         # TODO: this is ugly, I think we should provide a more
@@ -396,10 +394,7 @@ class BasicUseCases(unittest.TestCase):
             print >>sys.stderr, 'Polling disputes..., elapsed', elapsed
             self.assertLess(elapsed, timeout, 'Ouch, timeout')
 
-        disputes = balanced.Dispute.query.all()
-        self.assertEqual(len(disputes), 1)
-        dispute = disputes[0]
-
+        dispute = balanced.Dispute.query.one()
         self.assertEqual(dispute.status, 'pending')
         self.assertEqual(dispute.reason, 'fraud')
         self.assertEqual(dispute.transaction.id, debit.id)
