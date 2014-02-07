@@ -23,10 +23,9 @@ def construct_response(scenario_name):
             del response["links"]
             for key, value in response.items():
                 response = value[0]
-                word = key
-                print word
+                balanced_object = key
                 # for key, value in response.items():
-                    # response2 = setattr(word, key, value)
+                    # response2 = setattr(balanced_object, key, value)
             text =template.render(response= response).strip()
         except KeyError:
             text = ''
