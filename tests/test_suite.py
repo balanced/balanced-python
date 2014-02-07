@@ -385,38 +385,55 @@ class Rev0URIBasicUseCases(unittest.TestCase):
 
     @classmethod
     def _iter_customer_uris(cls, marketplace, customer):
-        for uri in [
-            '/v1/customers/{}'.format(customer.id),
-            '/v1/marketplaces/{}/accounts/{}'.format(marketplace.id, customer.id),
+        args = dict(
+            mp=marketplace,
+            customer=customer,
+        )
+        for pattern in [
+            '/v1/customers/{customer.id}',
+            '/v1/marketplaces/{mp.id}/accounts/{customer.id}',
         ]:
-            yield uri
+            yield pattern.format(**args)
 
     @classmethod
     def _iter_card_uris(cls, marketplace, customer, card):
-        for uri in [
-            '/v1/customers/{}/cards/{}'.format(customer.id, card.id),
-            '/v1/marketplaces/{}/cards/{}'.format(marketplace.id, card.id),
-            '/v1/marketplaces/{}/accounts/{}/cards/{}'.format(
-                marketplace.id, customer.id, card.id,
-            )
+        args = dict(
+            mp=marketplace,
+            customer=customer,
+            card=card,
+        )
+        for pattern in [
+            '/v1/customers/{customer.id}/cards/{card.id}',
+            '/v1/marketplaces/{mp.id}/cards/{card.id}',
+            '/v1/marketplaces/{mp.id}/accounts/{customer.id}/cards/{card.id}',
         ]:
-            yield uri
+            yield pattern.format(**args)
 
     @classmethod
     def _iter_bank_account_uris(cls, marketplace, customer, bank_account):
-        for uri in [
-            '/v1/customers/{}/bank_accounts/{}'.format(customer.id, bank_account.id),
-            '/v1/marketplaces/{}/bank_accounts/{}'.format(marketplace.id, bank_account.id),
-            '/v1/marketplaces/{}/accounts/{}/bank_accounts/{}'.format(
-                marketplace.id, customer.id, bank_account.id,
-            )
+        args = dict(
+            mp=marketplace,
+            customer=customer,
+            bank_account=bank_account,
+        )
+        for pattern in [
+            '/v1/customers/{customer.id}/bank_accounts/{bank_account.id}',
+            '/v1/marketplaces/{mp.id}/bank_accounts/{bank_account.id}',
+            '/v1/marketplaces/{mp.id}/accounts/{customer.id}/bank_accounts/{bank_account.id}',
         ]:
-            yield uri
+            yield pattern.format(**args)
+
+    def assert_not_rev0(self, resource):
+        """Ensures the given resouce is not in revision 0 format
+
+        """
+        self.assert_(not hasattr(resource, '_uris'))
 
     def test_marketplace(self):
-        uri = '/v1/marketplaces/{}'.format(self.marketplace.id)
+        uri = '/v1/marketplaces/{0}'.format(self.marketplace.id)
         marketplace = balanced.Marketplace.fetch(uri)
         self.assertEqual(marketplace.id, self.marketplace.id)
+        self.assert_not_rev0(marketplace)
 
     def test_customer(self):
         customer = balanced.Customer().save()
@@ -426,6 +443,7 @@ class Rev0URIBasicUseCases(unittest.TestCase):
         ):
             result_customer = balanced.Customer.fetch(uri)
             self.assertEqual(result_customer.id, customer.id)
+            self.assert_not_rev0(result_customer)
 
     def test_associate_card(self):
         customer = balanced.Customer().save()
