@@ -18,13 +18,14 @@ def configure(
         root_url=API_ROOT,
         api_revision='1.1',
         user_agent='balanced-python/' + __version__,
+        accept_type='application/vnd.api+json',
         **kwargs
 ):
     kwargs.setdefault('headers', {})
 
     for key, value in (
-        ('content-type', 'application/vnd.api+json;revision=' + api_revision),
-        ('accept', 'application/json;revision=' + api_revision)
+        ('content-type', 'application/json;revision=' + api_revision),
+        ('accept', '{0};revision={1}'.format(accept_type, api_revision))
     ):
         kwargs['headers'].setdefault(key, value)
 
