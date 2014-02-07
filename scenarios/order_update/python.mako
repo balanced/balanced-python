@@ -13,41 +13,5 @@ order.meta = {
 }
 order.save()
 % elif mode == 'response':
-{
-    "links": {
-        "orders.buyers": "/orders/{orders.id}/buyers", 
-        "orders.credits": "/orders/{orders.id}/credits", 
-        "orders.debits": "/orders/{orders.id}/debits", 
-        "orders.merchant": "/customers/{orders.merchant}", 
-        "orders.refunds": "/orders/{orders.id}/refunds", 
-        "orders.reversals": "/orders/{orders.id}/reversals"
-    }, 
-    "orders": [
-        {
-            "amount": 0, 
-            "amount_escrowed": 0, 
-            "created_at": "2014-01-27T22:58:01.115720Z", 
-            "currency": "USD", 
-            "delivery_address": {
-                "city": null, 
-                "country_code": null, 
-                "line1": null, 
-                "line2": null, 
-                "postal_code": null, 
-                "state": null
-            }, 
-            "description": "New description for order", 
-            "href": "/orders/OR3FOihZa7lMHdAP5p8BJZVY", 
-            "id": "OR3FOihZa7lMHdAP5p8BJZVY", 
-            "links": {
-                "merchant": "CU3eeasZ9yQ86uzzIYZkrPGg"
-            }, 
-            "meta": {
-                "anykey": "valuegoeshere", 
-                "product.id": "1234567890"
-            }, 
-            "updated_at": "2014-01-27T22:58:05.657463Z"
-        }
-    ]
-}
+{u'delivery_address': {u'city': None, u'line2': None, u'line1': None, u'state': None, u'postal_code': None, u'country_code': None}, u'description': u'New description for order', u'links': {u'merchant': u'CU3eeasZ9yQ86uzzIYZkrPGg'}, u'created_at': u'2014-01-27T22:58:01.115720Z', u'updated_at': u'2014-01-27T22:58:05.657463Z', u'id': u'OR3FOihZa7lMHdAP5p8BJZVY', u'currency': u'USD', u'amount': 0, u'href': u'/orders/OR3FOihZa7lMHdAP5p8BJZVY', u'meta': {u'product.id': u'1234567890', u'anykey': u'valuegoeshere'}, u'amount_escrowed': 0}
 % endif

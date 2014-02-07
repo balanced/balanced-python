@@ -16,35 +16,5 @@ refund = debit.refund(
     }
 )
 % elif mode == 'response':
-{
-    "links": {
-        "refunds.debit": "/debits/{refunds.debit}", 
-        "refunds.dispute": "/disputes/{refunds.dispute}", 
-        "refunds.events": "/refunds/{refunds.id}/events", 
-        "refunds.order": "/orders/{refunds.order}"
-    }, 
-    "refunds": [
-        {
-            "amount": 3000, 
-            "created_at": "2014-01-27T22:58:11.375665Z", 
-            "currency": "USD", 
-            "description": "Refund for Order #1111", 
-            "href": "/refunds/RF3RklPuFgsgI50UuYtr4g6I", 
-            "id": "RF3RklPuFgsgI50UuYtr4g6I", 
-            "links": {
-                "debit": "WD3MKNxNTKBGgA7mX50yogiu", 
-                "dispute": null, 
-                "order": null
-            }, 
-            "meta": {
-                "fulfillment.item.condition": "OK", 
-                "merchant.feedback": "positive", 
-                "user.refund_reason": "not happy with product"
-            }, 
-            "status": "succeeded", 
-            "transaction_number": "RF383-088-7077", 
-            "updated_at": "2014-01-27T22:58:12.115131Z"
-        }
-    ]
-}
+{u'status': u'succeeded', u'description': u'Refund for Order #1111', u'links': {u'dispute': None, u'order': None, u'debit': u'WD3MKNxNTKBGgA7mX50yogiu'}, u'created_at': u'2014-01-27T22:58:11.375665Z', u'transaction_number': u'RF383-088-7077', u'updated_at': u'2014-01-27T22:58:12.115131Z', u'currency': u'USD', u'amount': 3000, u'href': u'/refunds/RF3RklPuFgsgI50UuYtr4g6I', u'meta': {u'fulfillment.item.condition': u'OK', u'user.refund_reason': u'not happy with product', u'merchant.feedback': u'positive'}, u'id': u'RF3RklPuFgsgI50UuYtr4g6I'}
 % endif

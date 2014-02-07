@@ -8,35 +8,5 @@ balanced.configure('ak-test-1kvvievk0Qqw5wQPsrlM9g7wQwNe62cyc')
 
 refund = balanced.Reversal.fetch('/reversals/RV42n8M9XZWna427oPDDi4RG')
 % elif mode == 'response':
-{
-    "links": {
-        "reversals.credit": "/credits/{reversals.credit}", 
-        "reversals.events": "/reversals/{reversals.id}/events", 
-        "reversals.order": "/orders/{reversals.order}"
-    }, 
-    "reversals": [
-        {
-            "amount": 3000, 
-            "created_at": "2014-01-27T22:58:21.214829Z", 
-            "currency": "USD", 
-            "description": "Reversal for Order #1111", 
-            "failure_reason": null, 
-            "failure_reason_code": null, 
-            "href": "/reversals/RV42n8M9XZWna427oPDDi4RG", 
-            "id": "RV42n8M9XZWna427oPDDi4RG", 
-            "links": {
-                "credit": "CR40neytmVG2HDBp1opfF7sY", 
-                "order": null
-            }, 
-            "meta": {
-                "fulfillment.item.condition": "OK", 
-                "merchant.feedback": "positive", 
-                "user.refund_reason": "not happy with product"
-            }, 
-            "status": "succeeded", 
-            "transaction_number": "RV219-169-0008", 
-            "updated_at": "2014-01-27T22:58:22.190749Z"
-        }
-    ]
-}
+{u'status': u'succeeded', u'description': u'Reversal for Order #1111', u'links': {u'credit': u'CR40neytmVG2HDBp1opfF7sY', u'order': None}, u'updated_at': u'2014-01-27T22:58:22.190749Z', u'created_at': u'2014-01-27T22:58:21.214829Z', u'transaction_number': u'RV219-169-0008', u'failure_reason': None, u'currency': u'USD', u'amount': 3000, u'href': u'/reversals/RV42n8M9XZWna427oPDDi4RG', u'meta': {u'fulfillment.item.condition': u'OK', u'user.refund_reason': u'not happy with product', u'merchant.feedback': u'positive'}, u'failure_reason_code': None, u'id': u'RV42n8M9XZWna427oPDDi4RG'}
 % endif

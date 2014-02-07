@@ -1,6 +1,7 @@
 import glob2
 import os
 import json
+import pprint
 from mako.template import Template
 from mako.lookup import TemplateLookup
 
@@ -18,6 +19,15 @@ def construct_response(scenario_name):
         try:
             response = data[event_name].get('response', {})
             text = template.render(response= response).strip()
+            response =  json.loads(text)
+            del response["links"]
+            for key, value in response.items():
+                response = value[0]
+                word = key
+                print word
+                # for key, value in response.items():
+                    # response2 = setattr(word, key, value)
+            text =template.render(response= response).strip()
         except KeyError:
             text = ''
     return  text

@@ -8,38 +8,5 @@ balanced.configure('ak-test-1kvvievk0Qqw5wQPsrlM9g7wQwNe62cyc')
 
 order = balanced.Order.fetch('/orders/OR3FOihZa7lMHdAP5p8BJZVY')
 % elif mode == 'response':
-{
-    "links": {
-        "orders.buyers": "/orders/{orders.id}/buyers", 
-        "orders.credits": "/orders/{orders.id}/credits", 
-        "orders.debits": "/orders/{orders.id}/debits", 
-        "orders.merchant": "/customers/{orders.merchant}", 
-        "orders.refunds": "/orders/{orders.id}/refunds", 
-        "orders.reversals": "/orders/{orders.id}/reversals"
-    }, 
-    "orders": [
-        {
-            "amount": 0, 
-            "amount_escrowed": 0, 
-            "created_at": "2014-01-27T22:58:01.115720Z", 
-            "currency": "USD", 
-            "delivery_address": {
-                "city": null, 
-                "country_code": null, 
-                "line1": null, 
-                "line2": null, 
-                "postal_code": null, 
-                "state": null
-            }, 
-            "description": "Order #12341234", 
-            "href": "/orders/OR3FOihZa7lMHdAP5p8BJZVY", 
-            "id": "OR3FOihZa7lMHdAP5p8BJZVY", 
-            "links": {
-                "merchant": "CU3eeasZ9yQ86uzzIYZkrPGg"
-            }, 
-            "meta": {}, 
-            "updated_at": "2014-01-27T22:58:01.115723Z"
-        }
-    ]
-}
+{u'delivery_address': {u'city': None, u'line2': None, u'line1': None, u'state': None, u'postal_code': None, u'country_code': None}, u'description': u'Order #12341234', u'links': {u'merchant': u'CU3eeasZ9yQ86uzzIYZkrPGg'}, u'created_at': u'2014-01-27T22:58:01.115720Z', u'updated_at': u'2014-01-27T22:58:01.115723Z', u'id': u'OR3FOihZa7lMHdAP5p8BJZVY', u'currency': u'USD', u'amount': 0, u'href': u'/orders/OR3FOihZa7lMHdAP5p8BJZVY', u'meta': {}, u'amount_escrowed': 0}
 % endif
