@@ -514,6 +514,16 @@ class Callback(Resource):
     uri_gen = wac.URIGen('/callbacks', '{callback}')
 
 
+class Dispute(Resource):
+    """
+    A dispute occurs when a customer disputes a transaction that
+    occurred on their funding instrument.
+    """
+    type = 'disputes'
+
+    uri_gen = wac.URIGen('/disputes', '{dispute}')
+
+
 class Event(Resource):
     """
     An Event is a snapshot of another resource at a point in time when

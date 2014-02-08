@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
-
 from __future__ import unicode_literals
+import sys
+import time
 from datetime import date
 
 import unittest2 as unittest
@@ -68,6 +69,10 @@ CARD = {
         'country_code': 'US',
     }
 }
+
+#: a card which will always create a dispute when you debit it
+DISPUTE_CARD = CARD.copy()
+DISPUTE_CARD['number'] = '6500000000000002'
 
 INTERNATIONAL_CARD = {
     'name': 'Johnny Fresh',
@@ -365,3 +370,31 @@ class BasicUseCases(unittest.TestCase):
         balanced.configure(api_key.secret)
         balanced.Marketplace().save()
         self.assertEqual(balanced.Credit.query.all(), [])
+
+    def test_dispute(self):
+        card = balanced.Card(**DISPUTE_CARD).save()
+        debit = card.debit(amount=100)
+
+        # TODO: this is ugly, I think we should provide a more
+        # reliable way to generate dispute, at least it should not
+        # take this long
+        print >>sys.stderr, (
+            'It takes a while before the dispute record created, '
+            'take and nap and wake up, then it should be done :/ '
+            '(last time I tried it took 10 minutes...)'
+        )
+        timeout = 12 * 60
+        interval = 10
+        begin = time.time()
+        while True:
+            if balanced.Dispute.query.count():
+                break
+            time.sleep(interval)
+            elapsed = time.time() - begin
+            print >>sys.stderr, 'Polling disputes..., elapsed', elapsed
+            self.assertLess(elapsed, timeout, 'Ouch, timeout')
+
+        dispute = balanced.Dispute.query.one()
+        self.assertEqual(dispute.status, 'pending')
+        self.assertEqual(dispute.reason, 'fraud')
+        self.assertEqual(dispute.transaction.id, debit.id)
