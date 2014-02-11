@@ -13,5 +13,19 @@ card_hold.meta = {
 }
 card_hold.save()
 % elif mode == 'response':
-{u'description': u'update this description', u'links': {u'card': u'CC2abDOQVm5aNFhHpcRvWS02', u'debit': None}, u'updated_at': u'2014-01-27T22:56:44.255042Z', u'created_at': u'2014-01-27T22:56:39.379941Z', u'transaction_number': u'HL500-842-5492', u'expires_at': u'2014-02-03T22:56:39.876902Z', u'failure_reason': None, u'currency': u'USD', u'amount': 5000, u'href': u'/card_holds/HL2bT9uMRkTZkfSPmA2pBD9S', u'meta': {u'holding.for': u'user1', u'meaningful.key': u'some.value'}, u'failure_reason_code': None, u'id': u'HL2bT9uMRkTZkfSPmA2pBD9S'}
+CardHold(
+ 'amount': 5000,
+ 'created_at': u'2014-01-27T22:56:39.379941Z',
+ 'currency': u'USD',
+ 'description': u'update this description',
+ 'expires_at': u'2014-02-03T22:56:39.876902Z',
+ 'failure_reason': None,
+ 'failure_reason_code': None,
+ 'href': u'/card_holds/HL2bT9uMRkTZkfSPmA2pBD9S',
+ 'id': u'HL2bT9uMRkTZkfSPmA2pBD9S',
+ 'links': {u'card': u'CC2abDOQVm5aNFhHpcRvWS02', u'debit': None},
+ 'meta': {u'holding.for': u'user1', u'meaningful.key': u'some.value'},
+ 'transaction_number': u'HL500-842-5492',
+ 'updated_at': u'2014-01-27T22:56:44.255042Z')
+ 
 % endif

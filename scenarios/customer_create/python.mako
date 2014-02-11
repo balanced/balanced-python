@@ -14,5 +14,27 @@ customer = balanced.Customer(
     }
 ).save()
 % elif mode == 'response':
-{u'name': u'Henry Ford', u'links': {u'source': None, u'destination': None}, u'updated_at': u'2014-01-27T22:57:37.740442Z', u'created_at': u'2014-01-27T22:57:36.586782Z', u'dob_month': 7, u'merchant_status': u'underwritten', u'id': u'CU3eeasZ9yQ86uzzIYZkrPGg', u'phone': None, u'href': u'/customers/CU3eeasZ9yQ86uzzIYZkrPGg', u'meta': {}, u'dob_year': 1963, u'address': {u'city': None, u'line2': None, u'line1': None, u'state': None, u'postal_code': u'48120', u'country_code': None}, u'business_name': None, u'ssn_last4': None, u'email': None, u'ein': None}
+Customer(
+ 'address': {u'city': None,
+             u'country_code': None,
+             u'line1': None,
+             u'line2': None,
+             u'postal_code': u'48120',
+             u'state': None},
+ 'business_name': None,
+ 'created_at': u'2014-01-27T22:57:36.586782Z',
+ 'dob_month': 7,
+ 'dob_year': 1963,
+ 'ein': None,
+ 'email': None,
+ 'href': u'/customers/CU3eeasZ9yQ86uzzIYZkrPGg',
+ 'id': u'CU3eeasZ9yQ86uzzIYZkrPGg',
+ 'links': {u'destination': None, u'source': None},
+ 'merchant_status': u'underwritten',
+ 'meta': {},
+ 'name': u'Henry Ford',
+ 'phone': None,
+ 'ssn_last4': None,
+ 'updated_at': u'2014-01-27T22:57:37.740442Z')
+ 
 % endif
