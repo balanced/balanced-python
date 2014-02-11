@@ -7,7 +7,7 @@ balanced.configure('ak-test-1kvvievk0Qqw5wQPsrlM9g7wQwNe62cyc')
 
 card = balanced.Card.fetch('/cards/CC2uc8iPDjgyxOXHVtnZloyI')
 % elif mode == 'response':
-Card(
+Card(**{
  'address': {u'city': None,
              u'country_code': None,
              u'line1': None,
@@ -32,6 +32,6 @@ Card(
  'meta': {},
  'name': None,
  'number': u'xxxxxxxxxxxx5100',
- 'updated_at': u'2014-01-27T22:56:55.656379Z')
- 
+ 'updated_at': u'2014-01-27T22:56:55.656379Z'
+})
 % endif

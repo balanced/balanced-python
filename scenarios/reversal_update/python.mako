@@ -14,7 +14,7 @@ reversal.meta = {
 }
 reversal.save()
 % elif mode == 'response':
-Reversal(
+Reversal(**{
  'amount': 3000,
  'created_at': u'2014-01-27T22:58:21.214829Z',
  'currency': u'USD',
@@ -29,6 +29,6 @@ Reversal(
           u'user.satisfaction': u'6'},
  'status': u'succeeded',
  'transaction_number': u'RV219-169-0008',
- 'updated_at': u'2014-01-27T22:58:27.354488Z')
- 
+ 'updated_at': u'2014-01-27T22:58:27.354488Z'
+})
 % endif

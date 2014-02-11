@@ -13,7 +13,7 @@ order.meta = {
 }
 order.save()
 % elif mode == 'response':
-Order(
+Order(**{
  'amount': 0,
  'amount_escrowed': 0,
  'created_at': u'2014-01-27T22:58:01.115720Z',
@@ -29,6 +29,6 @@ Order(
  'id': u'OR3FOihZa7lMHdAP5p8BJZVY',
  'links': {u'merchant': u'CU3eeasZ9yQ86uzzIYZkrPGg'},
  'meta': {u'anykey': u'valuegoeshere', u'product.id': u'1234567890'},
- 'updated_at': u'2014-01-27T22:58:05.657463Z')
- 
+ 'updated_at': u'2014-01-27T22:58:05.657463Z'
+})
 % endif

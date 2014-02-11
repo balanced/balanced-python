@@ -13,7 +13,7 @@ credit.meta = {
 }
 credit.save()
 % elif mode == 'response':
-Credit(
+Credit(**{
  'amount': 5000,
  'appears_on_statement_as': u'example.com',
  'created_at': u'2014-01-27T22:57:19.073817Z',
@@ -29,6 +29,6 @@ Credit(
  'meta': {u'anykey': u'valuegoeshere', u'facebook.id': u'1234567890'},
  'status': u'succeeded',
  'transaction_number': u'CR408-633-3169',
- 'updated_at': u'2014-01-27T22:57:25.832930Z')
- 
+ 'updated_at': u'2014-01-27T22:57:25.832930Z'
+})
 % endif

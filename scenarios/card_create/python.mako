@@ -12,7 +12,7 @@ card = balanced.Card(
   expiration_year='2020'
 ).save()
 % elif mode == 'response':
-Card(
+Card(**{
  'address': {u'city': None,
              u'country_code': None,
              u'line1': None,
@@ -37,6 +37,6 @@ Card(
  'meta': {},
  'name': None,
  'number': u'xxxxxxxxxxxx5100',
- 'updated_at': u'2014-01-27T22:57:42.092926Z')
- 
+ 'updated_at': u'2014-01-27T22:57:42.092926Z'
+})
 % endif

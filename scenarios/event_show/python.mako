@@ -8,7 +8,7 @@ balanced.configure('ak-test-1kvvievk0Qqw5wQPsrlM9g7wQwNe62cyc')
 
 event = balanced.Event.fetch('/events/EV2abbb98487a611e3a86f026ba7d31e6f')
 % elif mode == 'response':
-Event(
+Event(**{
  'callback_statuses': {u'failed': 0,
                        u'pending': 0,
                        u'retrying': 0,
@@ -50,6 +50,6 @@ Event(
  'id': u'EV2abbb98487a611e3a86f026ba7d31e6f',
  'links': {},
  'occurred_at': u'2014-01-27T22:55:50.767000Z',
- 'type': u'account.created')
- 
+ 'type': u'account.created'
+})
 % endif

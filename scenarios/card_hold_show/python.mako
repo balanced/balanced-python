@@ -8,7 +8,7 @@ balanced.configure('ak-test-1kvvievk0Qqw5wQPsrlM9g7wQwNe62cyc')
 
 card_hold = balanced.CardHold.fetch('/card_holds/HL2bT9uMRkTZkfSPmA2pBD9S')
 % elif mode == 'response':
-CardHold(
+CardHold(**{
  'amount': 5000,
  'created_at': u'2014-01-27T22:56:39.379941Z',
  'currency': u'USD',
@@ -21,6 +21,6 @@ CardHold(
  'links': {u'card': u'CC2abDOQVm5aNFhHpcRvWS02', u'debit': None},
  'meta': {},
  'transaction_number': u'HL500-842-5492',
- 'updated_at': u'2014-01-27T22:56:40.238140Z')
- 
+ 'updated_at': u'2014-01-27T22:56:40.238140Z'
+})
 % endif

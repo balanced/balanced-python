@@ -12,7 +12,7 @@ bank_account = balanced.BankAccount(
   name='Johann Bernoulli'
 ).save()
 % elif mode == 'response':
-BankAccount(
+BankAccount(**{
  'account_number': u'xxxxxx0001',
  'account_type': u'checking',
  'address': {u'city': None,
@@ -32,6 +32,6 @@ BankAccount(
  'meta': {},
  'name': u'Johann Bernoulli',
  'routing_number': u'121000358',
- 'updated_at': u'2014-01-27T22:57:47.772483Z')
- 
+ 'updated_at': u'2014-01-27T22:57:47.772483Z'
+})
 % endif

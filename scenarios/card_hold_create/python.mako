@@ -11,7 +11,7 @@ card_hold = card.hold(
   description='Some descriptive text for the debit in the dashboard'
 )
 % elif mode == 'response':
-CardHold(
+CardHold(**{
  'amount': 5000,
  'created_at': u'2014-01-27T22:56:49.446376Z',
  'currency': u'USD',
@@ -24,6 +24,6 @@ CardHold(
  'links': {u'card': u'CC2abDOQVm5aNFhHpcRvWS02', u'debit': None},
  'meta': {},
  'transaction_number': u'HL102-313-8003',
- 'updated_at': u'2014-01-27T22:56:51.115729Z')
- 
+ 'updated_at': u'2014-01-27T22:56:51.115729Z'
+})
 % endif

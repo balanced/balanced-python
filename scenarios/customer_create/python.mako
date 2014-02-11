@@ -14,7 +14,7 @@ customer = balanced.Customer(
     }
 ).save()
 % elif mode == 'response':
-Customer(
+Customer(**{
  'address': {u'city': None,
              u'country_code': None,
              u'line1': None,
@@ -35,6 +35,6 @@ Customer(
  'name': u'Henry Ford',
  'phone': None,
  'ssn_last4': None,
- 'updated_at': u'2014-01-27T22:57:37.740442Z')
- 
+ 'updated_at': u'2014-01-27T22:57:37.740442Z'
+})
 % endif

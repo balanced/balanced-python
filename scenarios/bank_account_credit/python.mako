@@ -10,7 +10,7 @@ bank_account.credit(
   amount=5000
 )
 % elif mode == 'response':
-Credit(
+Credit(**{
  'amount': 5000,
  'appears_on_statement_as': u'example.com',
  'created_at': u'2014-01-27T22:58:19.422292Z',
@@ -26,6 +26,6 @@ Credit(
  'meta': {},
  'status': u'succeeded',
  'transaction_number': u'CR816-868-3666',
- 'updated_at': u'2014-01-27T22:58:20.346871Z')
- 
+ 'updated_at': u'2014-01-27T22:58:20.346871Z'
+})
 % endif

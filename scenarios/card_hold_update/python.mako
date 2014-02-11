@@ -13,7 +13,7 @@ card_hold.meta = {
 }
 card_hold.save()
 % elif mode == 'response':
-CardHold(
+CardHold(**{
  'amount': 5000,
  'created_at': u'2014-01-27T22:56:39.379941Z',
  'currency': u'USD',
@@ -26,6 +26,6 @@ CardHold(
  'links': {u'card': u'CC2abDOQVm5aNFhHpcRvWS02', u'debit': None},
  'meta': {u'holding.for': u'user1', u'meaningful.key': u'some.value'},
  'transaction_number': u'HL500-842-5492',
- 'updated_at': u'2014-01-27T22:56:44.255042Z')
- 
+ 'updated_at': u'2014-01-27T22:56:44.255042Z'
+})
 % endif

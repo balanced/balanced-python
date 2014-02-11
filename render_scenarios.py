@@ -9,12 +9,11 @@ from mako.lookup import TemplateLookup
 
 def pretty_print_response(response):
     template = Template("${response}")
-    pprinter = PrettyPrinter()
     dictionary_text = pprint.pformat(response.__dict__)
-    text = template.render(response= response)
+    text = template.render(response=response)
     text = text.split('(', 1)[0] + "(" + dictionary_text + ")"
-    text = text.replace('({', '(\n ')
-    text = text.replace('})', ')\n ')
+    text = text.replace('({', '(**{\n ')
+    text = text.replace('})', '\n})')
     return text
 
 def construct_response(scenario_name):
@@ -29,21 +28,21 @@ def construct_response(scenario_name):
         template = Template("${response}")
         try:
             response = data[event_name].get('response', {})
-            text = template.render(response= response).strip()
+            text = template.render(response=response).strip()
             response =  json.loads(text)
             del response["links"]
             for key, value in response.items():
                 response = value[0]
-                _type = key
+                type = key
                 resource = balanced.Resource()
-                object_type = resource.registry[_type]
+                object_type = resource.registry[type]
                 object_instance = object_type()
                 for key, value in response.items():
                    setattr(object_instance, key, value)
             text = pretty_print_response(object_instance)
         except KeyError:
             text = ''
-    return  text
+    return text
 
 def render_executables():
     # load up scenario data

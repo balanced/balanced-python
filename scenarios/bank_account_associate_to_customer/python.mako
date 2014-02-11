@@ -8,7 +8,7 @@ balanced.configure('ak-test-1kvvievk0Qqw5wQPsrlM9g7wQwNe62cyc')
 card = balanced.Card.fetch('/bank_accounts/BA3qNbYRqFM0Q7MXn3IcjGl0')
 card.associate_to_customer('/customers/CU3eeasZ9yQ86uzzIYZkrPGg')
 % elif mode == 'response':
-BankAccount(
+BankAccount(**{
  'account_number': u'xxxxxx0001',
  'account_type': u'checking',
  'address': {u'city': None,
@@ -29,6 +29,6 @@ BankAccount(
  'meta': {},
  'name': u'Johann Bernoulli',
  'routing_number': u'121000358',
- 'updated_at': u'2014-01-27T22:57:48.515195Z')
- 
+ 'updated_at': u'2014-01-27T22:57:48.515195Z'
+})
 % endif

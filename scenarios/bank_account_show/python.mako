@@ -8,7 +8,7 @@ balanced.configure('ak-test-1kvvievk0Qqw5wQPsrlM9g7wQwNe62cyc')
 
 bank_account = balanced.BankAccount.fetch('/bank_accounts/BA1QFf0LmIxr8p41msqX46Oy')
 % elif mode == 'response':
-BankAccount(
+BankAccount(**{
  'account_number': u'xxxxxx0001',
  'account_type': u'checking',
  'address': {u'city': None,
@@ -28,6 +28,6 @@ BankAccount(
  'meta': {},
  'name': u'Johann Bernoulli',
  'routing_number': u'121000358',
- 'updated_at': u'2014-01-27T22:56:20.540534Z')
- 
+ 'updated_at': u'2014-01-27T22:56:20.540534Z'
+})
 % endif

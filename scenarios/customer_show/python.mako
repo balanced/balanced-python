@@ -8,7 +8,7 @@ balanced.configure('ak-test-1kvvievk0Qqw5wQPsrlM9g7wQwNe62cyc')
 
 customer = balanced.Customer.fetch('/customers/CU33Y4cut21qu1d1lGYDBseQ')
 % elif mode == 'response':
-Customer(
+Customer(**{
  'address': {u'city': None,
              u'country_code': None,
              u'line1': None,
@@ -29,6 +29,6 @@ Customer(
  'name': u'Henry Ford',
  'phone': None,
  'ssn_last4': None,
- 'updated_at': u'2014-01-27T22:57:29.488272Z')
- 
+ 'updated_at': u'2014-01-27T22:57:29.488272Z'
+})
 % endif

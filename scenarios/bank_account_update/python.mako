@@ -13,7 +13,7 @@ bank_account.meta = {
 }
 bank_account.save()
 % elif mode == 'response':
-BankAccount(
+BankAccount(**{
  'account_number': u'xxxxxx0001',
  'account_type': u'checking',
  'address': {u'city': None,
@@ -35,6 +35,6 @@ BankAccount(
           u'twitter.id': u'1234987650'},
  'name': u'Johann Bernoulli',
  'routing_number': u'121000358',
- 'updated_at': u'2014-01-27T22:56:25.767386Z')
- 
+ 'updated_at': u'2014-01-27T22:56:25.767386Z'
+})
 % endif

@@ -13,7 +13,7 @@ debit.meta = {
 }
 debit.save()
 % elif mode == 'response':
-Debit(
+Debit(**{
  'amount': 5000,
  'appears_on_statement_as': u'BAL*Statement text',
  'created_at': u'2014-01-27T22:57:05.511023Z',
@@ -30,6 +30,6 @@ Debit(
  'meta': {u'anykey': u'valuegoeshere', u'facebook.id': u'1234567890'},
  'status': u'succeeded',
  'transaction_number': u'W906-153-1439',
- 'updated_at': u'2014-01-27T22:57:53.776191Z')
- 
+ 'updated_at': u'2014-01-27T22:57:53.776191Z'
+})
 % endif

@@ -14,7 +14,7 @@ refund.meta = {
 }
 refund.save()
 % elif mode == 'response':
-Refund(
+Refund(**{
  'amount': 3000,
  'created_at': u'2014-01-27T22:58:11.375665Z',
  'currency': u'USD',
@@ -29,6 +29,6 @@ Refund(
           u'user.refund.count': u'3'},
  'status': u'succeeded',
  'transaction_number': u'RF383-088-7077',
- 'updated_at': u'2014-01-27T22:58:17.950799Z')
- 
+ 'updated_at': u'2014-01-27T22:58:17.950799Z'
+})
 % endif

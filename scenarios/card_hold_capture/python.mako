@@ -11,7 +11,7 @@ debit = card_hold.capture(
   description='Some descriptive text for the debit in the dashboard'
 )
 % elif mode == 'response':
-Debit(
+Debit(**{
  'amount': 5000,
  'appears_on_statement_as': u'BAL*ShowsUpOnStmt',
  'created_at': u'2014-01-27T22:56:45.623268Z',
@@ -28,6 +28,6 @@ Debit(
  'meta': {u'holding.for': u'user1', u'meaningful.key': u'some.value'},
  'status': u'succeeded',
  'transaction_number': u'W744-719-1832',
- 'updated_at': u'2014-01-27T22:56:47.926021Z')
- 
+ 'updated_at': u'2014-01-27T22:56:47.926021Z'
+})
 % endif

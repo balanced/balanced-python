@@ -12,7 +12,7 @@ card.debit(
   description='Some descriptive text for the debit in the dashboard'
 )
 % elif mode == 'response':
-Debit(
+Debit(**{
  'amount': 5000,
  'appears_on_statement_as': u'BAL*Statement text',
  'created_at': u'2014-01-27T22:58:07.291226Z',
@@ -29,6 +29,6 @@ Debit(
  'meta': {},
  'status': u'succeeded',
  'transaction_number': u'W180-465-2000',
- 'updated_at': u'2014-01-27T22:58:09.706862Z')
- 
+ 'updated_at': u'2014-01-27T22:58:09.706862Z'
+})
 % endif

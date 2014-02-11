@@ -9,12 +9,12 @@ callback = balanced.Callback(
   url='http://www.example.com/callback'
 ).save()
 % elif mode == 'response':
-Callback(
+Callback(**{
  'href': u'/callbacks/CB224374R2NSyoYBpDV4r7C2',
  'id': u'CB224374R2NSyoYBpDV4r7C2',
  'links': {},
  'method': u'post',
  'revision': u'1.1',
- 'url': u'http://www.example.com/callback')
- 
+ 'url': u'http://www.example.com/callback'
+})
 % endif

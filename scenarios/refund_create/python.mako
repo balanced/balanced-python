@@ -16,7 +16,7 @@ refund = debit.refund(
     }
 )
 % elif mode == 'response':
-Refund(
+Refund(**{
  'amount': 3000,
  'created_at': u'2014-01-27T22:58:11.375665Z',
  'currency': u'USD',
@@ -31,6 +31,6 @@ Refund(
           u'user.refund_reason': u'not happy with product'},
  'status': u'succeeded',
  'transaction_number': u'RF383-088-7077',
- 'updated_at': u'2014-01-27T22:58:12.115131Z')
- 
+ 'updated_at': u'2014-01-27T22:58:12.115131Z'
+})
 % endif
