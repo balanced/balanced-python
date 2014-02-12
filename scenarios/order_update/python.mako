@@ -13,22 +13,5 @@ order.meta = {
 }
 order.save()
 % elif mode == 'response':
-Order(**{
- 'amount': 0,
- 'amount_escrowed': 0,
- 'created_at': u'2014-01-27T22:58:01.115720Z',
- 'currency': u'USD',
- 'delivery_address': {u'city': None,
-                      u'country_code': None,
-                      u'line1': None,
-                      u'line2': None,
-                      u'postal_code': None,
-                      u'state': None},
- 'description': u'New description for order',
- 'href': u'/orders/OR3FOihZa7lMHdAP5p8BJZVY',
- 'id': u'OR3FOihZa7lMHdAP5p8BJZVY',
- 'links': {u'merchant': u'CU3eeasZ9yQ86uzzIYZkrPGg'},
- 'meta': {u'anykey': u'valuegoeshere', u'product.id': u'1234567890'},
- 'updated_at': u'2014-01-27T22:58:05.657463Z'
-})
+Order(delivery_address={u'city': None, u'line2': None, u'line1': None, u'state': None, u'postal_code': None, u'country_code': None}, description=u'New description for order', links={u'merchant': u'CU3eeasZ9yQ86uzzIYZkrPGg'}, created_at=u'2014-01-27T22:58:01.115720Z', updated_at=u'2014-01-27T22:58:05.657463Z', currency=u'USD', amount=0, href=u'/orders/OR3FOihZa7lMHdAP5p8BJZVY', meta={u'product.id': u'1234567890', u'anykey': u'valuegoeshere'}, id=u'OR3FOihZa7lMHdAP5p8BJZVY', amount_escrowed=0)
 % endif

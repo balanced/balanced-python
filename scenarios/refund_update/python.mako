@@ -14,21 +14,5 @@ refund.meta = {
 }
 refund.save()
 % elif mode == 'response':
-Refund(**{
- 'amount': 3000,
- 'created_at': u'2014-01-27T22:58:11.375665Z',
- 'currency': u'USD',
- 'description': u'update this description',
- 'href': u'/refunds/RF3RklPuFgsgI50UuYtr4g6I',
- 'id': u'RF3RklPuFgsgI50UuYtr4g6I',
- 'links': {u'debit': u'WD3MKNxNTKBGgA7mX50yogiu',
-           u'dispute': None,
-           u'order': None},
- 'meta': {u'refund.reason': u'user not happy with product',
-          u'user.notes': u'very polite on the phone',
-          u'user.refund.count': u'3'},
- 'status': u'succeeded',
- 'transaction_number': u'RF383-088-7077',
- 'updated_at': u'2014-01-27T22:58:17.950799Z'
-})
+Refund(status=u'succeeded', description=u'update this description', links={u'dispute': None, u'order': None, u'debit': u'WD3MKNxNTKBGgA7mX50yogiu'}, amount=3000, created_at=u'2014-01-27T22:58:11.375665Z', updated_at=u'2014-01-27T22:58:17.950799Z', currency=u'USD', transaction_number=u'RF383-088-7077', href=u'/refunds/RF3RklPuFgsgI50UuYtr4g6I', meta={u'user.refund.count': u'3', u'refund.reason': u'user not happy with product', u'user.notes': u'very polite on the phone'}, id=u'RF3RklPuFgsgI50UuYtr4g6I')
 % endif

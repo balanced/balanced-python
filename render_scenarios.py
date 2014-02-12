@@ -7,15 +7,6 @@ from pprint import PrettyPrinter
 from mako.template import Template
 from mako.lookup import TemplateLookup
 
-def pretty_print_response(response):
-    template = Template("${response}")
-    dictionary_text = pprint.pformat(response.__dict__)
-    text = template.render(response=response)
-    text = text.split('(', 1)[0] + "(" + dictionary_text + ")"
-    text = text.replace('({', '(**{\n ')
-    text = text.replace('})', '\n})')
-    return text
-
 def construct_response(scenario_name):
     # load up response data
     data = json.load(open('scenario.cache','r'))
@@ -39,7 +30,7 @@ def construct_response(scenario_name):
                 object_instance = object_type()
                 for key, value in response.items():
                    setattr(object_instance, key, value)
-            text = pretty_print_response(object_instance)
+            text = template.render(response=object_instance)
         except KeyError:
             text = ''
     return text
