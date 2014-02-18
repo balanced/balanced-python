@@ -106,6 +106,8 @@ class BasicUseCases(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
+        # ensure we won't consume API key from other test case
+        balanced.configure()
         cls.api_key = balanced.APIKey().save()
         balanced.configure(cls.api_key.secret)
         cls.marketplace = balanced.Marketplace().save()
@@ -352,7 +354,7 @@ class BasicUseCases(unittest.TestCase):
         order = merchant.create_order()
         card = balanced.Card(**INTERNATIONAL_CARD).save()
 
-        debit = order.debit_from(source=card, amount=1234)
+        order.debit_from(source=card, amount=1234)
         bank_account = balanced.BankAccount(
             account_number='1234567890',
             routing_number='321174851',
@@ -398,3 +400,193 @@ class BasicUseCases(unittest.TestCase):
         self.assertEqual(dispute.status, 'pending')
         self.assertEqual(dispute.reason, 'fraud')
         self.assertEqual(dispute.transaction.id, debit.id)
+
+
+
+
+class Rev0URIBasicUseCases(unittest.TestCase):
+    """This test case ensures all revision 0 URIs can work without a problem
+    with current revision 1 client
+
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        # ensure we won't consume API key from other test case
+        balanced.configure()
+        cls.api_key = balanced.APIKey().save()
+        balanced.configure(cls.api_key.secret)
+        cls.marketplace = balanced.Marketplace().save()
+
+    @classmethod
+    def _iter_customer_uris(cls, marketplace, customer):
+        args = dict(
+            mp=marketplace,
+            customer=customer,
+        )
+        for pattern in [
+            '/v1/customers/{customer.id}',
+            '/v1/marketplaces/{mp.id}/accounts/{customer.id}',
+        ]:
+            yield pattern.format(**args)
+
+    @classmethod
+    def _iter_card_uris(cls, marketplace, customer, card):
+        args = dict(
+            mp=marketplace,
+            customer=customer,
+            card=card,
+        )
+        for pattern in [
+            '/v1/customers/{customer.id}/cards/{card.id}',
+            '/v1/marketplaces/{mp.id}/cards/{card.id}',
+            '/v1/marketplaces/{mp.id}/accounts/{customer.id}/cards/{card.id}',
+        ]:
+            yield pattern.format(**args)
+
+    @classmethod
+    def _iter_bank_account_uris(cls, marketplace, customer, bank_account):
+        args = dict(
+            mp=marketplace,
+            customer=customer,
+            bank_account=bank_account,
+        )
+        for pattern in [
+            '/v1/customers/{customer.id}/bank_accounts/{bank_account.id}',
+            '/v1/marketplaces/{mp.id}/bank_accounts/{bank_account.id}',
+            '/v1/marketplaces/{mp.id}/accounts/{customer.id}/bank_accounts/{bank_account.id}',
+        ]:
+            yield pattern.format(**args)
+
+    def assert_not_rev0(self, resource):
+        """Ensures the given resouce is not in revision 0 format
+
+        """
+        self.assert_(not hasattr(resource, '_uris'))
+
+    def test_marketplace(self):
+        uri = '/v1/marketplaces/{0}'.format(self.marketplace.id)
+        marketplace = balanced.Marketplace.fetch(uri)
+        self.assertEqual(marketplace.id, self.marketplace.id)
+        self.assert_not_rev0(marketplace)
+
+    def test_customer(self):
+        customer = balanced.Customer().save()
+        for uri in self._iter_customer_uris(
+            marketplace=self.marketplace,
+            customer=customer,
+        ):
+            result_customer = balanced.Customer.fetch(uri)
+            self.assertEqual(result_customer.id, customer.id)
+            self.assert_not_rev0(result_customer)
+
+    def test_associate_card(self):
+        customer = balanced.Customer().save()
+        cards = set()
+        for uri in self._iter_customer_uris(
+            marketplace=self.marketplace,
+            customer=customer,
+        ):
+            card = balanced.Card(**CARD).save()
+            card.customer = uri
+            card.save()
+            cards.add(card.href)
+        customer_cards = set(card.href for card in customer.cards)
+        self.assertEqual(cards, customer_cards)
+
+    def test_associate_bank_account(self):
+        customer = balanced.Customer().save()
+        bank_accounts = set()
+        for uri in self._iter_customer_uris(
+            marketplace=self.marketplace,
+            customer=customer,
+        ):
+            bank_account = balanced.BankAccount(**BANK_ACCOUNT).save()
+            bank_account.customer = uri
+            bank_account.save()
+            bank_accounts.add(bank_account.href)
+
+        customer_bank_accounts = set(
+            bank_account.href for bank_account in customer.bank_accounts
+        )
+        self.assertEqual(bank_accounts, customer_bank_accounts)
+
+    def test_set_default_card(self):
+        customer = balanced.Customer().save()
+        card1 = balanced.Card(**CARD).save()
+        card1.associate_to_customer(customer)
+        card2 = balanced.Card(**CARD).save()
+        card2.associate_to_customer(customer)
+        # set card 1 as the default source
+        customer.source = card1.href
+        customer.save()
+        self.assertEqual(customer.source.href, card1.href)
+        for uri in self._iter_card_uris(
+            marketplace=self.marketplace,
+            customer=customer,
+            card=card2,
+        ):
+            # set the source to card2 via rev0 URI
+            customer.source = uri
+            customer.save()
+            self.assertEqual(customer.source.href, card2.href)
+
+            # set the source back to card1
+            customer.source = card1.href
+            customer.save()
+            self.assertEqual(customer.source.href, card1.href)
+
+    def test_set_default_bank_account(self):
+        customer = balanced.Customer().save()
+        bank_account1 = balanced.BankAccount(**BANK_ACCOUNT).save()
+        bank_account1.associate_to_customer(customer)
+        bank_account2 = balanced.BankAccount(**BANK_ACCOUNT).save()
+        bank_account2.associate_to_customer(customer)
+        # set bank account 1 as the default destination
+        customer.destination = bank_account1.href
+        customer.save()
+        self.assertEqual(customer.destination.href, bank_account1.href)
+        for uri in self._iter_bank_account_uris(
+            marketplace=self.marketplace,
+            customer=customer,
+            bank_account=bank_account2,
+        ):
+            # set the destination to bank_account2 via rev0 URI
+            customer.destination = uri
+            customer.save()
+            self.assertEqual(customer.destination.href, bank_account2.href)
+
+            # set the destination back to bank_account1
+            customer.destination = bank_account1.href
+            customer.save()
+            self.assertEqual(customer.destination.href, bank_account1.href)
+
+    def test_debit(self):
+        customer = balanced.Customer().save()
+        card = balanced.Card(**CARD).save()
+        card.associate_to_customer(customer)
+        for uri in self._iter_card_uris(
+            marketplace=self.marketplace,
+            customer=customer,
+            card=card,
+        ):
+            debit = balanced.Debit(amount=100, source=uri).save()
+            self.assertEqual(debit.source.href, card.href)
+            self.assertEqual(debit.amount, 100)
+
+    def test_credit(self):
+        # make sufficient amount for credit later
+        card = balanced.Card(**CARD).save()
+        card.debit(amount=1000000)
+
+        customer = balanced.Customer().save()
+        bank_account = balanced.BankAccount(**BANK_ACCOUNT).save()
+        bank_account.associate_to_customer(customer)
+        for uri in self._iter_bank_account_uris(
+            marketplace=self.marketplace,
+            customer=customer,
+            bank_account=bank_account,
+        ):
+            credit = balanced.Credit(amount=100, destination=uri).save()
+            self.assertEqual(credit.destination.href, bank_account.href)
+            self.assertEqual(credit.amount, 100)
