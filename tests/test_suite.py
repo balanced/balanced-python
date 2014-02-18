@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
-
 from __future__ import unicode_literals
+import sys
+import time
 from datetime import date
 
 import unittest2 as unittest
@@ -68,6 +69,10 @@ CARD = {
         'country_code': 'US',
     }
 }
+
+#: a card which will always create a dispute when you debit it
+DISPUTE_CARD = CARD.copy()
+DISPUTE_CARD['number'] = '6500000000000002'
 
 INTERNATIONAL_CARD = {
     'name': 'Johnny Fresh',
@@ -368,9 +373,39 @@ class BasicUseCases(unittest.TestCase):
         balanced.Marketplace().save()
         self.assertEqual(balanced.Credit.query.all(), [])
 
+    def test_dispute(self):
+        card = balanced.Card(**DISPUTE_CARD).save()
+        debit = card.debit(amount=100)
+
+        # TODO: this is ugly, I think we should provide a more
+        # reliable way to generate dispute, at least it should not
+        # take this long
+        print >>sys.stderr, (
+            'It takes a while before the dispute record created, '
+            'take and nap and wake up, then it should be done :/ '
+            '(last time I tried it took 10 minutes...)'
+        )
+        timeout = 12 * 60
+        interval = 10
+        begin = time.time()
+        while True:
+            if balanced.Dispute.query.count():
+                break
+            time.sleep(interval)
+            elapsed = time.time() - begin
+            print >>sys.stderr, 'Polling disputes..., elapsed', elapsed
+            self.assertLess(elapsed, timeout, 'Ouch, timeout')
+
+        dispute = balanced.Dispute.query.one()
+        self.assertEqual(dispute.status, 'pending')
+        self.assertEqual(dispute.reason, 'fraud')
+        self.assertEqual(dispute.transaction.id, debit.id)
+
+
+
 
 class Rev0URIBasicUseCases(unittest.TestCase):
-    """This test case ensures all revision 0 URIs can work without a problem 
+    """This test case ensures all revision 0 URIs can work without a problem
     with current revision 1 client
 
     """
@@ -439,7 +474,7 @@ class Rev0URIBasicUseCases(unittest.TestCase):
         customer = balanced.Customer().save()
         for uri in self._iter_customer_uris(
             marketplace=self.marketplace,
-            customer=customer, 
+            customer=customer,
         ):
             result_customer = balanced.Customer.fetch(uri)
             self.assertEqual(result_customer.id, customer.id)
@@ -450,7 +485,7 @@ class Rev0URIBasicUseCases(unittest.TestCase):
         cards = set()
         for uri in self._iter_customer_uris(
             marketplace=self.marketplace,
-            customer=customer, 
+            customer=customer,
         ):
             card = balanced.Card(**CARD).save()
             card.customer = uri
@@ -464,7 +499,7 @@ class Rev0URIBasicUseCases(unittest.TestCase):
         bank_accounts = set()
         for uri in self._iter_customer_uris(
             marketplace=self.marketplace,
-            customer=customer, 
+            customer=customer,
         ):
             bank_account = balanced.BankAccount(**BANK_ACCOUNT).save()
             bank_account.customer = uri
