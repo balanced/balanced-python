@@ -106,17 +106,21 @@ class BasicUseCases(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        # ensure we won't consume API key from other test case
-        balanced.configure()
-        cls.api_key = balanced.APIKey().save()
-        balanced.configure(cls.api_key.secret)
-        cls.marketplace = balanced.Marketplace().save()
+        cls.marketplace, cls.api_key = cls.create_marketplace()
 
     def setUp(self):
         super(BasicUseCases, self).setUp()
         # some test might rewrite api_key, so we need to configure it
         # here again
         balanced.configure(self.api_key.secret)
+
+    @classmethod
+    def create_marketplace(self):
+        balanced.configure(None)
+        api_key = balanced.APIKey().save()
+        balanced.configure(api_key.secret)
+        marketplace = balanced.Marketplace().save()
+        return marketplace, api_key
 
     def test_create_a_second_marketplace_should_fail(self):
         with self.assertRaises(requests.HTTPError) as exc:
@@ -198,24 +202,27 @@ class BasicUseCases(unittest.TestCase):
                 self.assertEqual(getattr(customer, key), value)
 
     def test_credit_a_bank_account(self):
+        self.create_marketplace()  # NOTE: fresh mp for escrow checks
         card = balanced.Card(**INTERNATIONAL_CARD).save()
         bank_account = balanced.BankAccount(**BANK_ACCOUNT).save()
-        card.debit(amount=10000)
-        original_balance = balanced.Marketplace.mine.in_escrow
+        debit = card.debit(amount=10000)
         credit = bank_account.credit(amount=1000)
         self.assertTrue(credit.id.startswith('CR'))
         self.assertEqual(credit.amount, 1000)
-        self.assertEqual(
-            balanced.Marketplace.mine.in_escrow,
-            original_balance - credit.amount)
+        with self.assertRaises(requests.HTTPError) as exc:
+            bank_account.credit(amount=(debit.amount - credit.amount) + 1)
+        self.assertEqual(exc.exception.status_code, 409)
+        self.assertEqual(exc.exception.category_code, 'insufficient-funds')
 
     def test_escrow_limit(self):
+        self.create_marketplace()  # NOTE: fresh mp for escrow checks
         bank_account = balanced.BankAccount(**BANK_ACCOUNT).save()
-        original_balance = balanced.Marketplace.mine.in_escrow
+        original_balance = 0
         with self.assertRaises(requests.HTTPError) as exc:
             bank_account.credit(amount=original_balance + 1)
-        the_exception = exc.exception
-        self.assertEqual(the_exception.status_code, 409)
+        ex = exc.exception
+        self.assertEqual(ex.status_code, 409)
+        self.assertEqual(ex.category_code, 'insufficient-funds')
 
     def test_slice_syntax(self):
         total_debit = balanced.Debit.query.count()
@@ -226,7 +233,7 @@ class BasicUseCases(unittest.TestCase):
         for debit in sliced_debits:
             self.assertIsInstance(debit, balanced.Debit)
         all_debits = balanced.Debit.query.all()
-        last = total_debit * - 1
+        last = total_debit * -1
         for index, debit in enumerate(all_debits):
             self.assertEqual(debit.href,
                              balanced.Debit.query[last + index].href)
@@ -364,13 +371,10 @@ class BasicUseCases(unittest.TestCase):
         order.credit_to(destination=bank_account, amount=1234)
 
     def test_empty_list(self):
-        # Notice: we need a whole new marketplace to reproduce the bug,
+        # NOTE: we need a whole new marketplace to reproduce the bug,
         # otherwise, it's very likely we will consume records created
         # by other tests
-        balanced.configure(None)
-        api_key = balanced.APIKey().save()
-        balanced.configure(api_key.secret)
-        balanced.Marketplace().save()
+        self.create_marketplace()
         self.assertEqual(balanced.Credit.query.all(), [])
 
     def test_dispute(self):
@@ -380,7 +384,7 @@ class BasicUseCases(unittest.TestCase):
         # TODO: this is ugly, I think we should provide a more
         # reliable way to generate dispute, at least it should not
         # take this long
-        print >>sys.stderr, (
+        print >> sys.stderr, (
             'It takes a while before the dispute record created, '
             'take and nap and wake up, then it should be done :/ '
             '(last time I tried it took 10 minutes...)'
@@ -393,7 +397,7 @@ class BasicUseCases(unittest.TestCase):
                 break
             time.sleep(interval)
             elapsed = time.time() - begin
-            print >>sys.stderr, 'Polling disputes..., elapsed', elapsed
+            print >> sys.stderr, 'Polling disputes..., elapsed', elapsed
             self.assertLess(elapsed, timeout, 'Ouch, timeout')
 
         dispute = balanced.Dispute.query.one()
