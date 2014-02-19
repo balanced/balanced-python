@@ -401,7 +401,15 @@ class BasicUseCases(unittest.TestCase):
         self.assertEqual(dispute.reason, 'fraud')
         self.assertEqual(dispute.transaction.id, debit.id)
 
-
+    def test_external_accounts(self):
+        external_account = balanced.ExternalAccount(
+            token='123123123',
+            network='name_of_provider',
+        ).save()
+        debit = external_account.debit(
+            amount=1234
+        )
+        self.assertEqual(debit.source, external_account.id)
 
 
 class Rev0URIBasicUseCases(unittest.TestCase):

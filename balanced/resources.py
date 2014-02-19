@@ -552,3 +552,14 @@ class EventCallbackLog(Resource):
     """
 
     type = 'event_callback_logs'
+
+
+class ExternalAccount(FundingInstrument):
+    """
+    An External Account represents a source of funds provided by an external, 3rd
+    party processor. You may Debit funds from the account if can_debit is true.
+    """
+
+    type = 'external_accounts'
+
+    uri_gen = wac.URIGen('/external_accounts', '{external_account}')
