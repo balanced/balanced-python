@@ -409,7 +409,7 @@ class BasicUseCases(unittest.TestCase):
         debit = external_account.debit(
             amount=1234
         )
-        self.assertEqual(debit.source, external_account.id)
+        self.assertEqual(debit.source.id, external_account.id)
 
 
 class Rev0URIBasicUseCases(unittest.TestCase):
