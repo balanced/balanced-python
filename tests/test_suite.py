@@ -408,7 +408,7 @@ class BasicUseCases(unittest.TestCase):
     def test_external_accounts(self):
         external_account = balanced.ExternalAccount(
             token='123123123',
-            network='name_of_provider',
+            provider='name_of_provider',
         ).save()
         debit = external_account.debit(
             amount=1234
