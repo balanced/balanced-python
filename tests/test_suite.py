@@ -436,8 +436,7 @@ class BasicUseCases(unittest.TestCase):
 
     def test_query_accounts_via_meta(self):
         customer = balanced.Customer().save()
-        for i in range(0, 2):
-            print i
+        for i in xrange(2):
             customer.accounts.create(
                 account_type=balanced.Account.OPERATING,
                 description='Operating account {0}'.format(i),
