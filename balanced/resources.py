@@ -478,6 +478,51 @@ class Customer(Resource):
     def create_order(self, **kwargs):
         return Order(href=self.orders.href, **kwargs).save()
 
+    @property
+    def deposit_account(self):
+        return self.accounts.filter(account_type=Account.DEPOSIT).first()
+
+    @property
+    def line_of_credit_account(self):
+        return self.accounts.filter(account_type=Account.LINE_OF_CREDIT).first()
+
+    @property
+    def operating_account(self):
+        return self.accounts.filter(account_type=Account.OPERATING).first()
+
+
+class Account(FundingInstrument):
+    """
+    An Account represents an account at accrues a balance.
+    """
+
+    type = 'accounts'
+
+    uri_gen = wac.URIGen('/accounts', '{account}')
+
+    DEPOSIT = 'deposit'
+    LINE_OF_CREDIT = 'line-of-credit'
+    OPERATING = 'operating'
+
+    def transfer_to(self, destination, amount, **kwargs):
+        return Transfer(
+            href=self.transfers.href,
+            destination=destination,
+            amount=amount,
+            **kwargs
+        ).save()
+
+
+class Transfer(Resource):
+    """
+    A Transfer represents the exchange of funds between supported funding
+    instruments, BankAccount and Account.
+    """
+
+    type = 'transfers'
+
+    uri_gen = wac.URIGen('/transfers', '{transfer}')
+
 
 class Order(Resource):
     """

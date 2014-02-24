@@ -1,6 +1,6 @@
 from __future__ import unicode_literals
 
-__version__ = '1.beta3'
+__version__ = '1.1dev'
 
 from balanced.config import configure
 from balanced import resources
@@ -10,7 +10,7 @@ from balanced.resources import (
     Transaction, BankAccount, Card, Dispute,
     Callback, Event, EventCallback, EventCallbackLog,
     BankAccountVerification, Customer, Order,
-    ExternalAccount
+    ExternalAccount, Account, Transfer
 )
 from balanced import exc
 
@@ -36,5 +36,7 @@ __all__ = [
     Reversal.__name__,
     Transaction.__name__,
     ExternalAccount.__name__,
+    Account.__name__,
+    Transfer.__name__,
     str(exc.__name__.partition('.')[-1])
 ]
