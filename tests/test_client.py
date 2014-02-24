@@ -12,7 +12,7 @@ class TestClient(utils.TestCase):
 
     def test_configure(self):
         expected_headers = {
-            'content-type': 'application/json;revision=1.1',
+            'content-type': 'application/json;revision=1.1.dev',
             'accept': 'application/vnd.api+json;revision=1.1.dev',
             'User-Agent': u'balanced-python/' + balanced.__version__,
         }
