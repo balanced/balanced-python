@@ -16,7 +16,7 @@ API_ROOT = 'https://api.balancedpayments.com'
 def configure(
         user=None,
         root_url=API_ROOT,
-        api_revision='1.1',
+        api_revision='1.1.dev',
         user_agent='balanced-python/' + __version__,
         accept_type='application/vnd.api+json',
         **kwargs

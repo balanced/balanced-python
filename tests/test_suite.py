@@ -370,6 +370,121 @@ class BasicUseCases(unittest.TestCase):
         bank_account.associate_to_customer(merchant)
         order.credit_to(destination=bank_account, amount=1234)
 
+    def test_operating_account_go_negative(self):
+        customer = balanced.Customer().save()
+        customer.accounts.create(
+            account_type=balanced.Account.OPERATING,
+            description='Redeemable balances migration'
+        )
+        acct = customer.operating_account
+        self.assertEqual(acct.balance, 0)
+        debit = acct.debit(amount=1000)
+        self.assertEqual(debit.amount, 1000)
+        self.assertEqual(debit.status, 'succeeded')
+        acct = customer.operating_account
+        self.assertEqual(acct.balance, -1000)
+
+    def test_deposit_account_no_negative(self):
+        customer = balanced.Customer().save()
+        customer.accounts.create(
+            account_type=balanced.Account.DEPOSIT,
+            description='Example description'
+        )
+
+        card = balanced.Card(**INTERNATIONAL_CARD).save()
+        card.debit(1000)
+
+        acct = customer.deposit_account
+        self.assertEqual(acct.balance, 0)
+
+        with self.assertRaises(balanced.exc.BalancedError):
+            acct.debit(amount=1000)
+
+        acct = customer.deposit_account
+        self.assertEqual(acct.balance, 0)
+
+        credit = acct.credit(amount=1000)
+        self.assertEqual(credit.amount, 1000)
+        self.assertEqual(credit.status, 'succeeded')
+        acct = customer.deposit_account
+        self.assertEqual(acct.balance, 1000)
+
+    def test_line_of_credit_account_only_negative(self):
+        customer = balanced.Customer().save()
+        customer.accounts.create(
+            account_type=balanced.Account.LINE_OF_CREDIT,
+            description='Overweight shipping'
+        )
+
+        acct = customer.line_of_credit_account
+        self.assertEqual(acct.balance, 0)
+
+        with self.assertRaises(balanced.exc.BalancedError):
+            acct.credit(amount=1000)
+
+        card = balanced.Card(**INTERNATIONAL_CARD).save()
+        card.debit(1000)
+
+        acct = customer.line_of_credit_account
+        self.assertEqual(acct.balance, 0)
+
+        debit = acct.debit(amount=1000)
+        self.assertEqual(debit.amount, 1000)
+        self.assertEqual(debit.status, 'succeeded')
+        acct = customer.line_of_credit_account
+        self.assertEqual(acct.balance, -1000)
+
+    def test_query_accounts_via_meta(self):
+        customer = balanced.Customer().save()
+        for i in range(0, 2):
+            print i
+            customer.accounts.create(
+                account_type=balanced.Account.OPERATING,
+                description='Operating account {0}'.format(i),
+                meta={
+                    'tag': 'account-number-{0}'.format(i)
+                }
+            )
+        acct = customer.accounts.filter(**{'meta.tag': 'account-number-1'}).first()
+        self.assertIsNotNone(acct)
+        self.assertEqual(acct.meta['tag'], 'account-number-1')
+        self.assertEqual(acct.description, 'Operating account 1')
+        self.assertEqual(len(customer.accounts), 3)
+
+    def test_transfer(self):
+        seller = balanced.Customer().save()
+        bank_account = balanced.BankAccount(**BANK_ACCOUNT).save()
+        bank_account.associate_to_customer(seller)
+
+        account = seller.deposit_account
+
+        buyer = balanced.Customer().save()
+        card = balanced.Card(**INTERNATIONAL_CARD).save()
+        card.associate_to_customer(buyer)
+
+        order = seller.create_order(description='foo order')
+
+        amount = 124
+        initial_balance = account.balance
+
+        order.debit_from(source=card, amount=amount)
+
+        order = balanced.Order.fetch(order.href)
+        self.assertEqual(order.amount_escrowed, amount)
+
+        order.credit_to(destination=account, amount=amount)
+
+        # Withdraw from Balanced to a bank account
+        withdrawal = account.transfer_to(
+            destination=bank_account,
+            amount=amount
+        )
+
+        self.assertEqual(withdrawal.amount, amount)
+        self.assertIsInstance(withdrawal, balanced.Transfer)
+        account = seller.deposit_account
+        self.assertEqual(account.balance, initial_balance)
+
     def test_empty_list(self):
         # NOTE: we need a whole new marketplace to reproduce the bug,
         # otherwise, it's very likely we will consume records created
