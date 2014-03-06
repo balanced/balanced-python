@@ -3,8 +3,8 @@ balanced.BankAccountVerification().confirm()
 % elif mode == 'request':
 import balanced
 
-balanced.configure('ak-test-1kvvievk0Qqw5wQPsrlM9g7wQwNe62cyc')
+balanced.configure('ak-test-2cSDy37BKy5K4NUHKHVNXNTjTHPEqjRtB')
 
-verification = balanced.BankAccountVerification.fetch('/verifications/BZ1FF2MHFH9upRu7C0QUwnby')
+verification = balanced.BankAccountVerification.fetch('/verifications/BZ3NheXIi1UxUiNtkaSo1ZI5')
 verification.confirm(amount_1=1, amount_2=1)
 % endif

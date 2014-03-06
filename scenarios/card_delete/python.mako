@@ -3,8 +3,8 @@ balanced.Card().unstore()
 % elif mode == 'request':
 import balanced
 
-balanced.configure('ak-test-1kvvievk0Qqw5wQPsrlM9g7wQwNe62cyc')
+balanced.configure('ak-test-2cSDy37BKy5K4NUHKHVNXNTjTHPEqjRtB')
 
-card = balanced.Card.fetch('/cards/CC2uc8iPDjgyxOXHVtnZloyI')
+card = balanced.Card.fetch('/cards/CC4cbNzUmFqGrc1GmFpXp6fe')
 card.unstore()
 % endif

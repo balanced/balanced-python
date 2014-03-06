@@ -1,5 +1,5 @@
 import balanced
 
-balanced.configure('ak-test-1kvvievk0Qqw5wQPsrlM9g7wQwNe62cyc')
+balanced.configure('ak-test-2cSDy37BKy5K4NUHKHVNXNTjTHPEqjRtB')
 
-refund = balanced.Reversal.fetch('/reversals/RV42n8M9XZWna427oPDDi4RG')
+refund = balanced.Reversal.fetch('/reversals/RV5h1LgxTlH1OtHAZEfQbvbH')

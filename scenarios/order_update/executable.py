@@ -1,8 +1,8 @@
 import balanced
 
-balanced.configure('ak-test-1kvvievk0Qqw5wQPsrlM9g7wQwNe62cyc')
+balanced.configure('ak-test-2cSDy37BKy5K4NUHKHVNXNTjTHPEqjRtB')
 
-order = balanced.Order.fetch('/orders/OR3FOihZa7lMHdAP5p8BJZVY')
+order = balanced.Order.fetch('/orders/OR520nGy59wfJ4mM7HR6TYrn')
 order.description = 'New description for order'
 order.meta = {
   'anykey': 'valuegoeshere',

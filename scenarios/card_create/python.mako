@@ -3,11 +3,11 @@ balanced.Card().save()
 % elif mode == 'request':
 import balanced
 
-balanced.configure('ak-test-1kvvievk0Qqw5wQPsrlM9g7wQwNe62cyc')
+balanced.configure('ak-test-2cSDy37BKy5K4NUHKHVNXNTjTHPEqjRtB')
 
 card = balanced.Card(
+  cvv='123',
   expiration_month='12',
-  security_code='123',
   number='5105105105105100',
   expiration_year='2020'
 ).save()

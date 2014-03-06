@@ -3,9 +3,9 @@ balanced.Customer().save()
 % elif mode == 'request':
 import balanced
 
-balanced.configure('ak-test-1kvvievk0Qqw5wQPsrlM9g7wQwNe62cyc')
+balanced.configure('ak-test-2cSDy37BKy5K4NUHKHVNXNTjTHPEqjRtB')
 
-customer = balanced.Debit.fetch('/customers/CU33Y4cut21qu1d1lGYDBseQ')
+customer = balanced.Debit.fetch('/customers/CU4xpIqZ7mf2fuLpBoXgoG7m')
 customer.email = 'email@newdomain.com'
 customer.meta = {
   'shipping-preference': 'ground'

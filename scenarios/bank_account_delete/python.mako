@@ -3,8 +3,8 @@ balanced.BankAccount().delete()
 % elif mode == 'request':
 import balanced
 
-balanced.configure('ak-test-1kvvievk0Qqw5wQPsrlM9g7wQwNe62cyc')
+balanced.configure('ak-test-2cSDy37BKy5K4NUHKHVNXNTjTHPEqjRtB')
 
-bank_account = balanced.BankAccount.fetch('/bank_accounts/BA1QFf0LmIxr8p41msqX46Oy')
+bank_account = balanced.BankAccount.fetch('/bank_accounts/BA3LBmizwthrjehivn2ffzHU')
 bank_account.delete()
 % endif
