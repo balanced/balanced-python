@@ -1,8 +1,8 @@
 import balanced
 
-balanced.configure('ak-test-2cSDy37BKy5K4NUHKHVNXNTjTHPEqjRtB')
+balanced.configure('ak-test-2ADpvITfpgBn8uBzEGsQ2bIgWaftUWiul')
 
-credit = balanced.Credit.fetch('/credits/CR4wyLukORa0TXhCYtjZrfw5')
+credit = balanced.Credit.fetch('/credits/CR5XXPwA1ckaTDSIg3593sEx')
 credit.meta = {
   'twitter.id': '1234987650',
   'facebook.user_id': '0192837465',

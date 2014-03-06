@@ -4,7 +4,7 @@ balanced.Reversal.fetch()
 % elif mode == 'request':
 import balanced
 
-balanced.configure('ak-test-2cSDy37BKy5K4NUHKHVNXNTjTHPEqjRtB')
+balanced.configure('ak-test-2ADpvITfpgBn8uBzEGsQ2bIgWaftUWiul')
 
-refund = balanced.Reversal.fetch('/reversals/RV5h1LgxTlH1OtHAZEfQbvbH')
+refund = balanced.Reversal.fetch('/reversals/RV6OCxJ1UhkG84is6H9PHjkZ')
 % endif

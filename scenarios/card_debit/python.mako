@@ -3,9 +3,9 @@ balanced.Card().debit()
 % elif mode == 'request':
 import balanced
 
-balanced.configure('ak-test-2cSDy37BKy5K4NUHKHVNXNTjTHPEqjRtB')
+balanced.configure('ak-test-2ADpvITfpgBn8uBzEGsQ2bIgWaftUWiul')
 
-card = balanced.Card.fetch('/cards/CC4GOYzOKyWXBzJMVTs00aNk')
+card = balanced.Card.fetch('/cards/CC68IoCVpoFlkugB7xt52p8C')
 card.debit(
   appears_on_statement_as='Statement text',
   amount=5000,
