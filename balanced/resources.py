@@ -132,8 +132,8 @@ class JSONSchemaPage(wac.Page, ObjectifyMixin):
             # there is no resources key in the response from server
             # if the list is empty, so when we try to get something like
             # `debits`, an AttributeError will be raised. Not sure is this
-            # behavior a bug of server, but anyway, this is just a workaround here
-            # for solving the problem. The issue was posted here
+            # behavior a bug of server, but anyway, this is just a workaround
+            # here for solving the problem. The issue was posted here
             # https://github.com/balanced/balanced-python/issues/93
             return []
 

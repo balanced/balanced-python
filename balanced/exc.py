@@ -6,7 +6,13 @@ import wac
 
 
 class BalancedError(Exception):
-    pass
+
+    def __str__(self):
+        attrs = ', '.join([
+            '{0}={1}'.format(k, repr(v))
+            for k, v in self.__dict__.iteritems()
+        ])
+        return '{0}({1})'.format(self.__class__.__name__, attrs)
 
 
 class ResourceError(BalancedError):
