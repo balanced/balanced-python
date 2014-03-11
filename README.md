@@ -4,6 +4,8 @@ Online Marketplace Payments
 
 [![Build Status](https://secure.travis-ci.org/balanced/balanced-python.png?branch=master)](http://travis-ci.org/balanced/balanced-python)
 
+**v1.x requires Balanced API 1.1. Use [v0.x](https://github.com/balanced/balanced-python/tree/rev0) for Balanced API 1.0.**
+
 ## Installation
 
     pip install balanced
