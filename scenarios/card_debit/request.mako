@@ -5,3 +5,4 @@ card = balanced.Card.fetch('${request['card_href']}')
 card.debit(
   <% main.payload_expand(request['payload']) %>
 )
+
