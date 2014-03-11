@@ -186,7 +186,8 @@ class JSONSchemaResource(wac.Resource, ObjectifyMixin):
             if suffix not in item:
                 href = getattr(self, item + suffix, None)
                 if href:
-                    setattr(self, item, Resource.get(href))
+                    item_type = Resource.registry.get(item + 's', Resource)
+                    setattr(self, item, item_type.get(href))
                     return getattr(self, item)
         raise AttributeError(
             "'{0}' has no attribute '{1}'".format(

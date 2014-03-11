@@ -39,6 +39,11 @@ def main():
     except balanced.exc.BankAccountVerificationFailure as ex:
         print 'Authentication error , %s' % ex.message
 
+    # reload
+    verification = balanced.BankAccount.fetch(
+        bank_account.href
+    ).bank_account_verification
+
     if verification.confirm(1, 1).verification_status != 'succeeded':
         raise Exception('unpossible')
     debit = bank_account.debit(100)
