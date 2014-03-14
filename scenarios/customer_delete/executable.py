@@ -1,6 +1,6 @@
 import balanced
 
-balanced.configure('ak-test-1kvvievk0Qqw5wQPsrlM9g7wQwNe62cyc')
+balanced.configure('ak-test-2ADpvITfpgBn8uBzEGsQ2bIgWaftUWiul')
 
-customer = balanced.Customer.fetch('/customers/CU3eeasZ9yQ86uzzIYZkrPGg')
+customer = balanced.Customer.fetch('/customers/CU64R7DS6DwuXYVg9RTskFK8')
 customer.unstore()

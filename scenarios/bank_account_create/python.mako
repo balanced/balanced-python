@@ -3,14 +3,14 @@ balanced.BankAccount().save()
 % elif mode == 'request':
 import balanced
 
-balanced.configure('ak-test-1kvvievk0Qqw5wQPsrlM9g7wQwNe62cyc')
+balanced.configure('ak-test-2ADpvITfpgBn8uBzEGsQ2bIgWaftUWiul')
 
 bank_account = balanced.BankAccount(
   routing_number='121000358',
-  type='checking',
+  account_type='checking',
   account_number='9900000001',
   name='Johann Bernoulli'
 ).save()
 % elif mode == 'response':
-BankAccount(routing_number=u'121000358', bank_name=u'BANK OF AMERICA, N.A.', account_type=u'checking', name=u'Johann Bernoulli', links={u'customer': None, u'bank_account_verification': None}, can_credit=True, created_at=u'2014-01-27T22:57:47.772481Z', address={u'city': None, u'line2': None, u'line1': None, u'state': None, u'postal_code': None, u'country_code': None}, updated_at=u'2014-01-27T22:57:47.772483Z', href=u'/bank_accounts/BA3qNbYRqFM0Q7MXn3IcjGl0', meta={}, account_number=u'xxxxxx0001', fingerprint=u'5f0ba9fa3f1122ef13b944a40abfe44e7eba9e16934e64200913cb4c402ace14', can_debit=False, id=u'BA3qNbYRqFM0Q7MXn3IcjGl0')
+BankAccount(routing_number=u'121000358', bank_name=u'BANK OF AMERICA, N.A.', account_type=u'checking', name=u'Johann Bernoulli', links={u'customer': None, u'bank_account_verification': None}, can_credit=True, created_at=u'2014-03-06T19:23:27.876147Z', address={u'city': None, u'line2': None, u'line1': None, u'state': None, u'postal_code': None, u'country_code': None}, updated_at=u'2014-03-06T19:23:27.876150Z', href=u'/bank_accounts/BA6bLGpQZPOiTNRxF24rMd9m', meta={}, account_number=u'xxxxxx0001', fingerprint=u'5f0ba9fa3f1122ef13b944a40abfe44e7eba9e16934e64200913cb4c402ace14', can_debit=False, id=u'BA6bLGpQZPOiTNRxF24rMd9m')
 % endif

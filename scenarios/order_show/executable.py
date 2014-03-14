@@ -1,5 +1,5 @@
 import balanced
 
-balanced.configure('ak-test-1kvvievk0Qqw5wQPsrlM9g7wQwNe62cyc')
+balanced.configure('ak-test-2ADpvITfpgBn8uBzEGsQ2bIgWaftUWiul')
 
-order = balanced.Order.fetch('/orders/OR3FOihZa7lMHdAP5p8BJZVY')
+order = balanced.Order.fetch('/orders/OR6wcEVkOymvs4PairiGEcIx')

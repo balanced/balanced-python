@@ -4,7 +4,7 @@ balanced.Event.query
 % elif mode == 'request':
 import balanced
 
-balanced.configure('ak-test-1kvvievk0Qqw5wQPsrlM9g7wQwNe62cyc')
+balanced.configure('ak-test-2ADpvITfpgBn8uBzEGsQ2bIgWaftUWiul')
 
 events = balanced.Event.query
 % elif mode == 'response':

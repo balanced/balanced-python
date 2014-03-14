@@ -1,8 +1,8 @@
 import balanced
 
-balanced.configure('ak-test-1kvvievk0Qqw5wQPsrlM9g7wQwNe62cyc')
+balanced.configure('ak-test-2ADpvITfpgBn8uBzEGsQ2bIgWaftUWiul')
 
-bank_account = balanced.BankAccount.fetch('/bank_accounts/BA1QFf0LmIxr8p41msqX46Oy')
+bank_account = balanced.BankAccount.fetch('/bank_accounts/BA58WYAEUMrEtAkW5KAvWo5V')
 bank_account.meta = {
   'twitter.id'='1234987650',
   'facebook.user_id'='0192837465',

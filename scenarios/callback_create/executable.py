@@ -1,7 +1,8 @@
 import balanced
 
-balanced.configure('ak-test-1kvvievk0Qqw5wQPsrlM9g7wQwNe62cyc')
+balanced.configure('ak-test-2ADpvITfpgBn8uBzEGsQ2bIgWaftUWiul')
 
 callback = balanced.Callback(
-  url='http://www.example.com/callback'
+  url='http://www.example.com/callback',
+  method='post'
 ).save()

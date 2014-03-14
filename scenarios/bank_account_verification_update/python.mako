@@ -3,10 +3,10 @@ balanced.BankAccountVerification().confirm()
 % elif mode == 'request':
 import balanced
 
-balanced.configure('ak-test-1kvvievk0Qqw5wQPsrlM9g7wQwNe62cyc')
+balanced.configure('ak-test-2ADpvITfpgBn8uBzEGsQ2bIgWaftUWiul')
 
-verification = balanced.BankAccountVerification.fetch('/verifications/BZ1FF2MHFH9upRu7C0QUwnby')
+verification = balanced.BankAccountVerification.fetch('/verifications/BZ5alC0fajkuBOvOU7lVT7QJ')
 verification.confirm(amount_1=1, amount_2=1)
 % elif mode == 'response':
-BankAccountVerification(verification_status=u'succeeded', links={u'bank_account': u'BA1D3vL3LjasB0kewMqRGI0S'}, created_at=u'2014-01-27T22:56:10.726455Z', attempts_remaining=2, updated_at=u'2014-01-27T22:56:18.631337Z', deposit_status=u'succeeded', attempts=1, href=u'/verifications/BZ1FF2MHFH9upRu7C0QUwnby', meta={}, id=u'BZ1FF2MHFH9upRu7C0QUwnby')
+BankAccountVerification(verification_status=u'succeeded', links={u'bank_account': u'BA50LpPrCTB63Ecm0wEgdOQM'}, created_at=u'2014-03-06T19:22:24.651572Z', attempts_remaining=2, updated_at=u'2014-03-06T19:22:27.893114Z', deposit_status=u'succeeded', attempts=1, href=u'/verifications/BZ5alC0fajkuBOvOU7lVT7QJ', meta={}, id=u'BZ5alC0fajkuBOvOU7lVT7QJ')
 % endif

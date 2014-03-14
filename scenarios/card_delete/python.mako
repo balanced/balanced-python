@@ -3,9 +3,9 @@ balanced.Card().unstore()
 % elif mode == 'request':
 import balanced
 
-balanced.configure('ak-test-1kvvievk0Qqw5wQPsrlM9g7wQwNe62cyc')
+balanced.configure('ak-test-2ADpvITfpgBn8uBzEGsQ2bIgWaftUWiul')
 
-card = balanced.Card.fetch('/cards/CC2uc8iPDjgyxOXHVtnZloyI')
+card = balanced.Card.fetch('/cards/CC5Buki6e4Kg4bDVZ3OSfQ8O')
 card.unstore()
 % elif mode == 'response':
 
