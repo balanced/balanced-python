@@ -1,4 +1,4 @@
-from __future__ import unicode_literals
+
 
 import balanced
 
@@ -56,6 +56,6 @@ another_bank_account.associate_to_customer(another_merchant)
 try:
     another_credit = another_bank_account.credit(amount=50, order=order)
 except balanced.exc.BalancedError as ex:
-    print ex
+    print(ex)
 
 assert ex is not None

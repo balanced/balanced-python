@@ -1,4 +1,4 @@
-from __future__ import unicode_literals
+
 
 import balanced
 
@@ -14,7 +14,7 @@ class TestClient(utils.TestCase):
         expected_headers = {
             'content-type': 'application/json;revision=1.1',
             'accept': 'application/vnd.api+json;revision=1.1',
-            'User-Agent': u'balanced-python/' + balanced.__version__,
+            'User-Agent': 'balanced-python/' + balanced.__version__,
         }
         self.assertDictContainsSubset(
             expected_headers, balanced.config.client.config.headers

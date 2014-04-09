@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals
+
 import sys
 import time
 from datetime import date
@@ -183,7 +183,7 @@ class BasicUseCases(unittest.TestCase):
 
     def test_create_a_person_customer(self):
         customer = balanced.Customer(**PERSON).save()
-        for key, value in PERSON.iteritems():
+        for key, value in PERSON.items():
             if key == 'dob':
                 continue
             if isinstance(value, dict):
@@ -193,7 +193,7 @@ class BasicUseCases(unittest.TestCase):
 
     def test_create_a_business_customer(self):
         customer = balanced.Customer(**BUSINESS).save()
-        for key, value in BUSINESS.iteritems():
+        for key, value in BUSINESS.items():
             if key == 'dob':
                 continue
             if isinstance(value, dict):
@@ -384,11 +384,11 @@ class BasicUseCases(unittest.TestCase):
         # TODO: this is ugly, I think we should provide a more
         # reliable way to generate dispute, at least it should not
         # take this long
-        print >> sys.stderr, (
+        print((
             'It takes a while before the dispute record created, '
             'take and nap and wake up, then it should be done :/ '
             '(last time I tried it took 10 minutes...)'
-        )
+        ), file=sys.stderr)
         timeout = 12 * 60
         interval = 10
         begin = time.time()
@@ -397,7 +397,7 @@ class BasicUseCases(unittest.TestCase):
                 break
             time.sleep(interval)
             elapsed = time.time() - begin
-            print >> sys.stderr, 'Polling disputes..., elapsed', elapsed
+            print('Polling disputes..., elapsed', elapsed, file=sys.stderr)
             self.assertLess(elapsed, timeout, 'Ouch, timeout')
 
         dispute = balanced.Dispute.query.one()

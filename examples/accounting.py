@@ -32,16 +32,16 @@ def generate_report(args):
         if not os.path.exists('./cache'):
             os.makedirs('./cache')
 
-        print 'Downloading Debits'
+        print('Downloading Debits')
         debits = balanced.Debit.query.all()
 
-        print 'Downloading Credits'
+        print('Downloading Credits')
         credits = balanced.Credit.query.all()
 
-        print 'Downloading Refunds'
+        print('Downloading Refunds')
         refunds = balanced.Refund.query.all()
 
-        print 'Caching Transactions'
+        print('Caching Transactions')
         with open('cache/debits.obj', 'w') as f:
             pickle.dump(debits, f)
 
@@ -66,10 +66,10 @@ def generate_report(args):
 
     # {year: [(month, txn)]}
     txns_by_year = group(txns_by_period,
-                         lambda (y, m, txn): y,
-                         lambda (y, m, txn): (m, txn))
+                         lambda y_m_txn: y_m_txn[0],
+                         lambda y_m_txn2: (y_m_txn2[1], y_m_txn2[2]))
 
-    group_by_month = lambda xs: group(xs, lambda (a, b): a, lambda (a, b): b)
+    group_by_month = lambda xs: group(xs, lambda a_b: a_b[0], lambda a_b1: a_b1[1])
 
     # {year: {month: [txn]}}
     txns_by_year_by_month = {key: group_by_month(txns_by_year[key])

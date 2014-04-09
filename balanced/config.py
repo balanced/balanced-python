@@ -1,4 +1,4 @@
-from __future__ import unicode_literals
+
 from datetime import datetime
 
 import simplejson as json
@@ -71,8 +71,8 @@ class Client(wac.Client):
     @staticmethod
     def _parse_deserialized(e):
         if isinstance(e, dict):
-            for k in e.iterkeys():
-                if k.endswith('_at') and isinstance(e[k], basestring):
+            for k in e.keys():
+                if k.endswith('_at') and isinstance(e[k], str):
                     e[k] = iso8601.parse_date(e[k])
         return e
 

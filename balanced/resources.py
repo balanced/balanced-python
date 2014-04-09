@@ -1,4 +1,4 @@
-from __future__ import unicode_literals
+
 
 import uritemplate
 import wac
@@ -21,7 +21,7 @@ class ObjectifyMixin(wac._ObjectifyMixin):
     def _objectify(self, resource_cls, **fields):
         # setting values locally, not from server
         if 'links' not in fields:
-            for key, value in fields.iteritems():
+            for key, value in fields.items():
                 setattr(self, key, value)
         else:
             self._construct_from_response(**fields)
@@ -31,11 +31,11 @@ class ObjectifyMixin(wac._ObjectifyMixin):
         meta = payload.pop('meta', None)
 
         if isinstance(self, wac.Page):
-            for key, value in meta.iteritems():
+            for key, value in meta.items():
                 setattr(self, key, value)
 
         # the remaining keys here are just hypermedia resources
-        for _type, resources in payload.iteritems():
+        for _type, resources in payload.items():
             # Singular resources are represented as JSON objects. However,
             # they are still wrapped inside an array:
             cls = Resource.registry[_type]
@@ -48,7 +48,7 @@ class ObjectifyMixin(wac._ObjectifyMixin):
                     target = self
                 else:
                     target = cls()
-                for key, value in resource_body.iteritems():
+                for key, value in resource_body.items():
                     if key in ('links',):
                         continue
                     setattr(target, key, value)
@@ -66,7 +66,7 @@ class ObjectifyMixin(wac._ObjectifyMixin):
         Construct links for objects
         """
         links = payload.pop('links', {})
-        for key, uri in links.iteritems():
+        for key, uri in links.items():
             variables = uritemplate.variables(uri)
             # marketplaces.card_holds
             collection, resource_type = key.split('.')
@@ -103,7 +103,7 @@ class ObjectifyMixin(wac._ObjectifyMixin):
                 # check if this is a collection or a singular item
                 if any(
                         parsed_link.endswith(value)
-                        for value in item_variables.itervalues()
+                        for value in item_variables.values()
                 ):
                     # singular
                     if not item_property.endswith('_href'):
@@ -162,7 +162,7 @@ class JSONSchemaResource(wac.Resource, ObjectifyMixin):
 
         attrs = dict(
             (k, v.href if isinstance(v, Resource) else v)
-            for k, v in attrs.iteritems()
+            for k, v in attrs.items()
             if not isinstance(v, (cls.collection_cls))
         )
 
@@ -178,10 +178,10 @@ class JSONSchemaResource(wac.Resource, ObjectifyMixin):
         self.client.delete(self.href)
 
     def __dir__(self):
-        return self.__dict__.keys()
+        return list(self.__dict__.keys())
 
     def __getattr__(self, item):
-        if isinstance(item, basestring):
+        if isinstance(item, str):
             suffix = '_href'
             if suffix not in item:
                 href = getattr(self, item + suffix, None)

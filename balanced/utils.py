@@ -1,4 +1,4 @@
-from __future__ import unicode_literals
+
 
 
 class ClassPropertyDescriptor(object):
@@ -33,7 +33,7 @@ def classproperty(func):
 
 
 def extract_href_from_object(obj):
-    if isinstance(obj, basestring):
+    if isinstance(obj, str):
         return obj
     if isinstance(obj, dict):
         return obj['href']

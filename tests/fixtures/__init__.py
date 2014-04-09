@@ -1,4 +1,4 @@
-from __future__ import unicode_literals
+
 import os
 
 import simplejson as json
@@ -13,5 +13,5 @@ class ResourceMeta(type):
         ))
 
 
-class Resources(object):
-    __metaclass__ = ResourceMeta
+class Resources(object, metaclass=ResourceMeta):
+    pass

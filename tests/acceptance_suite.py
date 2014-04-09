@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals
+
 from datetime import date
 import inspect
 import time
@@ -9,7 +9,7 @@ import copy
 import requests
 import unittest2 as unittest
 
-from fixtures import cards, merchants, bank_accounts
+from .fixtures import cards, merchants, bank_accounts
 
 
 class TestCases(unittest.TestCase):
@@ -430,7 +430,7 @@ class AICases(TestCases):
                 resource = callable(**kwargs)
             if validate_cls is not None:
                 self.assertTrue(isinstance(resource, validate_cls))
-                for k, v in validate_kwargs.iteritems():
+                for k, v in validate_kwargs.items():
                     resource_v = getattr(resource, k)
                     if isinstance(v, balanced.Resource):
                         self.assertEqual(v.id, resource_v.id)
@@ -851,7 +851,7 @@ class AICases(TestCases):
             **bank_accounts.BANK_ACCOUNT).save()
         verification = bank_account.verify()
         ex = balanced.exc.FundingInstrumentVerificationFailure
-        for _ in xrange(verification.remaining_attempts):
+        for _ in range(verification.remaining_attempts):
             with self.assertRaises(ex):
                 verification.confirm(1, 2)
         with self.assertRaises(ex):

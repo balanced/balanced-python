@@ -22,13 +22,13 @@ def construct_response(scenario_name):
             text = template.render(response=response).strip()
             response =  json.loads(text)
             del response["links"]
-            for key, value in response.items():
+            for key, value in list(response.items()):
                 response = value[0]
                 type = key
                 resource = balanced.Resource()
                 object_type = resource.registry[type]
                 object_instance = object_type()
-                for key, value in response.items():
+                for key, value in list(response.items()):
                    setattr(object_instance, key, value)
             text = template.render(response=object_instance)
         except KeyError:
@@ -50,8 +50,8 @@ def render_executables():
                                    request=request, payload=payload).strip()
         except KeyError:
             text = ''
-            print "WARN: Skipped {} since {} not in scenario.cache".format(
-                path, event_name)
+            print("WARN: Skipped {} since {} not in scenario.cache".format(
+                path, event_name))
         with open(os.path.join(os.path.dirname(path),
                                'executable.py'), 'w+') as write_to:
             write_to.write(text)
@@ -76,15 +76,15 @@ def issue_no_mako_warnings():
         set_has_mako.add(os.path.dirname(path))
     for path in glob2.glob('./scenarios/**/python.mako'):
         set_no_python_mako.add(os.path.dirname(path))
-    print 'The following dont have a python.mako file. Look into it!'
-    print set_has_mako.difference(set_no_python_mako)
+    print('The following dont have a python.mako file. Look into it!')
+    print(set_has_mako.difference(set_no_python_mako))
 
 
 
 if __name__ == "__main__":
-    print "Making Executables"
+    print("Making Executables")
     render_executables()
-    print "Rendering new mako files"
+    print("Rendering new mako files")
     render_mako()
     issue_no_mako_warnings()
 

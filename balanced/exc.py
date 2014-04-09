@@ -1,6 +1,6 @@
-from __future__ import unicode_literals
 
-import httplib
+
+import http.client
 
 import wac
 
@@ -10,7 +10,7 @@ class BalancedError(Exception):
     def __str__(self):
         attrs = ', '.join([
             '{0}={1}'.format(k, repr(v))
-            for k, v in self.__dict__.iteritems()
+            for k, v in self.__dict__.items()
         ])
         return '{0}({1})'.format(self.__class__.__name__, attrs)
 
@@ -42,22 +42,22 @@ class HTTPError(BalancedError, wac.Error):
             cls.types = [
                 getattr(cls, k)
                 for k in dir(cls)
-                if k.isupper() and isinstance(getattr(cls, k), basestring)
+                if k.isupper() and isinstance(getattr(cls, k), str)
             ]
-            cls.type_to_error.update(zip(cls.types, [cls] * len(cls.types)))
+            cls.type_to_error.update(list(zip(cls.types, [cls] * len(cls.types))))
             return cls
 
     def __init__(self, requests_ex):
         super(wac.Error, self).__init__(requests_ex)
         self.status_code = requests_ex.response.status_code
         data = getattr(requests_ex.response, 'data', {})
-        for k, v in data.get('errors', [{}])[0].iteritems():
+        for k, v in data.get('errors', [{}])[0].items():
             setattr(self, k, v)
 
     @classmethod
     def format_message(cls, requests_ex):
         data = getattr(requests_ex.response, 'data', {})
-        status = httplib.responses[requests_ex.response.status_code]
+        status = http.client.responses[requests_ex.response.status_code]
         error = data['errors'][0]
         status = error.pop('status', status)
         status_code = error.pop('status_code',
