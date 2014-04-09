@@ -2,7 +2,7 @@
 
 import contextlib
 import multiprocessing
-import unittest2py3k as unittest
+import unittest2 as unittest
 
 from wsgiref.simple_server import make_server
 

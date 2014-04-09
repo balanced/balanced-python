@@ -4,7 +4,7 @@ import sys
 import time
 from datetime import date
 
-import unittest2py3k as unittest
+import unittest2 as unittest
 import requests
 
 import balanced
