@@ -7,7 +7,7 @@ import time
 import balanced
 import copy
 import requests
-import unittest2 as unittest
+import unittest2py3k as unittest
 
 from .fixtures import cards, merchants, bank_accounts
 
