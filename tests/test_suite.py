@@ -377,12 +377,12 @@ class BasicUseCases(unittest.TestCase):
         self.create_marketplace()
         self.assertEqual(balanced.Credit.query.all(), [])
 
-    # def test_query_pagination(self):
-    #     card = balanced.Card(**CARD).save()
-    #     while balanced.Debit.query.count() <= 25:
-    #         debit = card.debit(amount=1000)
-    #         balanced.Debit.query.all()
-    #     self.assertEqual(balanced.Debit.query.count(), 26)
+    @unittest.skip('FAILING')
+    def test_query_pagination(self):
+        card = balanced.Card(**CARD).save()
+        for _ in xrange(30): card.debit(amount=100)
+        self.assertEqual(len(balanced.Debit.query.all()), 30)
+
 
     def test_dispute(self):
         card = balanced.Card(**DISPUTE_CARD).save()
