@@ -1,5 +1,5 @@
 import balanced
 
-balanced.configure('ak-test-2ADpvITfpgBn8uBzEGsQ2bIgWaftUWiul')
+balanced.configure('ak-test-1ByQgRpcQLTwmOhCBUofyIHm0r96qPm8s')
 
-customer = balanced.Customer.fetch('/customers/CU5YopHN07Ul5XQnILUifeQT')
+customer = balanced.Customer.fetch('/customers/CU194sQ52I1idiwicbg0mOOB')

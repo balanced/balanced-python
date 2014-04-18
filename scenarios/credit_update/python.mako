@@ -3,9 +3,9 @@ balanced.Credit().save()
 % elif mode == 'request':
 import balanced
 
-balanced.configure('ak-test-2ADpvITfpgBn8uBzEGsQ2bIgWaftUWiul')
+balanced.configure('ak-test-1ByQgRpcQLTwmOhCBUofyIHm0r96qPm8s')
 
-credit = balanced.Credit.fetch('/credits/CR5XXPwA1ckaTDSIg3593sEx')
+credit = balanced.Credit.fetch('/credits/CROijU7WflyjITPTGU9GMlL')
 credit.meta = {
   'twitter.id': '1234987650',
   'facebook.user_id': '0192837465',
@@ -13,5 +13,5 @@ credit.meta = {
 }
 credit.save()
 % elif mode == 'response':
-Credit(status=u'succeeded', description=u'New description for credit', links={u'customer': u'CU5LVuaZG7gURfbA7TuMNoZa', u'destination': u'BA5OqdmH8URGBYpilMITWsNW', u'order': None}, amount=5000, created_at=u'2014-03-06T19:23:08.771807Z', updated_at=u'2014-03-06T19:23:14.259690Z', failure_reason=None, currency=u'USD', transaction_number=u'CR570-678-5174', href=u'/credits/CR5XXPwA1ckaTDSIg3593sEx', meta={u'facebook.id': u'1234567890', u'anykey': u'valuegoeshere'}, failure_reason_code=None, appears_on_statement_as=u'example.com', id=u'CR5XXPwA1ckaTDSIg3593sEx')
+Credit(status=u'succeeded', description=u'New description for credit', links={u'customer': u'CUeXNjpejPooRtSnJLc6SRD', u'destination': u'BAscOV2erMwv3yhIb5sFTaV', u'order': None}, amount=5000, created_at=u'2014-04-17T22:39:27.622238Z', updated_at=u'2014-04-17T22:39:33.204162Z', failure_reason=None, currency=u'USD', transaction_number=u'CR574-106-7569', href=u'/credits/CROijU7WflyjITPTGU9GMlL', meta={u'facebook.id': u'1234567890', u'anykey': u'valuegoeshere'}, failure_reason_code=None, appears_on_statement_as=u'example.com', id=u'CROijU7WflyjITPTGU9GMlL')
 % endif

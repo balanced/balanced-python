@@ -1,5 +1,5 @@
 import balanced
 
-balanced.configure('ak-test-2ADpvITfpgBn8uBzEGsQ2bIgWaftUWiul')
+balanced.configure('ak-test-1ByQgRpcQLTwmOhCBUofyIHm0r96qPm8s')
 
-credit = balanced.Credit.fetch('/credits/CR5XXPwA1ckaTDSIg3593sEx')
+credit = balanced.Credit.fetch('/credits/CROijU7WflyjITPTGU9GMlL')
