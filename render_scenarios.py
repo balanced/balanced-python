@@ -3,9 +3,20 @@ import os
 import json
 import balanced
 import pprint
+import requests
+import sys
+
 from pprint import PrettyPrinter
 from mako.template import Template
 from mako.lookup import TemplateLookup
+
+class colors:
+    GREEN = '\033[92m'
+    YELLOW = '\033[93m'
+    RED = '\033[91m'
+    RESET = '\033[0m'
+
+SCENARIO_CACHE_URL = 'https://raw.githubusercontent.com/balanced/balanced-docs/master/scenario.cache'
 
 def construct_response(scenario_name):
     # load up response data
@@ -50,8 +61,8 @@ def render_executables():
                                    request=request, payload=payload).strip()
         except KeyError:
             text = ''
-            print "WARN: Skipped {} since {} not in scenario.cache".format(
-                path, event_name)
+            print colors.YELLOW + "WARN: Skipped {} since {} not in scenario.cache".format(
+                path, event_name) + colors.RESET
         with open(os.path.join(os.path.dirname(path),
                                'executable.py'), 'w+') as write_to:
             write_to.write(text)
@@ -68,23 +79,24 @@ def render_mako():
                     "% elif mode == 'response':\n" + response + "\n% endif"
             wfile.write(body)
 
-def issue_no_mako_warnings():
+def fetch_scenario_cache():
+    try:
+        os.remove('scenario.cache')
+    except OSError:
+        pass
 
-    set_has_mako = set([])
-    set_no_python_mako = set([])
-    for path in glob2.glob('./scenarios/**/*.mako'):
-        set_has_mako.add(os.path.dirname(path))
-    for path in glob2.glob('./scenarios/**/python.mako'):
-        set_no_python_mako.add(os.path.dirname(path))
-    print 'The following dont have a python.mako file. Look into it!'
-    print set_has_mako.difference(set_no_python_mako)
-
-
+    with open('scenario.cache', 'wb') as fo:
+        response = requests.get(SCENARIO_CACHE_URL)
+        if not response.ok:
+            sys.exit()
+        for block in response.iter_content():
+            fo.write(block)
 
 if __name__ == "__main__":
-    print "Making Executables"
+    print colors.GREEN + "Obtaining scenario cache..." + colors.RESET
+    fetch_scenario_cache()
+    print colors.GREEN + "Making Executables..." + colors.RESET
     render_executables()
-    print "Rendering new mako files"
+    print colors.GREEN + "Rendering new mako files..." + colors.RESET
     render_mako()
-    issue_no_mako_warnings()
 

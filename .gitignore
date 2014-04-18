@@ -40,3 +40,4 @@ dist/
 .idea/
 _build/
 coverage.xml
+scenario.cache
