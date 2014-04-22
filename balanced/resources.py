@@ -211,6 +211,21 @@ class Resource(JSONSchemaResource):
     def fetch(cls, href):
         return cls.get(href)
 
+    @classmethod
+    def get(cls, href):
+        if href.startswith('/resources'):
+            # hackety hack hax
+            # resource is an abstract type, we shouldn't have it comeing back itself
+            # instead we need to figure out the type based off the api response
+            resp = cls.client.get(href)
+            resource = [
+                k for k in resp.data.keys() if k != 'links' and k != 'meta'
+            ]
+            if resource:
+                return Resource.registry.get(resource[0], cls)(**resp.data)
+            return cls(**resp.data)
+        return super(Resource, cls).get(href)
+
 
 class Marketplace(Resource):
     """
