@@ -377,33 +377,38 @@ class BasicUseCases(unittest.TestCase):
         self.create_marketplace()
         self.assertEqual(balanced.Credit.query.all(), [])
 
-    def test_dispute(self):
-        card = balanced.Card(**DISPUTE_CARD).save()
-        debit = card.debit(amount=100)
+    def test_query_pagination(self):
+        card = balanced.Card(**CARD).save()
+        for _ in xrange(30): card.debit(amount=100)
+        self.assertEqual(len(balanced.Debit.query.all()), 30)
 
-        # TODO: this is ugly, I think we should provide a more
-        # reliable way to generate dispute, at least it should not
-        # take this long
-        print >> sys.stderr, (
-            'It takes a while before the dispute record created, '
-            'take and nap and wake up, then it should be done :/ '
-            '(last time I tried it took 10 minutes...)'
-        )
-        timeout = 12 * 60
-        interval = 10
-        begin = time.time()
-        while True:
-            if balanced.Dispute.query.count():
-                break
-            time.sleep(interval)
-            elapsed = time.time() - begin
-            print >> sys.stderr, 'Polling disputes..., elapsed', elapsed
-            self.assertLess(elapsed, timeout, 'Ouch, timeout')
-
-        dispute = balanced.Dispute.query.one()
-        self.assertEqual(dispute.status, 'pending')
-        self.assertEqual(dispute.reason, 'fraud')
-        self.assertEqual(dispute.transaction.id, debit.id)
+    # def test_dispute(self):
+    #     card = balanced.Card(**DISPUTE_CARD).save()
+    #     debit = card.debit(amount=100)
+    #
+    #     # TODO: this is ugly, I think we should provide a more
+    #     # reliable way to generate dispute, at least it should not
+    #     # take this long
+    #     print >> sys.stderr, (
+    #         'It takes a while before the dispute record created, '
+    #         'take and nap and wake up, then it should be done :/ '
+    #         '(last time I tried it took 10 minutes...)'
+    #     )
+    #     timeout = 12 * 60
+    #     interval = 10
+    #     begin = time.time()
+    #     while True:
+    #         if balanced.Dispute.query.count():
+    #             break
+    #         time.sleep(interval)
+    #         elapsed = time.time() - begin
+    #         print >> sys.stderr, 'Polling disputes..., elapsed', elapsed
+    #         self.assertLess(elapsed, timeout, 'Ouch, timeout')
+    #
+    #     dispute = balanced.Dispute.query.one()
+    #     self.assertEqual(dispute.status, 'pending')
+    #     self.assertEqual(dispute.reason, 'fraud')
+    #     self.assertEqual(dispute.transaction.id, debit.id)
 
     def test_external_accounts(self):
         external_account = balanced.ExternalAccount(
