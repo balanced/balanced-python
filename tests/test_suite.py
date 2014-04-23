@@ -424,6 +424,15 @@ class BasicUseCases(unittest.TestCase):
         self.assertIsNotNone(debit.source)
         self.assertTrue(isinstance(debit.source, balanced.Card))
 
+    def test_get_none_for_none(self):
+        card = balanced.Card(**CARD).save()
+        customer = balanced.Customer().save()
+        self.assertIsNone(card.customer)
+        card.associate_to_customer(customer)
+        card = balanced.Card.get(card.href)
+        self.assertIsNotNone(card.customer)
+        self.assertTrue(isinstance(card.customer, balanced.Customer))
+
 
 class Rev0URIBasicUseCases(unittest.TestCase):
     """This test case ensures all revision 0 URIs can work without a problem
