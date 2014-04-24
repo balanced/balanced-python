@@ -381,7 +381,7 @@ class BasicUseCases(unittest.TestCase):
         card = balanced.Card(**CARD).save()
         for _ in xrange(30): card.debit(amount=100)
         self.assertEqual(len(balanced.Debit.query.all()), 30)
- 
+        
     def test_dispute(self):
         card = balanced.Card(**DISPUTE_CARD).save()
         debit = card.debit(amount=100)
@@ -409,6 +409,7 @@ class BasicUseCases(unittest.TestCase):
         self.assertEqual(dispute.status, 'pending')
         self.assertEqual(dispute.reason, 'fraud')
         self.assertEqual(dispute.transaction.id, debit.id)
+
 
     def test_external_accounts(self):
         external_account = balanced.ExternalAccount(
