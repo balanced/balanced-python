@@ -380,7 +380,7 @@ class BasicUseCases(unittest.TestCase):
     def test_query_pagination(self):
         card = balanced.Card(**CARD).save()
         for _ in xrange(30): card.debit(amount=100)
-        self.assertEqual(len(balanced.Debit.query.all()), 30)
+        self.assertEqual(len(card.debits.all()), balanced.Debit.query.count())
 
     def test_dispute(self):
         card = balanced.Card(**DISPUTE_CARD).save()
