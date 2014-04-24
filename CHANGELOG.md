@@ -2,7 +2,6 @@
 
 * Fix for query pagination
 
-
 ## 1.0.1
 
 * Fix for returned generic Resource instead of expected resource class
