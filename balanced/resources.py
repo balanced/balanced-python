@@ -109,6 +109,14 @@ class ObjectifyMixin(wac._ObjectifyMixin):
                     if not item_property.endswith('_href'):
                         item_property += '_href'
                     lazy_href = parsed_link
+
+                elif '{' in parsed_link and '}' in parsed_link:
+                    # the link is of the form /asdf/{asdf} which means
+                    # that the variables could not be resolved as it
+                    # was None.  Instead of making it into a page object
+                    # we explicitly set it to None to represent the
+                    # attribute is None
+                    lazy_href = None
                 else:
                     # collection
                     lazy_href = JSONSchemaCollection(
