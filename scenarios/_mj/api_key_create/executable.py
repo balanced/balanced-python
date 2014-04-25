@@ -1,6 +1,6 @@
 import balanced
 
-balanced.configure('ak-test-1ByQgRpcQLTwmOhCBUofyIHm0r96qPm8s')
+balanced.configure('ak-test-22IOkhevjZlmRP2do6CZixkkDshTiOjTV')
 
 api_key = balanced.APIKey()
 api_key.save()

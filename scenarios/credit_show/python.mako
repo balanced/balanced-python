@@ -4,9 +4,9 @@ balanced.Credit.fetch()
 % elif mode == 'request':
 import balanced
 
-balanced.configure('ak-test-1ByQgRpcQLTwmOhCBUofyIHm0r96qPm8s')
+balanced.configure('ak-test-22IOkhevjZlmRP2do6CZixkkDshTiOjTV')
 
-credit = balanced.Credit.fetch('/credits/CROijU7WflyjITPTGU9GMlL')
+credit = balanced.Credit.fetch('/credits/CR4yt4sdkTWI1t3HVS16mNAV')
 % elif mode == 'response':
-Credit(status=u'succeeded', description=None, links={u'customer': u'CUeXNjpejPooRtSnJLc6SRD', u'destination': u'BAscOV2erMwv3yhIb5sFTaV', u'order': None}, amount=5000, created_at=u'2014-04-17T22:39:27.622238Z', updated_at=u'2014-04-17T22:39:27.978440Z', failure_reason=None, currency=u'USD', transaction_number=u'CR574-106-7569', href=u'/credits/CROijU7WflyjITPTGU9GMlL', meta={}, failure_reason_code=None, appears_on_statement_as=u'example.com', id=u'CROijU7WflyjITPTGU9GMlL')
+Credit(status=u'succeeded', description=None, links={u'customer': u'CU3VYCUIfwngJsidJWdGw2W5', u'destination': u'BA3Y63fK5STwlhKNMkE3Utmd', u'order': None}, amount=5000, created_at=u'2014-04-25T20:10:02.398021Z', updated_at=u'2014-04-25T20:10:03.049785Z', failure_reason=None, currency=u'USD', transaction_number=u'CR883-913-0274', href=u'/credits/CR4yt4sdkTWI1t3HVS16mNAV', meta={}, failure_reason_code=None, appears_on_statement_as=u'example.com', id=u'CR4yt4sdkTWI1t3HVS16mNAV')
 % endif

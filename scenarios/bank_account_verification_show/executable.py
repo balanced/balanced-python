@@ -1,4 +1,4 @@
 import balanced
 
-balanced.configure('ak-test-1ByQgRpcQLTwmOhCBUofyIHm0r96qPm8s')
-verification = balanced.BankAccountVerification.fetch('/verifications/BZ2AZ05mk2SQsEcicjSh3UN')
+balanced.configure('ak-test-22IOkhevjZlmRP2do6CZixkkDshTiOjTV')
+verification = balanced.BankAccountVerification.fetch('/verifications/BZ3KkIZuSazKfqFrFIfsrhmB')

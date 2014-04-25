@@ -1,6 +1,6 @@
 import balanced
 
-balanced.configure('ak-test-1ByQgRpcQLTwmOhCBUofyIHm0r96qPm8s')
+balanced.configure('ak-test-22IOkhevjZlmRP2do6CZixkkDshTiOjTV')
 
-card = balanced.Card.fetch('/cards/CCOeoFZJMd94AruXU0wuSI9')
+card = balanced.Card.fetch('/cards/CC4mYF7dj7X6OA2K5F0Qyb4N')
 card.unstore()
