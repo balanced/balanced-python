@@ -109,6 +109,14 @@ class ObjectifyMixin(wac._ObjectifyMixin):
                     if not item_property.endswith('_href'):
                         item_property += '_href'
                     lazy_href = parsed_link
+
+                elif '{' in parsed_link and '}' in parsed_link:
+                    # the link is of the form /asdf/{asdf} which means
+                    # that the variables could not be resolved as it
+                    # was None.  Instead of making it into a page object
+                    # we explicitly set it to None to represent the
+                    # attribute is None
+                    lazy_href = None
                 else:
                     # collection
                     lazy_href = JSONSchemaCollection(
@@ -210,6 +218,21 @@ class Resource(JSONSchemaResource):
     @classmethod
     def fetch(cls, href):
         return cls.get(href)
+
+    @classmethod
+    def get(cls, href):
+        if href.startswith('/resources'):
+            # hackety hack hax
+            # resource is an abstract type, we shouldn't have it comeing back itself
+            # instead we need to figure out the type based off the api response
+            resp = cls.client.get(href)
+            resource = [
+                k for k in resp.data.keys() if k != 'links' and k != 'meta'
+            ]
+            if resource:
+                return Resource.registry.get(resource[0], cls)(**resp.data)
+            return cls(**resp.data)
+        return super(Resource, cls).get(href)
 
 
 class Marketplace(Resource):

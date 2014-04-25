@@ -377,6 +377,11 @@ class BasicUseCases(unittest.TestCase):
         self.create_marketplace()
         self.assertEqual(balanced.Credit.query.all(), [])
 
+    def test_query_pagination(self):
+        card = balanced.Card(**CARD).save()
+        for _ in xrange(30): card.debit(amount=100)
+        self.assertEqual(len(balanced.Debit.query.all()), balanced.Debit.query.count())
+
     def test_dispute(self):
         card = balanced.Card(**DISPUTE_CARD).save()
         debit = card.debit(amount=100)
@@ -405,6 +410,7 @@ class BasicUseCases(unittest.TestCase):
         self.assertEqual(dispute.reason, 'fraud')
         self.assertEqual(dispute.transaction.id, debit.id)
 
+
     def test_external_accounts(self):
         external_account = balanced.ExternalAccount(
             token='123123123',
@@ -414,6 +420,24 @@ class BasicUseCases(unittest.TestCase):
             amount=1234
         )
         self.assertEqual(debit.source.id, external_account.id)
+
+    def test_general_resources(self):
+        card = balanced.Card(**CARD).save()
+        customer = balanced.Customer().save()
+        card.associate_to_customer(customer)
+        debit = card.debit(amount=1000)
+        self.assertIsNotNone(debit)
+        self.assertIsNotNone(debit.source)
+        self.assertTrue(isinstance(debit.source, balanced.Card))
+
+    def test_get_none_for_none(self):
+        card = balanced.Card(**CARD).save()
+        customer = balanced.Customer().save()
+        self.assertIsNone(card.customer)
+        card.associate_to_customer(customer)
+        card = balanced.Card.get(card.href)
+        self.assertIsNotNone(card.customer)
+        self.assertTrue(isinstance(card.customer, balanced.Customer))
 
 
 class Rev0URIBasicUseCases(unittest.TestCase):
