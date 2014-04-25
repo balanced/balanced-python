@@ -415,6 +415,15 @@ class BasicUseCases(unittest.TestCase):
         )
         self.assertEqual(debit.source.id, external_account.id)
 
+    def test_general_resources(self):
+        card = balanced.Card(**CARD).save()
+        customer = balanced.Customer().save()
+        card.associate_to_customer(customer)
+        debit = card.debit(amount=1000)
+        self.assertIsNotNone(debit)
+        self.assertIsNotNone(debit.source)
+        self.assertTrue(isinstance(debit.source, balanced.Card))
+
 
 class Rev0URIBasicUseCases(unittest.TestCase):
     """This test case ensures all revision 0 URIs can work without a problem
