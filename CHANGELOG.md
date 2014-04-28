@@ -1,6 +1,10 @@
 ## 1.0.2
 
-* Fix for query pagination
+* Return None when there is actually none instead of a page object (#115)
+* Fix polymorphic types coming back as resource (#114)
+* Fix for query pagination (#109)
+* Fix iterator (#21)
+
 
 ## 1.0.1
 
