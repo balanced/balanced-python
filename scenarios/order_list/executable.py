@@ -1,5 +1,5 @@
 import balanced
 
-balanced.configure('ak-test-22IOkhevjZlmRP2do6CZixkkDshTiOjTV')
+balanced.configure('ak-test-aUV295IugdhWSNx2JFckYBCSvfY2ibgq')
 
 orders = balanced.Order.query

@@ -1,8 +1,8 @@
 import balanced
 
-balanced.configure('ak-test-22IOkhevjZlmRP2do6CZixkkDshTiOjTV')
+balanced.configure('ak-test-aUV295IugdhWSNx2JFckYBCSvfY2ibgq')
 
-card = balanced.Card.fetch('/cards/CC4auQXiAWMBxJcEUIMYeZFj')
+card = balanced.Card.fetch('/cards/CC7JlMyXyZ8W3RBfE1SSlnrD')
 card_hold = card.hold(
   amount=5000,
   description='Some descriptive text for the debit in the dashboard'
