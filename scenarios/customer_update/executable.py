@@ -1,8 +1,8 @@
 import balanced
 
-balanced.configure('ak-test-22IOkhevjZlmRP2do6CZixkkDshTiOjTV')
+balanced.configure('ak-test-aUV295IugdhWSNx2JFckYBCSvfY2ibgq')
 
-customer = balanced.Debit.fetch('/customers/CU4GAx8tZTDNIgAmwfV35e53')
+customer = balanced.Debit.fetch('/customers/CUrtoxuYO4XmXZi6NzXKBLL')
 customer.email = 'email@newdomain.com'
 customer.meta = {
   'shipping-preference': 'ground'

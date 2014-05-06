@@ -3,7 +3,7 @@ balanced.Card().save()
 % elif mode == 'request':
 import balanced
 
-balanced.configure('ak-test-22IOkhevjZlmRP2do6CZixkkDshTiOjTV')
+balanced.configure('ak-test-aUV295IugdhWSNx2JFckYBCSvfY2ibgq')
 
 card = balanced.Card(
   cvv='123',
@@ -12,5 +12,5 @@ card = balanced.Card(
   expiration_year='2020'
 ).save()
 % elif mode == 'response':
-Card(cvv_match=u'yes', links={u'customer': None}, expiration_year=2020, avs_street_match=None, avs_postal_match=None, created_at=u'2014-04-25T20:09:57.984444Z', cvv_result=u'Match', number=u'xxxxxxxxxxxx5100', updated_at=u'2014-04-25T20:09:57.984446Z', expiration_month=12, cvv=u'xxx', href=u'/cards/CC4tvKLTKXcBJAgkGvPEW58N', meta={}, avs_result=None, address={u'city': None, u'line2': None, u'line1': None, u'state': None, u'postal_code': None, u'country_code': None}, id=u'CC4tvKLTKXcBJAgkGvPEW58N', fingerprint=u'fc4ccd5de54f42a5e75f76fbfde60948440c7a382ee7d21b2bc509ab9cfed788', is_verified=True, brand=u'MasterCard', name=None)
+Card(cvv_match=u'yes', links={u'customer': None}, expiration_year=2020, avs_street_match=None, avs_postal_match=None, created_at=u'2014-04-25T22:00:36.548055Z', cvv_result=u'Match', number=u'xxxxxxxxxxxx5100', updated_at=u'2014-04-25T22:00:36.548057Z', expiration_month=12, cvv=u'xxx', href=u'/cards/CCf1fF6z2RjwvniinUVefhb', meta={}, avs_result=None, address={u'city': None, u'line2': None, u'line1': None, u'state': None, u'postal_code': None, u'country_code': None}, id=u'CCf1fF6z2RjwvniinUVefhb', fingerprint=u'fc4ccd5de54f42a5e75f76fbfde60948440c7a382ee7d21b2bc509ab9cfed788', is_verified=True, brand=u'MasterCard', name=None)
 % endif

@@ -4,7 +4,7 @@ balanced.APIKey.query
 % elif mode == 'request':
 import balanced
 
-balanced.configure('ak-test-22IOkhevjZlmRP2do6CZixkkDshTiOjTV')
+balanced.configure('ak-test-aUV295IugdhWSNx2JFckYBCSvfY2ibgq')
 
 keys = balanced.APIKey.query
 % elif mode == 'response':

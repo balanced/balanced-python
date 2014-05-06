@@ -3,9 +3,9 @@ balanced.CardHold().save()
 % elif mode == 'request':
 import balanced
 
-balanced.configure('ak-test-22IOkhevjZlmRP2do6CZixkkDshTiOjTV')
+balanced.configure('ak-test-aUV295IugdhWSNx2JFckYBCSvfY2ibgq')
 
-card_hold = balanced.CardHold.fetch('/card_holds/HL4bdnO7ELS2JfyJ2T8elYOl')
+card_hold = balanced.CardHold.fetch('/card_holds/HL7K6mNHtWSl33Whc0WDOJ81')
 card_hold.description = 'update this description'
 card_hold.meta = {
   'holding.for': 'user1',
@@ -13,5 +13,5 @@ card_hold.meta = {
 }
 card_hold.save()
 % elif mode == 'response':
-CardHold(status=u'succeeded', description=u'update this description', links={u'card': u'CC4auQXiAWMBxJcEUIMYeZFj', u'debit': None}, amount=5000, created_at=u'2014-04-25T20:09:41.712497Z', updated_at=u'2014-04-25T20:09:45.729280Z', expires_at=u'2014-05-02T20:09:41.878825Z', failure_reason=None, currency=u'USD', transaction_number=u'HL244-046-8353', href=u'/card_holds/HL4bdnO7ELS2JfyJ2T8elYOl', meta={u'holding.for': u'user1', u'meaningful.key': u'some.value'}, failure_reason_code=None, voided_at=None, id=u'HL4bdnO7ELS2JfyJ2T8elYOl')
+CardHold(status=u'succeeded', description=u'update this description', links={u'card': u'CC7JlMyXyZ8W3RBfE1SSlnrD', u'debit': None}, amount=5000, created_at=u'2014-04-25T22:00:20.558033Z', updated_at=u'2014-04-25T22:00:24.531626Z', expires_at=u'2014-05-02T22:00:20.666972Z', failure_reason=None, currency=u'USD', transaction_number=u'HL046-527-6041', href=u'/card_holds/HL7K6mNHtWSl33Whc0WDOJ81', meta={u'holding.for': u'user1', u'meaningful.key': u'some.value'}, failure_reason_code=None, voided_at=None, id=u'HL7K6mNHtWSl33Whc0WDOJ81')
 % endif

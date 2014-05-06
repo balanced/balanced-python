@@ -1,5 +1,5 @@
 import balanced
 
-balanced.configure('ak-test-22IOkhevjZlmRP2do6CZixkkDshTiOjTV')
+balanced.configure('ak-test-aUV295IugdhWSNx2JFckYBCSvfY2ibgq')
 
-key = balanced.APIKey.fetch('/api_keys/AK3DgZwSCD2ggxGSw1bsiyDX')
+key = balanced.APIKey.fetch('/api_keys/AK7gg5FNb0Owb6hErcMm0CZ7')
