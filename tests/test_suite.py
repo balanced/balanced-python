@@ -74,6 +74,20 @@ CARD = {
 DISPUTE_CARD = CARD.copy()
 DISPUTE_CARD['number'] = '6500000000000002'
 
+CREDITABLE_CARD = {
+    'name': 'Johannes Bach',
+    'number': '4342561111111118',
+    'expiration_month': 05,
+    'expiration_year': date.today().year + 1,
+}
+
+NON_CREDITABLE_CARD = {
+    'name': 'Georg Telemann',
+    'number': '4111111111111111',
+    'expiration_month': 12,
+    'expiration_year': date.today().year + 1,
+}
+
 INTERNATIONAL_CARD = {
     'name': 'Johnny Fresh',
     'number': '4444424444444440',
@@ -213,6 +227,59 @@ class BasicUseCases(unittest.TestCase):
             bank_account.credit(amount=(debit.amount - credit.amount) + 1)
         self.assertEqual(exc.exception.status_code, 409)
         self.assertEqual(exc.exception.category_code, 'insufficient-funds')
+
+    def test_credit_existing_card(self):
+        funding_card = balanced.Card(**CARD).save()
+        card = balanced.Card(**CREDITABLE_CARD).save()
+        debit = funding_card.debit(amount=250000)
+        credit = card.credit(amount=250000)
+        self.assertTrue(credit.id.startswith('CR'))
+        self.assertEqual(credit.href, '/credits/{}'.format(credit.id))
+        self.assertEqual(credit.status, 'succeeded')
+        self.assertEqual(credit.amount, 250000)
+
+    def test_credit_card_in_request(self):
+        funding_card = balanced.Card(**CARD).save()
+        debit = funding_card.debit(amount=250000)
+        credit = balanced.Credit(
+            amount=250000,
+            description='A sweet ride',
+            destination=CREDITABLE_CARD
+        ).save()
+        self.assertTrue(credit.id.startswith('CR'))
+        self.assertEqual(credit.href, '/credits/{}'.format(credit.id))
+        self.assertEqual(credit.status, 'succeeded')
+        self.assertEqual(credit.amount, 250000)
+        self.assertEqual(credit.description, 'A sweet ride')
+
+    def test_credit_card_can_credit_false(self):
+        funding_card = balanced.Card(**CARD).save()
+        debit = funding_card.debit(amount=250000)
+        card = balanced.Card(**NON_CREDITABLE_CARD).save()
+        with self.assertRaises(requests.HTTPError) as exc:
+            card.credit(amount=250000)
+        self.assertEqual(exc.exception.status_code, 409)
+        self.assertEqual(exc.exception.category_code, 'funding-destination-not-creditable')
+
+    def test_credit_card_limit(self):
+        funding_card = balanced.Card(**CARD).save()
+        debit = funding_card.debit(amount=250005)
+        card = balanced.Card(**CREDITABLE_CARD).save()
+        with self.assertRaises(requests.HTTPError) as exc:
+            credit = card.credit(amount=250001)
+        self.assertEqual(exc.exception.status_code, 400)
+        self.assertEqual(exc.exception.category_code, 'amount-exceeds-limit')
+
+    def test_credit_card_require_name(self):
+        funding_card = balanced.Card(**CARD).save()
+        debit = funding_card.debit(amount=250005)
+        card_payload = CREDITABLE_CARD.copy()
+        card_payload.pop("name")
+        card = balanced.Card(**card_payload).save()
+        with self.assertRaises(requests.HTTPError) as exc:
+            credit = card.credit(amount=250001)
+            self.assertEqual(exc.exception.status_code, 400)
+            self.assertEqual(exc.exception.category_code, 'request')
 
     def test_escrow_limit(self):
         self.create_marketplace()  # NOTE: fresh mp for escrow checks
