@@ -428,14 +428,13 @@ class FundingInstrument(Resource):
         :rtype: Credit
         """
  
-        if hasattr(self, 'credits'):
-            return Credit(
-                href=self.credits.href,
-                amount=amount,
-                **kwargs
-            ).save()
-        else:
-            raise exc.FundingSourceNotCreditable
+        if not hasattr(self, 'credits'):
+            raise exc.FundingSourceNotCreditable()
+        return Credit(
+            href=self.credits.href,
+            amount=amount,
+            **kwargs
+        ).save()
 
 
 class BankAccount(FundingInstrument):
