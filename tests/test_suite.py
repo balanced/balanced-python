@@ -234,7 +234,7 @@ class BasicUseCases(unittest.TestCase):
         debit = funding_card.debit(amount=250000)
         credit = card.credit(amount=250000)
         self.assertTrue(credit.id.startswith('CR'))
-        self.assertEqual(credit.href, '/credits/{}'.format(credit.id))
+        self.assertEqual(credit.href, '/credits/{0}'.format(credit.id))
         self.assertEqual(credit.status, 'succeeded')
         self.assertEqual(credit.amount, 250000)
 
@@ -247,7 +247,7 @@ class BasicUseCases(unittest.TestCase):
             destination=CREDITABLE_CARD
         ).save()
         self.assertTrue(credit.id.startswith('CR'))
-        self.assertEqual(credit.href, '/credits/{}'.format(credit.id))
+        self.assertEqual(credit.href, '/credits/{0}'.format(credit.id))
         self.assertEqual(credit.status, 'succeeded')
         self.assertEqual(credit.amount, 250000)
         self.assertEqual(credit.description, 'A sweet ride')
