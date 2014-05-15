@@ -265,7 +265,7 @@ class BasicUseCases(unittest.TestCase):
         card = balanced.Card(**CREDITABLE_CARD).save()
         with self.assertRaises(requests.HTTPError) as exc:
             credit = card.credit(amount=250001)
-        self.assertEqual(exc.exception.status_code, 400)
+        self.assertEqual(exc.exception.status_code, 409)
         self.assertEqual(exc.exception.category_code, 'amount-exceeds-limit')
 
     def test_credit_card_require_name(self):
