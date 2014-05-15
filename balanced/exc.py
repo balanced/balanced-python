@@ -27,6 +27,10 @@ class MultipleResultsFound(BalancedError):
     pass
 
 
+class FundingSourceNotCreditable(Exception):
+    pass
+
+
 def convert_error(ex):
     if not hasattr(ex.response, 'data'):
         return ex

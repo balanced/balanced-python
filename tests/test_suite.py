@@ -8,7 +8,7 @@ import unittest2 as unittest
 import requests
 
 import balanced
-
+from balanced import exc as bexc
 
 # fixtures
 
@@ -256,10 +256,8 @@ class BasicUseCases(unittest.TestCase):
         funding_card = balanced.Card(**CARD).save()
         debit = funding_card.debit(amount=250000)
         card = balanced.Card(**NON_CREDITABLE_CARD).save()
-        with self.assertRaises(requests.HTTPError) as exc:
+        with self.assertRaises(bexc.FundingSourceNotCreditable) as exc:
             card.credit(amount=250000)
-        self.assertEqual(exc.exception.status_code, 409)
-        self.assertEqual(exc.exception.category_code, 'funding-destination-not-creditable')
 
     def test_credit_card_limit(self):
         funding_card = balanced.Card(**CARD).save()
