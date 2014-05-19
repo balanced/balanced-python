@@ -276,8 +276,8 @@ class BasicUseCases(unittest.TestCase):
         card = balanced.Card(**card_payload).save()
         with self.assertRaises(requests.HTTPError) as exc:
             credit = card.credit(amount=250001)
-            self.assertEqual(exc.exception.status_code, 400)
-            self.assertEqual(exc.exception.category_code, 'request')
+        self.assertEqual(exc.exception.status_code, 400)
+        self.assertEqual(exc.exception.category_code, 'name-required-to-credit')
 
     def test_escrow_limit(self):
         self.create_marketplace()  # NOTE: fresh mp for escrow checks
