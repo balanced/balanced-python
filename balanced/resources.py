@@ -426,7 +426,10 @@ class FundingInstrument(Resource):
         this FundingInstrument.
 
         :rtype: Credit
-       """
+        """
+ 
+        if not hasattr(self, 'credits'):
+            raise exc.FundingSourceNotCreditable()
         return Credit(
             href=self.credits.href,
             amount=amount,
