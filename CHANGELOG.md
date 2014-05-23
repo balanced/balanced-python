@@ -1,3 +1,7 @@
+## 1.1.0
+
+* Push to card support
+
 ## 1.0.2
 
 * Return None when there is actually none instead of a page object (#115)
