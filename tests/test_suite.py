@@ -187,6 +187,7 @@ class BasicUseCases(unittest.TestCase):
         hold = card.hold(amount=1500, description='Hold me')
         self.assertEqual(hold.description, 'Hold me')
         hold.cancel()
+        self.assertIsNotNone(hold.voided_at)
 
     def test_create_hold_and_capture_it(self):
         card = balanced.Card(**CARD).save()
