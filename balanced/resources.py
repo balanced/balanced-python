@@ -285,7 +285,7 @@ class CardHold(Resource):
     uri_gen = wac.URIGen('/card_holds', '{card_hold}')
 
     def cancel(self):
-        self.is_void = False
+        self.is_void = True
         return self.save()
 
     def capture(self, **kwargs):
