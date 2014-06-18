@@ -1,3 +1,7 @@
+## 1.1.1
+
+* Fix allowing for voiding holds
+
 ## 1.1.0
 
 * Push to card support
