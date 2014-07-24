@@ -26,6 +26,9 @@ def main():
         url=request_bin.callback_url,
     ).save()
 
+    print "let's create a customer"
+    balanced.Customer(name='Bob McTavish').save()
+
     print 'let\'s create a card and associate it with a new account'
     card = balanced.Card(
         expiration_month='12',
