@@ -59,3 +59,11 @@ except balanced.exc.BalancedError as ex:
     print ex
 
 assert ex is not None
+
+# bring the money back again
+reversal = credit.reverse()
+
+order = balanced.Order.fetch(order.href)
+
+# order escrow is topped up again
+assert order.amount_escrowed == 100
