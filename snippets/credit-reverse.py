@@ -1,2 +1,2 @@
-credit = order.credits[0]
+credit = balanced.Credit.fetch(credit_href)
 reversal = credit.reverse()
