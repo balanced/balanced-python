@@ -3,9 +3,9 @@ balanced.Callback().unstore()
 % elif mode == 'request':
 import balanced
 
-balanced.configure('ak-test-aUV295IugdhWSNx2JFckYBCSvfY2ibgq')
+balanced.configure('ak-test-1o9QKwUCrwstHWO5sGxICtIJdQXFTjnrV')
 
-callback = balanced.Callback.fetch('/callbacks/CB7DP9sW9wRe19dFRutynahb')
+callback = balanced.Callback.fetch('/callbacks/CB3AuHtVP5mcxGS8OwnJwSrK')
 callback.unstore()
 % elif mode == 'response':
 

@@ -1,5 +1,5 @@
 import balanced
 
-balanced.configure('ak-test-aUV295IugdhWSNx2JFckYBCSvfY2ibgq')
+balanced.configure('ak-test-1o9QKwUCrwstHWO5sGxICtIJdQXFTjnrV')
 
-event = balanced.Event.fetch('/events/EVec6e7ac2ccc411e389ba061e5f402045')
+event = balanced.Event.fetch('/events/EVf13ffaec32ce11e48d6c0647853a3607')

@@ -1,5 +1,5 @@
 <%namespace file='/_main.mako' name='main'/>
 <% main.python_boilerplate() %>
 
-card = balanced.Card.fetch('${request['uri']}')
-card.associate_to_customer('${request['payload']['customer']}')
+bank_account = balanced.BankAccount.fetch('${request['uri']}')
+bank_account.associate_to_customer('${request['payload']['customer']}')

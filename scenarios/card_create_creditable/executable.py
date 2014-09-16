@@ -1,6 +1,6 @@
 import balanced
 
-balanced.configure('ak-test-2jJSjIixy2qkOMmIONPtXnawOUftBDRSK')
+balanced.configure('ak-test-1o9QKwUCrwstHWO5sGxICtIJdQXFTjnrV')
 
 card = balanced.Card(
   expiration_month='05',

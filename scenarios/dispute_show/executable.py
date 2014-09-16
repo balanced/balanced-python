@@ -1,5 +1,5 @@
 import balanced
 
-balanced.configure('ak-test-aUV295IugdhWSNx2JFckYBCSvfY2ibgq')
+balanced.configure('ak-test-1o9QKwUCrwstHWO5sGxICtIJdQXFTjnrV')
 
-dispute = balanced.Dispute.fetch('/disputes/DT180PABUUjnj5wdE2pcwXQD')
+dispute = balanced.Dispute.fetch('/disputes/DT7be1ZNkz2SkA9rhBqxynrA')
