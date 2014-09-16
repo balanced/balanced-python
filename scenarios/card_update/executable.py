@@ -1,8 +1,8 @@
 import balanced
 
-balanced.configure('ak-test-aUV295IugdhWSNx2JFckYBCSvfY2ibgq')
+balanced.configure('ak-test-1o9QKwUCrwstHWO5sGxICtIJdQXFTjnrV')
 
-card = balanced.Card.fetch('/cards/CC832pqCbRPor1ewRdxPvnv')
+card = balanced.Card.fetch('/cards/CC4OTo7bbk25ZWmhdQCdXkPu')
 card.meta = {
   'twitter.id': '1234987650',
   'facebook.user_id': '0192837465',

@@ -3,7 +3,7 @@ balanced.Card().save()
 % elif mode == 'request':
 import balanced
 
-balanced.configure('ak-test-aUV295IugdhWSNx2JFckYBCSvfY2ibgq')
+balanced.configure('ak-test-1o9QKwUCrwstHWO5sGxICtIJdQXFTjnrV')
 
 card = balanced.Card(
   cvv='123',
@@ -12,5 +12,5 @@ card = balanced.Card(
   expiration_year='3000'
 ).save()
 % elif mode == 'response':
-Card(cvv_match=u'yes', links={u'customer': None}, expiration_year=3000, avs_street_match=None, avs_postal_match=None, created_at=u'2014-04-25T22:01:02.497846Z', cvv_result=u'Match', number=u'xxxxxxxxxxxx0002', updated_at=u'2014-04-25T22:01:02.497848Z', expiration_month=12, cvv=u'xxx', href=u'/cards/CCIcOaBZBsK9o6Nbqmuu7B3', meta={}, avs_result=None, address={u'city': None, u'line2': None, u'line1': None, u'state': None, u'postal_code': None, u'country_code': None}, id=u'CCIcOaBZBsK9o6Nbqmuu7B3', fingerprint=u'3c667a62653e187f29b5781eeb0703f26e99558080de0c0f9490b5f9c4ac2871', is_verified=True, brand=u'Discover', name=None)
+Card(links={u'customer': None}, cvv_result=u'Match', number=u'xxxxxxxxxxxx0002', expiration_month=12, href=u'/cards/CC6KXqaIUXHDh6BJpY2XqRTW', type=u'debit', id=u'CC6KXqaIUXHDh6BJpY2XqRTW', category=u'other', is_verified=True, cvv_match=u'yes', bank_name=u'BANK OF AMERICA', avs_street_match=None, brand=u'Discover', updated_at=u'2014-09-02T18:27:59.762352Z', fingerprint=u'3c667a62653e187f29b5781eeb0703f26e99558080de0c0f9490b5f9c4ac2871', can_debit=True, name=None, expiration_year=3000, cvv=u'xxx', avs_postal_match=None, avs_result=None, can_credit=True, meta={}, created_at=u'2014-09-02T18:27:59.762349Z', address={u'city': None, u'line2': None, u'line1': None, u'state': None, u'postal_code': None, u'country_code': None})
 % endif

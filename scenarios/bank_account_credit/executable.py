@@ -1,8 +1,8 @@
 import balanced
 
-balanced.configure('ak-test-aUV295IugdhWSNx2JFckYBCSvfY2ibgq')
+balanced.configure('ak-test-1o9QKwUCrwstHWO5sGxICtIJdQXFTjnrV')
 
-bank_account = balanced.BankAccount.fetch('/bank_accounts/BA7zu6QXmylsn0o6qVpS8UO9')
+bank_account = balanced.BankAccount.fetch('/bank_accounts/BA3bgtBxC3q4N9QvlN2jqFnL')
 bank_account.credit(
   amount=5000
 )

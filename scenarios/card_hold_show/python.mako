@@ -4,9 +4,9 @@ balanced.CardHold.fetch()
 % elif mode == 'request':
 import balanced
 
-balanced.configure('ak-test-aUV295IugdhWSNx2JFckYBCSvfY2ibgq')
+balanced.configure('ak-test-1o9QKwUCrwstHWO5sGxICtIJdQXFTjnrV')
 
-card_hold = balanced.CardHold.fetch('/card_holds/HL7K6mNHtWSl33Whc0WDOJ81')
+card_hold = balanced.CardHold.fetch('/card_holds/HL4io3nFmawRhnkkUWnC1Eoo')
 % elif mode == 'response':
-CardHold(status=u'succeeded', description=u'Some descriptive text for the debit in the dashboard', links={u'card': u'CC7JlMyXyZ8W3RBfE1SSlnrD', u'debit': None}, amount=5000, created_at=u'2014-04-25T22:00:20.558033Z', updated_at=u'2014-04-25T22:00:20.741093Z', expires_at=u'2014-05-02T22:00:20.666972Z', failure_reason=None, currency=u'USD', transaction_number=u'HL046-527-6041', href=u'/card_holds/HL7K6mNHtWSl33Whc0WDOJ81', meta={}, failure_reason_code=None, voided_at=None, id=u'HL7K6mNHtWSl33Whc0WDOJ81')
+CardHold(status=u'succeeded', description=u'Some descriptive text for the debit in the dashboard', links={u'card': u'CC4hAPsanjFP7QWIIAAPAwKh', u'debit': None}, amount=5000, created_at=u'2014-09-02T18:25:44.114448Z', updated_at=u'2014-09-02T18:25:46.117246Z', expires_at=u'2014-09-09T18:25:44.889479Z', failure_reason=None, currency=u'USD', transaction_number=u'HLOUQ-V39-L4PE', href=u'/card_holds/HL4io3nFmawRhnkkUWnC1Eoo', meta={}, failure_reason_code=None, voided_at=None, id=u'HL4io3nFmawRhnkkUWnC1Eoo')
 % endif

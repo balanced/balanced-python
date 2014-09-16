@@ -1,8 +1,8 @@
 import balanced
 
-balanced.configure('ak-test-aUV295IugdhWSNx2JFckYBCSvfY2ibgq')
+balanced.configure('ak-test-1o9QKwUCrwstHWO5sGxICtIJdQXFTjnrV')
 
-reversal = balanced.Reversal.fetch('/reversals/RV1zj7hidB6KZ7MxLESBXRJD')
+reversal = balanced.Reversal.fetch('/reversals/RV7DQpcc6sowPOMi29WTjlOU')
 reversal.description = 'update this description'
 reversal.meta = {
   'user.refund.count': '3',

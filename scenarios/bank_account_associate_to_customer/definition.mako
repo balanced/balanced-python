@@ -1,1 +1,1 @@
-balanced.Card().associate_to_customer()
+balanced.BankAccount().associate_to_customer()
