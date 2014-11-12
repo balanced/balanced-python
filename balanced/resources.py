@@ -590,3 +590,13 @@ class ExternalAccount(FundingInstrument):
     type = 'external_accounts'
 
     uri_gen = wac.URIGen('/external_accounts', '{external_account}')
+
+
+class Account(FundingInstrument):
+    """
+    An Account is a way to have a store of some kind of value.
+    """
+
+    type = 'accounts'
+
+    uri_gen = wac.URIGen('/accounts', '{account}')

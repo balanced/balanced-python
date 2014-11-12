@@ -10,12 +10,13 @@ from balanced.resources import (
     Transaction, BankAccount, Card, Dispute,
     Callback, Event, EventCallback, EventCallbackLog,
     BankAccountVerification, Customer, Order,
-    ExternalAccount
+    ExternalAccount, Account,
 )
 from balanced import exc
 
 
 __all__ = [
+    Account.__name__,
     APIKey.__name__,
     BankAccount.__name__,
     BankAccountVerification.__name__,
