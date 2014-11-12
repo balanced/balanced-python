@@ -600,3 +600,14 @@ class Account(FundingInstrument):
     type = 'accounts'
 
     uri_gen = wac.URIGen('/accounts', '{account}')
+
+
+class Settlement(Transaction):
+    """
+    A Settlement is the action of moving money out of an Account to a
+    bank account.
+    """
+
+    type = 'settlements'
+
+    uri_gen = wac.URIGen('/settlementss', '{settlements}')
