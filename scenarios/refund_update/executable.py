@@ -1,8 +1,8 @@
 import balanced
 
-balanced.configure('ak-test-1o9QKwUCrwstHWO5sGxICtIJdQXFTjnrV')
+balanced.configure('ak-test-25ZY8HQwZPuQtDecrxb671LilUya5t5G0')
 
-refund = balanced.Refund.fetch('/refunds/RF6E0QICQDqJCkJ3HSvQtvOR')
+refund = balanced.Refund.fetch('/refunds/RF4n5AfJ8MRB55oTzVWTRoVa')
 refund.description = 'update this description'
 refund.meta = {
   'user.refund.count': '3',
