@@ -505,6 +505,60 @@ class BasicUseCases(unittest.TestCase):
         self.assertIsNotNone(card.customer)
         self.assertTrue(isinstance(card.customer, balanced.Customer))
 
+    def test_accounts_transfer(self):
+        merchant = balanced.Customer().save()
+        order = merchant.create_order()
+        card = balanced.Card(**INTERNATIONAL_CARD).save()
+
+        order.debit_from(source=card, amount=1234)
+        sweep_account = merchant.account
+        account_credit = sweep_account.credit(amount=1234, order=order.href,
+                                              appears_on_statement_as='Payout')
+        self.assertEqual(account_credit.status, 'succeeded')
+        self.assertEqual(sweep_account.balance, 1234)
+        self.assertEqual(account_credit.account_credit, 'Payout')
+
+    def test_accounts_transfer_from_multiple_orders(self):
+        merchant = balanced.Customer().save()
+        card = balanced.Card(**INTERNATIONAL_CARD).save()
+        sweep_account = merchant.account
+        amount = 1234
+
+        order_one = merchant.create_order()
+        order_one.debit_from(source=card, amount=amount)
+        account_credit_one = sweep_account.credit(amount=amount,
+                                                  order=order_one.href)
+        order_two = merchant.create_order()
+        order_two.debit_from(source=card, amount=amount)
+        account_credit_two = sweep_account.credit(amount=amount,
+                                                  order=order_two.href)
+        self.assertEqual(sweep_account.balance, amount*2)
+
+    def test_settlement(self):
+        merchant = balanced.Customer().save()
+        order = merchant.create_order()
+        card = balanced.Card(**INTERNATIONAL_CARD).save()
+
+        order.debit_from(source=card, amount=1234)
+        sweep_account = merchant.account
+        account_credit = sweep_account.credit(amount=1234, order=order.href,
+                                              appears_on_statement_as='Payout')
+        bank_account = balanced.BankAccount(
+            account_number='1234567890',
+            routing_number='321174851',
+            name='Someone',
+            ).save()
+        bank_account.associate_to_customer(merchant)
+
+        settlement = sweep_account.settle(
+            destination=bank_account.href,
+            appears_on_statement_as="Settlement Oct",
+            description="Settlement for payouts from October")
+        self.assertEqual(settlement.amount, 1234)
+        self.assertEqual(settlement.appears_on_statement_as, "Settlement Oct")
+        self.assertEqual(settlement.description,
+                         "Settlement for payouts from October")
+
 
 class Rev0URIBasicUseCases(unittest.TestCase):
     """This test case ensures all revision 0 URIs can work without a problem

@@ -594,12 +594,20 @@ class ExternalAccount(FundingInstrument):
 
 class Account(FundingInstrument):
     """
-    An Account is a way to have a store of some kind of value.
+    An Account is a way to transfer funds from multiple Orders into one place,
+    which can later be bulk credited out.
     """
 
     type = 'accounts'
 
     uri_gen = wac.URIGen('/accounts', '{account}')
+
+    def settle(self, destination, **kwargs):
+        return Settlement(
+            href=self.settlements.href,
+            destination=destination,
+            **kwargs
+        )
 
 
 class Settlement(Transaction):
