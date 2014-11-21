@@ -512,6 +512,7 @@ class BasicUseCases(unittest.TestCase):
 
         order.debit_from(source=card, amount=1234)
         sweep_account = merchant.account
+        self.assertEqual(sweep_account.balance, 0)
         account_credit = sweep_account.credit(amount=1234, order=order.href,
                                               appears_on_statement_as='Payout')
         self.assertEqual(account_credit.status, 'succeeded')
@@ -522,12 +523,14 @@ class BasicUseCases(unittest.TestCase):
         merchant = balanced.Customer().save()
         card = balanced.Card(**INTERNATIONAL_CARD).save()
         sweep_account = merchant.account
+        self.assertEqual(sweep_account.balance, 0)
         amount = 1234
 
         order_one = merchant.create_order()
         order_one.debit_from(source=card, amount=amount)
         account_credit_one = sweep_account.credit(amount=amount,
                                                   order=order_one.href)
+        self.assertEqual(sweep_account.balance, amount)
         order_two = merchant.create_order()
         order_two.debit_from(source=card, amount=amount)
         account_credit_two = sweep_account.credit(amount=amount,
@@ -535,6 +538,63 @@ class BasicUseCases(unittest.TestCase):
         self.assertEqual(sweep_account.balance, amount*2)
 
     def test_settlement(self):
+        merchant = balanced.Customer().save()
+        order = merchant.create_order()
+        card = balanced.Card(**INTERNATIONAL_CARD).save()
+
+        order.debit_from(source=card, amount=1234)
+        sweep_account = merchant.account
+        account_credit = sweep_account.credit(amount=1234, order=order.href,
+                                              appears_on_statement_as='Payout')
+        self.assertEqual(sweep_account.balance, 1234)
+        bank_account = balanced.BankAccount(
+            account_number='1234567890',
+            routing_number='321174851',
+            name='Someone',
+            ).save()
+        bank_account.associate_to_customer(merchant)
+
+        settlement = sweep_account.settle(
+            funding_instrument=bank_account.href,
+            appears_on_statement_as="Settlement Oct",
+            description="Settlement for payouts from October")
+        self.assertEqual(settlement.amount, 1234)
+        self.assertEqual(settlement.appears_on_statement_as, "Settlement Oct")
+        self.assertEqual(settlement.description,
+                         "Settlement for payouts from October")
+        self.assertEqual(sweep_account.balance, 0)
+
+    def test_reverse_settlement(self):
+        merchant = balanced.Customer().save()
+        order = merchant.create_order()
+        card = balanced.Card(**INTERNATIONAL_CARD).save()
+
+        order.debit_from(source=card, amount=1234)
+        sweep_account = merchant.account
+        account_credit = sweep_account.credit(amount=1234, order=order.href,
+                                              appears_on_statement_as='Payout')
+        self.assertEqual(sweep_account.balance, 1234)
+
+        bank_account = balanced.BankAccount(
+            account_number='1234567890',
+            routing_number='321174851',
+            name='Someone',
+            ).save()
+        bank_account.associate_to_customer(merchant)
+
+        settlement = sweep_account.settle(
+            funding_instrument=bank_account.href,
+            appears_on_statement_as="Settlement Oct",
+            description="Settlement for payouts from October")
+        self.assertEqual(sweep_account.balance, 0)
+
+        credit_from_escrow = sweep_account.credit(amount=1234)
+        self.assertEqual(sweep_account.balance, 1234)
+
+        account_credit.reverse(amount=1234)
+        self.assertEqual(sweep_account.balance, 0)
+
+    def test_reverse_settlement_with_negative_account_balance(self):
         merchant = balanced.Customer().save()
         order = merchant.create_order()
         card = balanced.Card(**INTERNATIONAL_CARD).save()
@@ -551,13 +611,19 @@ class BasicUseCases(unittest.TestCase):
         bank_account.associate_to_customer(merchant)
 
         settlement = sweep_account.settle(
-            destination=bank_account.href,
+            funding_instrument=bank_account.href,
             appears_on_statement_as="Settlement Oct",
             description="Settlement for payouts from October")
-        self.assertEqual(settlement.amount, 1234)
-        self.assertEqual(settlement.appears_on_statement_as, "Settlement Oct")
-        self.assertEqual(settlement.description,
-                         "Settlement for payouts from October")
+        self.assertEqual(sweep_account.balance, 0)
+
+        account_credit.reverse(amount=1234)
+        self.assertEqual(sweep_account.balance, -1234)
+
+        settlement = sweep_account.settle(
+            funding_instrument=bank_account.href,
+            appears_on_statement_as="Settlement Oct",
+            description="Settlement for payouts from October")
+        self.assertEqual(sweep_account.balance, 0)
 
 
 class Rev0URIBasicUseCases(unittest.TestCase):

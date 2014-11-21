@@ -602,10 +602,10 @@ class Account(FundingInstrument):
 
     uri_gen = wac.URIGen('/accounts', '{account}')
 
-    def settle(self, destination, **kwargs):
+    def settle(self, funding_instrument, **kwargs):
         return Settlement(
             href=self.settlements.href,
-            destination=destination,
+            funding_instrument=funding_instrument,
             **kwargs
         )
 
