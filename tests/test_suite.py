@@ -511,7 +511,7 @@ class BasicUseCases(unittest.TestCase):
         card = balanced.Card(**INTERNATIONAL_CARD).save()
 
         order.debit_from(source=card, amount=1234)
-        sweep_account = merchant.account
+        sweep_account = merchant.sweep_account
         self.assertEqual(sweep_account.balance, 0)
         account_credit = sweep_account.credit(amount=1234, order=order.href,
                                               appears_on_statement_as='Payout')
@@ -522,7 +522,7 @@ class BasicUseCases(unittest.TestCase):
     def test_accounts_transfer_from_multiple_orders(self):
         merchant = balanced.Customer().save()
         card = balanced.Card(**INTERNATIONAL_CARD).save()
-        sweep_account = merchant.account
+        sweep_account = merchant.sweep_account
         self.assertEqual(sweep_account.balance, 0)
         amount = 1234
 
@@ -543,7 +543,7 @@ class BasicUseCases(unittest.TestCase):
         card = balanced.Card(**INTERNATIONAL_CARD).save()
 
         order.debit_from(source=card, amount=1234)
-        sweep_account = merchant.account
+        sweep_account = merchant.sweep_account
         account_credit = sweep_account.credit(amount=1234, order=order.href,
                                               appears_on_statement_as='Payout')
         self.assertEqual(sweep_account.balance, 1234)
@@ -570,7 +570,7 @@ class BasicUseCases(unittest.TestCase):
         card = balanced.Card(**INTERNATIONAL_CARD).save()
 
         order.debit_from(source=card, amount=1234)
-        sweep_account = merchant.account
+        sweep_account = merchant.sweep_account
         account_credit = sweep_account.credit(amount=1234, order=order.href,
                                               appears_on_statement_as='Payout')
         self.assertEqual(sweep_account.balance, 1234)
@@ -600,7 +600,7 @@ class BasicUseCases(unittest.TestCase):
         card = balanced.Card(**INTERNATIONAL_CARD).save()
 
         order.debit_from(source=card, amount=1234)
-        sweep_account = merchant.account
+        sweep_account = merchant.sweep_account
         account_credit = sweep_account.credit(amount=1234, order=order.href,
                                               appears_on_statement_as='Payout')
         bank_account = balanced.BankAccount(
