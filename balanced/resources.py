@@ -505,6 +505,10 @@ class Customer(Resource):
     def create_order(self, **kwargs):
         return Order(href=self.orders.href, **kwargs).save()
 
+    @property
+    def payable_account(self):
+        return self.accounts.filter(type="payable").first()
+
 
 class Order(Resource):
     """
@@ -618,4 +622,4 @@ class Settlement(Transaction):
 
     type = 'settlements'
 
-    uri_gen = wac.URIGen('/settlementss', '{settlements}')
+    uri_gen = wac.URIGen('/settlements', '{settlements}')
