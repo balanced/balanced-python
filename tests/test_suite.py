@@ -513,11 +513,13 @@ class BasicUseCases(unittest.TestCase):
         order.debit_from(source=card, amount=1234)
         payable_account = merchant.payable_account
         self.assertEqual(payable_account.balance, 0)
-        account_credit = payable_account.credit(amount=1234, order=order.href,
-                                              appears_on_statement_as='Payout')
+        account_credit = payable_account.credit(
+            amount=1234, order=order.href,
+            appears_on_statement_as='Payout')
+        payable_account = merchant.payable_account
         self.assertEqual(account_credit.status, 'succeeded')
         self.assertEqual(payable_account.balance, 1234)
-        self.assertEqual(account_credit.account_credit, 'Payout')
+        self.assertEqual(account_credit.appears_on_statement_as, 'Payout')
 
     def test_accounts_transfer_from_multiple_orders(self):
         merchant = balanced.Customer().save()
@@ -530,11 +532,13 @@ class BasicUseCases(unittest.TestCase):
         order_one.debit_from(source=card, amount=amount)
         account_credit_one = payable_account.credit(amount=amount,
                                                   order=order_one.href)
+        payable_account = merchant.payable_account
         self.assertEqual(payable_account.balance, amount)
         order_two = merchant.create_order()
         order_two.debit_from(source=card, amount=amount)
         account_credit_two = payable_account.credit(amount=amount,
                                                   order=order_two.href)
+        payable_account = merchant.payable_account
         self.assertEqual(payable_account.balance, amount*2)
 
     def test_settlement(self):
@@ -544,8 +548,9 @@ class BasicUseCases(unittest.TestCase):
 
         order.debit_from(source=card, amount=1234)
         payable_account = merchant.payable_account
-        account_credit = payable_account.credit(amount=1234, order=order.href,
-                                              appears_on_statement_as='Payout')
+        account_credit = payable_account.credit(
+            amount=1234, order=order.href, appears_on_statement_as='Payout')
+        payable_account = merchant.payable_account
         self.assertEqual(payable_account.balance, 1234)
         bank_account = balanced.BankAccount(
             account_number='1234567890',
@@ -559,9 +564,10 @@ class BasicUseCases(unittest.TestCase):
             appears_on_statement_as="Settlement Oct",
             description="Settlement for payouts from October")
         self.assertEqual(settlement.amount, 1234)
-        self.assertEqual(settlement.appears_on_statement_as, "Settlement Oct")
+        self.assertEqual(settlement.appears_on_statement_as, "BAL*Settlement Oct")
         self.assertEqual(settlement.description,
                          "Settlement for payouts from October")
+        payable_account = merchant.payable_account
         self.assertEqual(payable_account.balance, 0)
 
     def test_reverse_settlement(self):
@@ -573,6 +579,7 @@ class BasicUseCases(unittest.TestCase):
         payable_account = merchant.payable_account
         account_credit = payable_account.credit(amount=1234, order=order.href,
                                               appears_on_statement_as='Payout')
+        payable_account = merchant.payable_account
         self.assertEqual(payable_account.balance, 1234)
 
         bank_account = balanced.BankAccount(
@@ -586,12 +593,19 @@ class BasicUseCases(unittest.TestCase):
             funding_instrument=bank_account.href,
             appears_on_statement_as="Settlement Oct",
             description="Settlement for payouts from October")
+        payable_account = merchant.payable_account
         self.assertEqual(payable_account.balance, 0)
 
-        credit_from_escrow = payable_account.credit(amount=1234)
+        order_two = merchant.create_order()
+        order_two.debit_from(source=card, amount=1234)
+        account_credit_two = payable_account.credit(amount=1234,
+                                                    order=order_two.href)
+
+        payable_account = merchant.payable_account
         self.assertEqual(payable_account.balance, 1234)
 
         account_credit.reverse(amount=1234)
+        payable_account = merchant.payable_account
         self.assertEqual(payable_account.balance, 0)
 
     def test_reverse_settlement_with_negative_account_balance(self):
@@ -614,15 +628,18 @@ class BasicUseCases(unittest.TestCase):
             funding_instrument=bank_account.href,
             appears_on_statement_as="Settlement Oct",
             description="Settlement for payouts from October")
+        payable_account = merchant.payable_account
         self.assertEqual(payable_account.balance, 0)
 
         account_credit.reverse(amount=1234)
+        payable_account = merchant.payable_account
         self.assertEqual(payable_account.balance, -1234)
 
         settlement = payable_account.settle(
             funding_instrument=bank_account.href,
             appears_on_statement_as="Settlement Oct",
             description="Settlement for payouts from October")
+        payable_account = merchant.payable_account
         self.assertEqual(payable_account.balance, 0)
 
 

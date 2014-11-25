@@ -507,7 +507,7 @@ class Customer(Resource):
 
     @property
     def payable_account(self):
-        return self.accounts.filter(type="payable").first()
+        return self.accounts.filter(account_type="payable").first()
 
 
 class Order(Resource):
@@ -611,7 +611,7 @@ class Account(FundingInstrument):
             href=self.settlements.href,
             funding_instrument=funding_instrument,
             **kwargs
-        )
+        ).save()
 
 
 class Settlement(Transaction):
