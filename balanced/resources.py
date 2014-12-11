@@ -507,7 +507,7 @@ class Customer(Resource):
 
     @property
     def payable_account(self):
-        return self.accounts.filter(account_type="payable").first()
+        return self.accounts.filter(type="payable").first()
 
 
 class Order(Resource):
