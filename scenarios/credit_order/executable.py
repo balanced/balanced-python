@@ -1,9 +1,9 @@
 import balanced
 
-balanced.configure('ak-test-1o9QKwUCrwstHWO5sGxICtIJdQXFTjnrV')
+balanced.configure('ak-test-2wIOi20ITgc1u1Lw6UM3y5ZZjZ66M8HMf')
 
-order = balanced.Order.fetch('/orders/OR5EZkSOSTsmYJlJi6UlrUmp')
-bank_account = balanced.BankAccount.fetch('/bank_accounts/BA3bgtBxC3q4N9QvlN2jqFnL/credits')
+order = balanced.Order.fetch('/orders/OR483MoeOnJEXwkxqoPdnDF3')
+bank_account = balanced.BankAccount.fetch('/bank_accounts/BA4UZsYXpf2BX97v5WPaT57O/credits')
 order.credit_to(
     amount=5000,
     destination=bank_account

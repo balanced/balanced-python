@@ -3,10 +3,10 @@ balanced.Card().associate_to_customer()
 % elif mode == 'request':
 import balanced
 
-balanced.configure('ak-test-1o9QKwUCrwstHWO5sGxICtIJdQXFTjnrV')
+balanced.configure('ak-test-2wIOi20ITgc1u1Lw6UM3y5ZZjZ66M8HMf')
 
-card = balanced.Card.fetch('/cards/CC526JELNk4pET43bVu6rGkZ')
-card.associate_to_customer('/customers/CU36bqPshRNopkLNM6qBmn5e')
+card = balanced.Card.fetch('/cards/CC5OFIKHlTTxx8uysB8woICs')
+card.associate_to_customer('/customers/CU42QGL6X08UHbQnRqgCNtKg')
 % elif mode == 'response':
-Card(links={u'customer': u'CU36bqPshRNopkLNM6qBmn5e'}, cvv_result=u'Match', number=u'xxxxxxxxxxxx5100', expiration_month=12, href=u'/cards/CC526JELNk4pET43bVu6rGkZ', type=u'credit', id=u'CC526JELNk4pET43bVu6rGkZ', category=u'other', is_verified=True, cvv_match=u'yes', bank_name=u'BANK OF HAWAII', avs_street_match=None, brand=u'MasterCard', updated_at=u'2014-09-02T18:26:25.351591Z', fingerprint=u'fc4ccd5de54f42a5e75f76fbfde60948440c7a382ee7d21b2bc509ab9cfed788', can_debit=True, name=None, expiration_year=2020, cvv=u'xxx', avs_postal_match=None, avs_result=None, can_credit=False, meta={}, created_at=u'2014-09-02T18:26:24.764778Z', address={u'city': None, u'line2': None, u'line1': None, u'state': None, u'postal_code': None, u'country_code': None})
+Card(links={u'customer': u'CU42QGL6X08UHbQnRqgCNtKg'}, cvv_result=None, number=u'xxxxxxxxxxxx1118', expiration_month=5, href=u'/cards/CC5OFIKHlTTxx8uysB8woICs', type=u'debit', id=u'CC5OFIKHlTTxx8uysB8woICs', category=u'other', is_verified=True, cvv_match=None, bank_name=u'WELLS FARGO BANK, N.A.', avs_street_match=None, brand=u'Visa', updated_at=u'2014-12-17T00:38:12.795115Z', fingerprint=u'7dc93d35b59078a1da8e0ebd2cbec65a6ca205760a1be1b90a143d7f2b00e355', can_debit=True, name=u'Johannes Bach', expiration_year=2020, cvv=None, avs_postal_match=None, avs_result=None, can_credit=True, meta={}, created_at=u'2014-12-17T00:38:12.316774Z', address={u'city': None, u'line2': None, u'line1': None, u'state': None, u'postal_code': None, u'country_code': None})
 % endif
