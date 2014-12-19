@@ -505,6 +505,10 @@ class Customer(Resource):
     def create_order(self, **kwargs):
         return Order(href=self.orders.href, **kwargs).save()
 
+    @property
+    def payable_account(self):
+        return self.accounts.filter(type="payable").first()
+
 
 class Order(Resource):
     """
@@ -590,3 +594,32 @@ class ExternalAccount(FundingInstrument):
     type = 'external_accounts'
 
     uri_gen = wac.URIGen('/external_accounts', '{external_account}')
+
+
+class Account(FundingInstrument):
+    """
+    An Account is a way to transfer funds from multiple Orders into one place,
+    which can later be bulk credited out.
+    """
+
+    type = 'accounts'
+
+    uri_gen = wac.URIGen('/accounts', '{account}')
+
+    def settle(self, funding_instrument, **kwargs):
+        return Settlement(
+            href=self.settlements.href,
+            funding_instrument=funding_instrument,
+            **kwargs
+        ).save()
+
+
+class Settlement(Transaction):
+    """
+    A Settlement is the action of moving money out of an Account to a
+    bank account.
+    """
+
+    type = 'settlements'
+
+    uri_gen = wac.URIGen('/settlements', '{settlements}')

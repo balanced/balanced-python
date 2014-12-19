@@ -10,12 +10,13 @@ from balanced.resources import (
     Transaction, BankAccount, Card, Dispute,
     Callback, Event, EventCallback, EventCallbackLog,
     BankAccountVerification, Customer, Order,
-    ExternalAccount
+    ExternalAccount, Account, Settlement
 )
 from balanced import exc
 
 
 __all__ = [
+    Account.__name__,
     APIKey.__name__,
     BankAccount.__name__,
     BankAccountVerification.__name__,
@@ -34,6 +35,7 @@ __all__ = [
     Resource.__name__,
     Refund.__name__,
     Reversal.__name__,
+    Settlement.__name__,
     Transaction.__name__,
     ExternalAccount.__name__,
     str(exc.__name__.partition('.')[-1])

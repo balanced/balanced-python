@@ -476,7 +476,6 @@ class BasicUseCases(unittest.TestCase):
         self.assertEqual(dispute.reason, 'fraud')
         self.assertEqual(dispute.transaction.id, debit.id)
 
-
     def test_external_accounts(self):
         external_account = balanced.ExternalAccount(
             token='123123123',
@@ -504,6 +503,141 @@ class BasicUseCases(unittest.TestCase):
         card = balanced.Card.get(card.href)
         self.assertIsNotNone(card.customer)
         self.assertTrue(isinstance(card.customer, balanced.Customer))
+
+    def test_accounts_credit(self):
+        merchant = balanced.Customer().save()
+        order = merchant.create_order()
+        card = balanced.Card(**INTERNATIONAL_CARD).save()
+
+        order.debit_from(source=card, amount=1234)
+        payable_account = merchant.payable_account
+        self.assertEqual(payable_account.balance, 0)
+        account_credit = payable_account.credit(
+            amount=1234, order=order.href,
+            appears_on_statement_as='Payout')
+        payable_account = merchant.payable_account
+        self.assertEqual(account_credit.status, 'succeeded')
+        self.assertEqual(payable_account.balance, 1234)
+        self.assertEqual(account_credit.appears_on_statement_as, 'Payout')
+
+    def test_accounts_credit_from_multiple_orders(self):
+        merchant = balanced.Customer().save()
+        card = balanced.Card(**INTERNATIONAL_CARD).save()
+        payable_account = merchant.payable_account
+        self.assertEqual(payable_account.balance, 0)
+        amount = 1234
+
+        order_one = merchant.create_order()
+        order_one.debit_from(source=card, amount=amount)
+        payable_account.credit(amount=amount, order=order_one.href)
+        payable_account = merchant.payable_account
+        self.assertEqual(payable_account.balance, amount)
+        order_two = merchant.create_order()
+        order_two.debit_from(source=card, amount=amount)
+        payable_account.credit(amount=amount, order=order_two.href)
+        payable_account = merchant.payable_account
+        self.assertEqual(payable_account.balance, amount*2)
+
+    def test_settlement(self):
+        merchant = balanced.Customer().save()
+        order = merchant.create_order()
+        card = balanced.Card(**INTERNATIONAL_CARD).save()
+
+        order.debit_from(source=card, amount=1234)
+        payable_account = merchant.payable_account
+        payable_account.credit(
+            amount=1234, order=order.href, appears_on_statement_as='Payout')
+        payable_account = merchant.payable_account
+        self.assertEqual(payable_account.balance, 1234)
+        bank_account = balanced.BankAccount(
+            account_number='1234567890',
+            routing_number='321174851',
+            name='Someone',
+            ).save()
+        bank_account.associate_to_customer(merchant)
+
+        settlement = payable_account.settle(
+            funding_instrument=bank_account.href,
+            appears_on_statement_as="Settlement Oct",
+            description="Settlement for payouts from October")
+        self.assertEqual(settlement.amount, 1234)
+        self.assertEqual(settlement.appears_on_statement_as,
+                         "BAL*Settlement Oct")
+        self.assertEqual(settlement.description,
+                         "Settlement for payouts from October")
+        payable_account = merchant.payable_account
+        self.assertEqual(payable_account.balance, 0)
+
+    def test_settle_reverse_account_credit(self):
+        merchant = balanced.Customer().save()
+        order = merchant.create_order()
+        card = balanced.Card(**INTERNATIONAL_CARD).save()
+
+        order.debit_from(source=card, amount=1234)
+        payable_account = merchant.payable_account
+        account_credit = payable_account.credit(
+            amount=1234, order=order.href, appears_on_statement_as='Payout')
+        payable_account = merchant.payable_account
+        self.assertEqual(payable_account.balance, 1234)
+
+        bank_account = balanced.BankAccount(
+            account_number='1234567890',
+            routing_number='321174851',
+            name='Someone',
+            ).save()
+        bank_account.associate_to_customer(merchant)
+
+        payable_account.settle(
+            funding_instrument=bank_account.href,
+            appears_on_statement_as="Settlement Oct",
+            description="Settlement for payouts from October")
+        payable_account = merchant.payable_account
+        self.assertEqual(payable_account.balance, 0)
+
+        order_two = merchant.create_order()
+        order_two.debit_from(source=card, amount=1234)
+        payable_account.credit(amount=1234, order=order_two.href)
+
+        payable_account = merchant.payable_account
+        self.assertEqual(payable_account.balance, 1234)
+
+        account_credit.reverse(amount=1234)
+        payable_account = merchant.payable_account
+        self.assertEqual(payable_account.balance, 0)
+
+    def test_settle_account_negative_balance(self):
+        merchant = balanced.Customer().save()
+        order = merchant.create_order()
+        card = balanced.Card(**INTERNATIONAL_CARD).save()
+
+        order.debit_from(source=card, amount=1234)
+        payable_account = merchant.payable_account
+        account_credit = payable_account.credit(
+            amount=1234, order=order.href, appears_on_statement_as='Payout')
+        bank_account = balanced.BankAccount(
+            account_number='1234567890',
+            routing_number='321174851',
+            name='Someone',
+            ).save()
+        bank_account.associate_to_customer(merchant)
+
+        payable_account.settle(
+            funding_instrument=bank_account.href,
+            appears_on_statement_as="Settlement Oct",
+            description="Settlement for payouts from October")
+        payable_account = merchant.payable_account
+        self.assertEqual(payable_account.balance, 0)
+
+        account_credit.reverse(amount=1234)
+        payable_account = merchant.payable_account
+        self.assertEqual(payable_account.balance, -1234)
+
+        payable_account.settle(
+            funding_instrument=bank_account.href,
+            appears_on_statement_as="Settlement Oct",
+            description="Settlement for payouts from October")
+        payable_account = merchant.payable_account
+        self.assertEqual(payable_account.balance, 0)
 
 
 class Rev0URIBasicUseCases(unittest.TestCase):
