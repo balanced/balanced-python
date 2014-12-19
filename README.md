@@ -2,7 +2,7 @@
 
 Online Marketplace Payments
 
-[![Build Status](https://secure.travis-ci.org/balanced/balanced-python.png?branch=master)](http://travis-ci.org/balanced/balanced-python)
+[![Build Status](https://secure.travis-ci.org/balanced/balanced-python.png?branch=master)](http://travis-ci.org/balanced/balanced-python) [![Latest Version](https://pypip.in/version/balanced/badge.svg)](https://pypi.python.org/pypi/balanced/) [![Downloads](https://pypip.in/download/balanced/badge.svg)](https://pypi.python.org/pypi/balanced/) [![Supported Python versions](https://pypip.in/py_versions/balanced/badge.svg)](https://pypi.python.org/pypi/balanced/) [![License](https://pypip.in/license/balanced/badge.svg)](https://pypi.python.org/pypi/balanced/)
 
 **v1.x requires Balanced API 1.1. Use [v0.x](https://github.com/balanced/balanced-python/tree/rev0) for Balanced API 1.0.**
 

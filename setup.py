@@ -67,7 +67,7 @@ setup(
     name='balanced',
     version=VERSION,
     url='https://balancedpayments.com/',
-    license='BSD',
+    license='MIT License',
     author='Balanced',
     author_email='dev@balancedpayments.com',
     description='Payments platform for marketplaces',
@@ -78,7 +78,7 @@ setup(
     dependency_links=parse_dependency_links('requirements.txt'),
     classifiers=[
         'Intended Audience :: Developers',
-        'License :: OSI Approved :: BSD License',
+        'License :: OSI Approved :: MIT License',
         'Programming Language :: Python',
         'Topic :: Software Development :: Libraries :: Python Modules',
     ],
