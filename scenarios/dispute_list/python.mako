@@ -3,7 +3,7 @@ balanced.Dispute.query
 % elif mode == 'request':
 import balanced
 
-balanced.configure('ak-test-aUV295IugdhWSNx2JFckYBCSvfY2ibgq')
+balanced.configure('ak-test-1xLFE6RLC1W3P4ePiQDI4UVpRwtKcdfqL')
 
 disputes = balanced.Dispute.query
 % elif mode == 'response':

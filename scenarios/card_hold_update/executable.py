@@ -1,8 +1,8 @@
 import balanced
 
-balanced.configure('ak-test-25ZY8HQwZPuQtDecrxb671LilUya5t5G0')
+balanced.configure('ak-test-1xLFE6RLC1W3P4ePiQDI4UVpRwtKcdfqL')
 
-card_hold = balanced.CardHold.fetch('/card_holds/HL2F8jlnySjVKidwfXgBYZMY')
+card_hold = balanced.CardHold.fetch('/card_holds/HL3QlUen3sZjc3dPbgK40F7G')
 card_hold.description = 'update this description'
 card_hold.meta = {
   'holding.for': 'user1',

@@ -1,9 +1,9 @@
 import balanced
 
-balanced.configure('ak-test-25ZY8HQwZPuQtDecrxb671LilUya5t5G0')
+balanced.configure('ak-test-1xLFE6RLC1W3P4ePiQDI4UVpRwtKcdfqL')
 
-order = balanced.Order.fetch('/orders/OR2UWXCNY2nKlqIQhQhWN3Jm')
-card = balanced.Card.fetch('/cards/CC33DRVrekWpiHYjxSdVuqWc')
+order = balanced.Order.fetch('/orders/OR2JfBYxYlDAF3L48u9DtIEU')
+card = balanced.Card.fetch('/cards/CC48j1De9eVYELLivrgDeCM8')
 order.debit_from(
     amount=5000,
     source=card,

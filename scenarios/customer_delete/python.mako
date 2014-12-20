@@ -3,9 +3,9 @@ balanced.Customer().unstore()
 % elif mode == 'request':
 import balanced
 
-balanced.configure('ak-test-aUV295IugdhWSNx2JFckYBCSvfY2ibgq')
+balanced.configure('ak-test-1xLFE6RLC1W3P4ePiQDI4UVpRwtKcdfqL')
 
-customer = balanced.Customer.fetch('/customers/CUxN95d3eKLokMS6CymVtIB')
+customer = balanced.Customer.fetch('/customers/CU4CZc7Xjn8gGJXl1LyzZk7S')
 customer.unstore()
 % elif mode == 'response':
 

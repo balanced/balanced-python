@@ -4,7 +4,7 @@ balanced.Debit.query
 % elif mode == 'request':
 import balanced
 
-balanced.configure('ak-test-aUV295IugdhWSNx2JFckYBCSvfY2ibgq')
+balanced.configure('ak-test-1xLFE6RLC1W3P4ePiQDI4UVpRwtKcdfqL')
 
 debits = balanced.Debit.query
 % elif mode == 'response':
