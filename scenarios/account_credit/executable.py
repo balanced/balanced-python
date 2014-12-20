@@ -1,11 +1,11 @@
 import balanced
 
-balanced.configure('ak-test-2wIOi20ITgc1u1Lw6UM3y5ZZjZ66M8HMf')
+balanced.configure('ak-test-1xLFE6RLC1W3P4ePiQDI4UVpRwtKcdfqL')
 
-payable_account = balanced.Account.fetch('/accounts/AT43cMKrvwKEJnV5qX8wCqY0')
+payable_account = balanced.Account.fetch('/accounts/AT2E6Ju62P9AnTJwe0fL5kOI')
 payable_account.credit(
   appears_on_statement_as='ThingsCo',
   amount=1000,
   description='A simple credit',
-  order='/orders/OR483MoeOnJEXwkxqoPdnDF3'meta[rating]=8,
+  order='/orders/OR2JfBYxYlDAF3L48u9DtIEU'meta[rating]=8,
 )

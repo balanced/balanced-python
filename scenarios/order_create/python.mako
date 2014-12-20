@@ -3,12 +3,12 @@ balanced.Order()
 % elif mode == 'request':
 import balanced
 
-balanced.configure('ak-test-2wIOi20ITgc1u1Lw6UM3y5ZZjZ66M8HMf')
+balanced.configure('ak-test-1xLFE6RLC1W3P4ePiQDI4UVpRwtKcdfqL')
 
-merchant_customer = balanced.Customer.fetch('/customers/CU6sIkS1KUtHVoPUBM1Gf72B')
+merchant_customer = balanced.Customer.fetch('/customers/CU4CZc7Xjn8gGJXl1LyzZk7S')
 merchant_customer.create_order(
   description='Order #12341234'
 ).save()
 % elif mode == 'response':
-Order(delivery_address={u'city': None, u'line2': None, u'line1': None, u'state': None, u'postal_code': None, u'country_code': None}, description=u'Order #12341234', links={u'merchant': u'CU6sIkS1KUtHVoPUBM1Gf72B'}, created_at=u'2014-12-17T00:41:23.181803Z', updated_at=u'2014-12-17T00:41:23.181805Z', currency=u'USD', amount=0, href=u'/orders/OR1ugPYIQ94wAaS439i25QVL', meta={}, id=u'OR1ugPYIQ94wAaS439i25QVL', amount_escrowed=0)
+Order(delivery_address={u'city': None, u'line2': None, u'line1': None, u'state': None, u'postal_code': None, u'country_code': None}, description=u'Order #12341234', links={u'merchant': u'CU4CZc7Xjn8gGJXl1LyzZk7S'}, created_at=u'2014-12-18T18:23:07.277803Z', updated_at=u'2014-12-18T18:23:07.277804Z', currency=u'USD', amount=0, href=u'/orders/OR5e6wrps4tp9QarDxWa01O5', meta={}, id=u'OR5e6wrps4tp9QarDxWa01O5', amount_escrowed=0)
 % endif

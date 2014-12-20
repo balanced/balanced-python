@@ -4,9 +4,9 @@ balanced.Dispute.fetch()
 % elif mode == 'request':
 import balanced
 
-balanced.configure('ak-test-2wIOi20ITgc1u1Lw6UM3y5ZZjZ66M8HMf')
+balanced.configure('ak-test-1xLFE6RLC1W3P4ePiQDI4UVpRwtKcdfqL')
 
-dispute = balanced.Dispute.fetch('/disputes/DT77EXjNYPh6qd8xErxOhHao')
+dispute = balanced.Dispute.fetch('/disputes/DT4WXjGGzPSsqYuPfWaKHDsf')
 % elif mode == 'response':
-Dispute(status=u'pending', links={u'transaction': u'WD6NY7W6uBFngNyBLqyhPBPv'}, respond_by=u'2015-01-16T00:37:26.830823Z', amount=5000, created_at=u'2014-12-17T00:39:24.356634Z', updated_at=u'2014-12-17T00:39:24.356636Z', initiated_at=u'2014-12-17T00:37:26.830821Z', currency=u'USD', reason=u'fraud', href=u'/disputes/DT77EXjNYPh6qd8xErxOhHao', meta={}, id=u'DT77EXjNYPh6qd8xErxOhHao')
+Dispute(status=u'pending', links={u'transaction': u'WD4QE0i532v0eWQ6mCWCASc5'}, respond_by=u'2015-01-17T18:21:02.819478Z', amount=5000, created_at=u'2014-12-18T18:22:52.051775Z', updated_at=u'2014-12-18T18:22:52.051777Z', initiated_at=u'2014-12-18T18:21:02.819475Z', currency=u'USD', reason=u'fraud', href=u'/disputes/DT4WXjGGzPSsqYuPfWaKHDsf', meta={}, id=u'DT4WXjGGzPSsqYuPfWaKHDsf')
 % endif

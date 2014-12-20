@@ -3,9 +3,9 @@ balanced.APIKey()
 % elif mode == 'request':
 import balanced
 
-balanced.configure('ak-test-2wIOi20ITgc1u1Lw6UM3y5ZZjZ66M8HMf')
+balanced.configure('ak-test-1xLFE6RLC1W3P4ePiQDI4UVpRwtKcdfqL')
 
 api_key = balanced.APIKey().save()
 % elif mode == 'response':
-APIKey(links={}, created_at=u'2014-12-17T00:36:44.621325Z', secret=u'ak-test-2zkVyNvJLrBn4mc1udeR9S2CFXCQvzWKN', href=u'/api_keys/AK4e2JjsmVYES9oUwqRYg8hy', meta={}, id=u'AK4e2JjsmVYES9oUwqRYg8hy')
+APIKey(links={}, created_at=u'2014-12-18T18:20:54.950589Z', secret=u'ak-test-2s6vMXj5TtFJzMDptyJufa0QObbpZkWqf', href=u'/api_keys/AK2Phglc8FZEbSJWy3H7UeB7', meta={}, id=u'AK2Phglc8FZEbSJWy3H7UeB7')
 % endif

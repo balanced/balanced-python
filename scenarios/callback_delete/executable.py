@@ -1,6 +1,6 @@
 import balanced
 
-balanced.configure('ak-test-2wIOi20ITgc1u1Lw6UM3y5ZZjZ66M8HMf')
+balanced.configure('ak-test-1xLFE6RLC1W3P4ePiQDI4UVpRwtKcdfqL')
 
-callback = balanced.Callback.fetch('/callbacks/CB52j36ilEVeALiL9ABZ0Jl6')
+callback = balanced.Callback.fetch('/callbacks/CB3BP8jjVy8RBUFdb2fYw0mh')
 callback.unstore()

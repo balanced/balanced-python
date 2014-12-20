@@ -1,3 +1,7 @@
+## 1.2
+
+* Account and Settlement support
+
 ## 1.1.1
 
 * Fix allowing for voiding holds

@@ -3,15 +3,15 @@ balanced.Account.credit()
 % elif mode == 'request':
 import balanced
 
-balanced.configure('ak-test-2wIOi20ITgc1u1Lw6UM3y5ZZjZ66M8HMf')
+balanced.configure('ak-test-1xLFE6RLC1W3P4ePiQDI4UVpRwtKcdfqL')
 
-payable_account = balanced.Account.fetch('/accounts/AT43cMKrvwKEJnV5qX8wCqY0')
+payable_account = balanced.Account.fetch('/accounts/AT2E6Ju62P9AnTJwe0fL5kOI')
 payable_account.credit(
   appears_on_statement_as='ThingsCo',
   amount=1000,
   description='A simple credit',
-  order='/orders/OR483MoeOnJEXwkxqoPdnDF3'meta[rating]=8,
+  order='/orders/OR2JfBYxYlDAF3L48u9DtIEU'meta[rating]=8,
 )
 % elif mode == 'response':
-Credit(status=u'succeeded', description=u'A simple credit', links={u'customer': u'CU42QGL6X08UHbQnRqgCNtKg', u'destination': u'AT43cMKrvwKEJnV5qX8wCqY0', u'order': u'OR483MoeOnJEXwkxqoPdnDF3'}, amount=1000, created_at=u'2014-12-18T18:37:17.500080Z', updated_at=u'2014-12-18T18:37:17.620931Z', failure_reason=None, currency=u'USD', transaction_number=u'CRA2V-TJP-CBO8', href=u'/credits/CR54cX9URL7OXgy3jOxCdgPe', meta={u'rating': u'8'}, failure_reason_code=None, appears_on_statement_as=u'ThingsCo', id=u'CR54cX9URL7OXgy3jOxCdgPe')
+Credit(status=u'succeeded', description=u'A simple credit', links={u'customer': u'CU2DRnwOXfbxBlKb5CUWwWJi', u'destination': u'AT2E6Ju62P9AnTJwe0fL5kOI', u'order': u'OR2JfBYxYlDAF3L48u9DtIEU'}, amount=1000, created_at=u'2014-12-19T19:33:31.202845Z', updated_at=u'2014-12-19T19:33:31.295273Z', failure_reason=None, currency=u'USD', transaction_number=u'CR77S-5TO-YRYQ', href=u'/credits/CR5bM6mv38qwW1NEo0ssJTiR', meta={u'rating': u'8'}, failure_reason_code=None, appears_on_statement_as=u'ThingsCo', id=u'CR5bM6mv38qwW1NEo0ssJTiR')
 % endif

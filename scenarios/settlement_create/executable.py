@@ -1,10 +1,10 @@
 import balanced
 
-balanced.configure('ak-test-2wIOi20ITgc1u1Lw6UM3y5ZZjZ66M8HMf')
+balanced.configure('ak-test-1xLFE6RLC1W3P4ePiQDI4UVpRwtKcdfqL')
 
-payable_account = balanced.Account.fetch('/accounts/AT43cMKrvwKEJnV5qX8wCqY0')
+payable_account = balanced.Account.fetch('/accounts/AT2E6Ju62P9AnTJwe0fL5kOI')
 payable_account.settle(
   appears_on_statement_as='ThingsCo',
-  funding_instrument='/bank_accounts/BA4UZsYXpf2BX97v5WPaT57O',
+  funding_instrument='/bank_accounts/BA3uzbngfVXy1SGg25Et7iKY',
   description='Payout A'meta[group]='alpha',
 )

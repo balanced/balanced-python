@@ -1,8 +1,8 @@
 import balanced
 
-balanced.configure('ak-test-2wIOi20ITgc1u1Lw6UM3y5ZZjZ66M8HMf')
+balanced.configure('ak-test-1xLFE6RLC1W3P4ePiQDI4UVpRwtKcdfqL')
 
-debit = balanced.Debit.fetch('/debits/WD6wpBAzwRyTIEdqkKgUSLHa')
+debit = balanced.Debit.fetch('/debits/WD4FfxxWRRcrlCsGEPti58RT')
 debit.description = 'New description for debit'
 debit.meta = {
   'facebook.id': '1234567890',
