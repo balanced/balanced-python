@@ -1,5 +1,5 @@
 import balanced
 
-balanced.configure('ak-test-1xLFE6RLC1W3P4ePiQDI4UVpRwtKcdfqL')
+balanced.configure('ak-test-2eKlj1ZDfAcZSARMf3NMhBHywDej0avSY')
 
-account = balanced.Account.fetch('/accounts/AT2t2NS6otEMnPT0jVuRAE6Y')
+account = balanced.Account.fetch('/accounts/AT2V7l4MoUJH8xDse641Xqog')

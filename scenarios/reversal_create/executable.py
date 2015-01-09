@@ -1,8 +1,8 @@
 import balanced
 
-balanced.configure('ak-test-1xLFE6RLC1W3P4ePiQDI4UVpRwtKcdfqL')
+balanced.configure('ak-test-2eKlj1ZDfAcZSARMf3NMhBHywDej0avSY')
 
-credit = balanced.Credit.fetch('/credits/CR5pb9ux8RYVNTwcJ3jdVF84')
+credit = balanced.Credit.fetch('/credits/CR6zeufmfv0u1KHrUBCQtAgU')
 reversal = credit.reverse(
     amount=3000,
     description="Reversal for Order #1111",

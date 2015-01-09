@@ -4,9 +4,9 @@ balanced.Settlement.query
 % elif mode == 'request':
 import balanced
 
-balanced.configure('ak-test-1xLFE6RLC1W3P4ePiQDI4UVpRwtKcdfqL')
+balanced.configure('ak-test-2eKlj1ZDfAcZSARMf3NMhBHywDej0avSY')
 
-account = balanced.Account.fetch('/accounts/AT2E6Ju62P9AnTJwe0fL5kOI')
+account = balanced.Account.fetch('/accounts/AT3ogJE07IErLJYR510QO6sM')
 account.settlements
 % elif mode == 'response':
 

@@ -1,8 +1,8 @@
 import balanced
 
-balanced.configure('ak-test-1xLFE6RLC1W3P4ePiQDI4UVpRwtKcdfqL')
+balanced.configure('ak-test-2eKlj1ZDfAcZSARMf3NMhBHywDej0avSY')
 
-merchant_customer = balanced.Customer.fetch('/customers/CU4CZc7Xjn8gGJXl1LyzZk7S')
+merchant_customer = balanced.Customer.fetch('/customers/CU5AxbQrjAcjsbquafnvwaas')
 merchant_customer.create_order(
   description='Order #12341234'
 ).save()

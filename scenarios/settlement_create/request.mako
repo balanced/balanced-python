@@ -3,5 +3,11 @@
 
 payable_account = balanced.Account.fetch('${request['href']}')
 payable_account.settle(
-  <% main.payload_expand(request['payload']) %>
+  appears_on_statement_as='${request['payload']['appears_on_statement_as']}',
+  funding_instrument='${request['payload']['funding_instrument']}',
+  description='${request['payload']['description']}',
+  meta={
+    'group': '${request['payload']['meta']['group']}'
+  }
+)
 )
