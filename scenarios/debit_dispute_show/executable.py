@@ -1,6 +1,6 @@
 import balanced
 
-balanced.configure('ak-test-1xLFE6RLC1W3P4ePiQDI4UVpRwtKcdfqL')
+balanced.configure('ak-test-2eKlj1ZDfAcZSARMf3NMhBHywDej0avSY')
 
-debit = balanced.Debit.fetch('/debits/WD4QE0i532v0eWQ6mCWCASc5')
+debit = balanced.Debit.fetch('/debits/WD5SwXr9jcCfCmmjTH5MCMFD')
 dispute = debit.dispute

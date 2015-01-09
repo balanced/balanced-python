@@ -3,14 +3,18 @@ balanced.Account.settle()
 % elif mode == 'request':
 import balanced
 
-balanced.configure('ak-test-1xLFE6RLC1W3P4ePiQDI4UVpRwtKcdfqL')
+balanced.configure('ak-test-2eKlj1ZDfAcZSARMf3NMhBHywDej0avSY')
 
-payable_account = balanced.Account.fetch('/accounts/AT2E6Ju62P9AnTJwe0fL5kOI')
+payable_account = balanced.Account.fetch('/accounts/AT3ogJE07IErLJYR510QO6sM')
 payable_account.settle(
   appears_on_statement_as='ThingsCo',
-  funding_instrument='/bank_accounts/BA3uzbngfVXy1SGg25Et7iKY',
-  description='Payout A'meta[group]='alpha',
+  funding_instrument='/bank_accounts/BA45anEaEr8g0lOhzhcE9VAN',
+  description='Payout A',
+  meta={
+    'group': 'alpha'
+  }
+)
 )
 % elif mode == 'response':
-Settlement(status=u'pending', description=u'Payout A', links={u'source': u'AT2E6Ju62P9AnTJwe0fL5kOI', u'destination': u'BA3uzbngfVXy1SGg25Et7iKY'}, amount=2000, created_at=u'2014-12-19T19:33:49.449170Z', updated_at=u'2014-12-19T19:33:49.876379Z', failure_reason=None, currency=u'USD', transaction_number=u'SCJZG-O1U-9EMP', href=u'/settlements/ST5wi3VdOdaA9HrMpFsJnabr', meta={u'group': u'alpha'}, failure_reason_code=None, appears_on_statement_as=u'BAL*ThingsCo', id=u'ST5wi3VdOdaA9HrMpFsJnabr')
+Settlement(status=u'pending', description=u'Payout A', links={u'source': u'AT3ogJE07IErLJYR510QO6sM', u'destination': u'BA45anEaEr8g0lOhzhcE9VAN'}, amount=1000, created_at=u'2015-01-09T03:25:48.587751Z', updated_at=u'2015-01-09T03:25:48.946792Z', failure_reason=None, currency=u'USD', transaction_number=u'SCRGN-RWP-FFSL', href=u'/settlements/ST6HmBuLJSEa82oUwId1AShW', meta={u'group': u'alpha'}, failure_reason_code=None, appears_on_statement_as=u'BAL*ThingsCo', id=u'ST6HmBuLJSEa82oUwId1AShW')
 % endif

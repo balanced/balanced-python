@@ -1,8 +1,8 @@
 import balanced
 
-balanced.configure('ak-test-1xLFE6RLC1W3P4ePiQDI4UVpRwtKcdfqL')
+balanced.configure('ak-test-2eKlj1ZDfAcZSARMf3NMhBHywDej0avSY')
 
-card = balanced.Card.fetch('/cards/CC4PUCBUQfNqecW8QDsjnOfz')
+card = balanced.Card.fetch('/cards/CC5RRvpnZIg0PWdSphR8xxPa')
 card.debit(
   appears_on_statement_as='Statement text',
   amount=5000,
