@@ -695,7 +695,7 @@ class Rev0URIBasicUseCases(unittest.TestCase):
             yield pattern.format(**args)
 
     def assert_not_rev0(self, resource):
-        """Ensures the given resouce is not in revision 0 format
+        """Ensures the given resource is not in revision 0 format
 
         """
         self.assert_(not hasattr(resource, '_uris'))
